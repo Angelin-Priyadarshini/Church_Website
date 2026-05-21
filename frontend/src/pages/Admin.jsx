@@ -3,8 +3,22 @@ import { useAuth } from '../context/AuthContext';
 import { API_BASE } from '../config';
 import { 
   Lock, RefreshCw, BarChart2, Users, Calendar, 
-  HeartHandshake, Check, Trash2, ArrowUpRight, HelpCircle 
+  HeartHandshake, Check, Trash2, ArrowUpRight, HelpCircle,
+  Plus, Video
 } from 'lucide-react';
+
+// Custom SVG YouTube Icon component to avoid lucide-react export mismatches
+const YoutubeIcon = (props) => (
+  <svg 
+    viewBox="0 0 24 24" 
+    width="24" 
+    height="24" 
+    fill="currentColor" 
+    className={props.className}
+  >
+    <path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.108C19.53 3.5 12 3.5 12 3.5s-7.53 0-9.388.555A3.003 3.003 0 0 0 .502 6.163C0 8.07 0 12 0 12s0 3.93.502 5.837a3.003 3.003 0 0 0 2.11 2.108C4.47 20.5 12 20.5 12 20.5s7.53 0 9.388-.555a3.003 3.003 0 0 0 2.11-2.108C24 15.93 24 12 24 12s0-3.93-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+  </svg>
+);
 
 const Admin = () => {
   const { user, token, login, logout, isModerator } = useAuth();
@@ -27,6 +41,25 @@ const Admin = () => {
   const [syncMessage, setSyncMessage] = useState('');
   const [actionError, setActionError] = useState('');
 
+  // Sermons Management State
+  const [sermons, setSermons] = useState([]);
+  const [sermonSearch, setSermonSearch] = useState('');
+  const [sermonCategoryFilter, setSermonCategoryFilter] = useState('');
+  const [sermonPreacherFilter, setSermonPreacherFilter] = useState('');
+  
+  // Manual Add Form State
+  const [newSermon, setNewSermon] = useState({
+    title: '',
+    youtube_video_id: '',
+    description: '',
+    category: 'Sunday Service',
+    duration: '1:30:00',
+    upload_date: new Date().toISOString().split('T')[0],
+    preacher: 'Pastor Immanuel'
+  });
+  const [formSuccess, setFormSuccess] = useState('');
+  const [formError, setFormError] = useState('');
+  const [isSubmittingSermon, setIsSubmittingSermon] = useState(false);
   const fetchDashboardData = async () => {
     if (!token) return;
 
@@ -48,9 +81,74 @@ const Admin = () => {
       const evtData = await evtRes.json();
       setEvents(evtData);
 
-      // Donations ledger sync removed
+      // 4. Fetch sermons list
+      const srmRes = await fetch(`${API_BASE}/api/services`);
+      const srmData = await srmRes.json();
+      setSermons(srmData);
     } catch (err) {
       console.error('Error fetching dashboard records:', err);
+    }
+  };
+
+  const handleDeleteSermon = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this sermon from the website catalog?')) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/services/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to delete sermon.');
+      }
+      fetchDashboardData();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleAddSermon = async (e) => {
+    e.preventDefault();
+    setFormError('');
+    setFormSuccess('');
+    setIsSubmittingSermon(true);
+
+    if (!newSermon.title || !newSermon.youtube_video_id) {
+      setFormError('Title and YouTube Video ID are required.');
+      setIsSubmittingSermon(false);
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/api/services`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(newSermon)
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to create manual sermon entry.');
+      }
+
+      setFormSuccess('Sermon successfully cataloged manually!');
+      setNewSermon({
+        title: '',
+        youtube_video_id: '',
+        description: '',
+        category: 'Sunday Service',
+        duration: '1:30:00',
+        upload_date: new Date().toISOString().split('T')[0],
+        preacher: 'Pastor Immanuel'
+      });
+      fetchDashboardData();
+    } catch (err) {
+      setFormError(err.message);
+    } finally {
+      setIsSubmittingSermon(false);
     }
   };
 
@@ -319,7 +417,14 @@ const Admin = () => {
             Prayers Queue ({prayers.length})
           </button>
           
-
+          <button 
+            onClick={() => setActiveTab('sermons')}
+            className={`pb-3 text-sm font-bold transition-all relative ${
+              activeTab === 'sermons' ? 'text-amber-600 border-b-2 border-amber-500' : 'text-slate-400 hover:text-slate-700'
+            }`}
+          >
+            Sermons Manager ({sermons.length})
+          </button>
 
           <button 
             onClick={() => setActiveTab('events')}
@@ -420,6 +525,271 @@ const Admin = () => {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* 4. SERMONS MANAGER PANEL */}
+        {activeTab === 'sermons' && (
+          <div className="flex flex-col gap-8 animate-slideup">
+            {/* Top row - Form & instructions */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Manual Add form */}
+              <div className="lg:col-span-2 glass-panel p-6 bg-white border-slate-200 shadow-sm flex flex-col gap-4">
+                <div className="border-b border-slate-100 pb-3 flex items-center gap-2">
+                  <Plus className="w-5 h-5 text-amber-500" />
+                  <h3 className="font-serif font-bold text-lg text-slate-900">Add Sermon Manually</h3>
+                </div>
+
+                <form onSubmit={handleAddSermon} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2">
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Sermon Video Title *</label>
+                    <input 
+                      type="text"
+                      value={newSermon.title}
+                      onChange={(e) => setNewSermon({ ...newSermon, title: e.target.value })}
+                      placeholder="e.g. 24/5/26 | SUNDAY SERVICE | Worship: Bro. Durai | Message: Pastor Immanuel"
+                      className="input-control w-full text-slate-950 bg-white"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">YouTube Video ID *</label>
+                    <input 
+                      type="text"
+                      value={newSermon.youtube_video_id}
+                      onChange={(e) => setNewSermon({ ...newSermon, youtube_video_id: e.target.value })}
+                      placeholder="e.g. pRUBl8hbfWM"
+                      className="input-control w-full text-slate-950 bg-white font-mono"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Sermon Category</label>
+                    <select
+                      value={newSermon.category}
+                      onChange={(e) => setNewSermon({ ...newSermon, category: e.target.value })}
+                      className="input-control w-full text-slate-950 bg-white"
+                    >
+                      <option value="Sunday Service">Sunday Service</option>
+                      <option value="Midweek Prayer">Midweek Prayer</option>
+                      <option value="Sisters Fellowship">Sisters Fellowship</option>
+                      <option value="New Year Service">New Year Service</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Preacher Name</label>
+                    <input 
+                      type="text"
+                      value={newSermon.preacher}
+                      onChange={(e) => setNewSermon({ ...newSermon, preacher: e.target.value })}
+                      placeholder="e.g. Pastor Immanuel"
+                      className="input-control w-full text-slate-950 bg-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Upload Date (YYYY-MM-DD)</label>
+                    <input 
+                      type="date"
+                      value={newSermon.upload_date}
+                      onChange={(e) => setNewSermon({ ...newSermon, upload_date: e.target.value })}
+                      className="input-control w-full text-slate-950 bg-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Video Duration (H:MM:SS)</label>
+                    <input 
+                      type="text"
+                      value={newSermon.duration}
+                      onChange={(e) => setNewSermon({ ...newSermon, duration: e.target.value })}
+                      placeholder="e.g. 2:15:00"
+                      className="input-control w-full text-slate-950 bg-white"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Sermon Description</label>
+                    <textarea 
+                      value={newSermon.description}
+                      onChange={(e) => setNewSermon({ ...newSermon, description: e.target.value })}
+                      placeholder="Enter sermon details or scriptures shared..."
+                      rows="3"
+                      className="input-control w-full text-slate-950 bg-white"
+                    />
+                  </div>
+
+                  {formError && <span className="md:col-span-2 text-xs font-bold text-red-600">{formError}</span>}
+                  {formSuccess && <span className="md:col-span-2 text-xs font-bold text-emerald-600">{formSuccess}</span>}
+
+                  <button 
+                    type="submit"
+                    disabled={isSubmittingSermon}
+                    className="md:col-span-2 btn-primary justify-center w-full py-2.5"
+                  >
+                    {isSubmittingSermon ? 'Saving sermon to catalog...' : 'Add Sermon to Website'}
+                  </button>
+                </form>
+              </div>
+
+              {/* YouTube Instructions card */}
+              <div className="glass-panel p-6 bg-slate-900 border-amber-500/20 text-white shadow-sm flex flex-col justify-between">
+                <div className="flex flex-col gap-4">
+                  <div className="border-b border-white/10 pb-3 flex items-center gap-2">
+                    <YoutubeIcon className="w-5 h-5 text-amber-400" />
+                    <h3 className="font-serif font-bold text-lg text-white">YouTube Integration</h3>
+                  </div>
+
+                  <div className="text-xs leading-relaxed text-slate-300 flex flex-col gap-3">
+                    <p>
+                      The website syncs directly with the Assemblies of God Sharjah Tamil Church official YouTube channel:
+                    </p>
+                    <div className="bg-white/5 border border-white/15 p-2.5 rounded font-mono text-[10px] text-amber-300">
+                      Channel ID: UC510Q7Wp2N7uXpB4R_Z-u5Q
+                    </div>
+
+                    <h4 className="font-bold text-white uppercase tracking-wider text-[10px] mt-2 text-amber-400">
+                      Archive Synchronization (Vercel / Render)
+                    </h4>
+                    <p>
+                      To sync the entire historic sermon catalog (hundreds of broadcasts), add a Google YouTube API key in your server's hosting panel environment variables:
+                    </p>
+                    <ol className="list-decimal pl-4 flex flex-col gap-1.5 text-slate-400">
+                      <li>Go to <a href="https://console.cloud.google.com" target="_blank" rel="noreferrer" className="text-amber-400 underline font-semibold">Google Cloud Console</a></li>
+                      <li>Create a new project & enable the <strong>YouTube Data API v3</strong></li>
+                      <li>Generate a credential <strong>API Key</strong></li>
+                      <li>Add it as <strong>YOUTUBE_API_KEY</strong> in Render / Vercel dashboard settings</li>
+                    </ol>
+                  </div>
+                </div>
+
+                <div className="border-t border-white/10 pt-4 mt-4">
+                  <div className="text-[10px] font-semibold text-slate-400 bg-white/5 p-2 rounded border border-white/5">
+                    💡 <strong>Zero-Config Mode</strong>: If no API key is specified, triggering the sync button pulls the <strong>15 most recent broadcasts</strong> instantly via public RSS.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Filter and Search Bar for table */}
+            <div className="glass-panel p-5 bg-white border-slate-200 flex flex-wrap gap-4 items-center justify-between shadow-sm">
+              <div className="flex-1 min-w-[280px]">
+                <input 
+                  type="text"
+                  placeholder="Filter cached sermons by title keyword..."
+                  value={sermonSearch}
+                  onChange={(e) => setSermonSearch(e.target.value)}
+                  className="input-control w-full text-slate-950 bg-white"
+                />
+              </div>
+
+              <div className="flex flex-wrap gap-3 items-center w-full md:w-auto">
+                <select 
+                  value={sermonCategoryFilter}
+                  onChange={(e) => setSermonCategoryFilter(e.target.value)}
+                  className="input-control py-2 text-sm text-slate-950 bg-white"
+                >
+                  <option value="">All Categories</option>
+                  <option value="Sunday Service">Sunday Service</option>
+                  <option value="Midweek Prayer">Midweek Prayer</option>
+                  <option value="Sisters Fellowship">Sisters Fellowship</option>
+                  <option value="New Year Service">New Year Service</option>
+                </select>
+
+                <select 
+                  value={sermonPreacherFilter}
+                  onChange={(e) => setSermonPreacherFilter(e.target.value)}
+                  className="input-control py-2 text-sm text-slate-950 bg-white"
+                >
+                  <option value="">All Preachers</option>
+                  <option value="Pastor Immanuel">Pastor Immanuel</option>
+                  <option value="Rev. Andrew">Rev. Andrew</option>
+                  <option value="Asst. Past. Paulsamy">Asst. Past. Paulsamy</option>
+                  <option value="Bro. Ruskin">Bro. Ruskin</option>
+                  <option value="Sis. Mary Immanuel">Sis. Mary Immanuel</option>
+                  <option value="Bro. Babu">Bro. Babu</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Sermons Table */}
+            <div className="glass-panel overflow-hidden bg-white border-slate-200 shadow-sm">
+              <table className="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr className="bg-slate-900 text-white font-bold text-xs uppercase tracking-wider">
+                    <th className="p-4 w-[160px]">Sermon Video</th>
+                    <th className="p-4">Title & Details</th>
+                    <th className="p-4">Preacher</th>
+                    <th className="p-4">Upload Date</th>
+                    <th className="p-4 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 font-semibold text-slate-700">
+                  {sermons
+                    .filter((srm) => {
+                      const matchSearch = srm.title.toLowerCase().includes(sermonSearch.toLowerCase());
+                      const matchCat = !sermonCategoryFilter || srm.category === sermonCategoryFilter;
+                      const matchPreach = !sermonPreacherFilter || srm.preacher === sermonPreacherFilter;
+                      return matchSearch && matchCat && matchPreach;
+                    })
+                    .map((srm) => (
+                      <tr key={srm.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="p-4">
+                          <a 
+                            href={`https://www.youtube.com/watch?v=${srm.youtube_video_id}`} 
+                            target="_blank" 
+                            rel="noreferrer"
+                            className="block relative overflow-hidden bg-slate-950 aspect-video rounded border border-slate-200 group shrink-0"
+                          >
+                            <img 
+                              src={`https://img.youtube.com/vi/${srm.youtube_video_id}/mqdefault.jpg`}
+                              alt={srm.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                            <span className="absolute bottom-1 right-1 px-1 py-0.5 rounded bg-black/75 text-white text-[9px] font-bold">
+                              {srm.duration}
+                            </span>
+                          </a>
+                        </td>
+                        <td className="p-4">
+                          <a 
+                            href={`https://www.youtube.com/watch?v=${srm.youtube_video_id}`} 
+                            target="_blank" 
+                            rel="noreferrer"
+                            className="text-slate-900 font-bold hover:text-amber-500 transition-colors line-clamp-2 leading-tight block mb-1"
+                          >
+                            {srm.title}
+                          </a>
+                          <div className="flex gap-2 items-center">
+                            <span className="px-1.5 py-0.5 bg-amber-100 text-amber-800 text-[9px] font-extrabold uppercase rounded">
+                              {srm.category}
+                            </span>
+                            <span className="text-[10px] text-slate-400 font-mono">
+                              ID: {srm.youtube_video_id}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="p-4 text-slate-600 text-xs font-bold">{srm.preacher}</td>
+                        <td className="p-4 text-slate-500 font-mono text-xs">{srm.upload_date}</td>
+                        <td className="p-4">
+                          <div className="flex gap-2 justify-center">
+                            <button 
+                              onClick={() => handleDeleteSermon(srm.id)}
+                              className="p-2 rounded bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition-colors"
+                              title="Delete Sermon from website database cache"
+                            >
+                              <Trash2 className="w-4.5 h-4.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </section>
