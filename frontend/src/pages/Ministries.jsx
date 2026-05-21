@@ -1,0 +1,98 @@
+import React, { useState, useEffect } from 'react';
+import { useLanguage } from '../context/LanguageContext';
+import { User, Calendar, Tag, ArrowRight } from 'lucide-react';
+import { API_BASE } from '../config';
+
+const Ministries = () => {
+  const { t } = useLanguage();
+  const [ministries, setMinistries] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/ministries`)
+      .then(res => res.json())
+      .then(data => {
+        setMinistries(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Error fetching ministries:', err);
+        setLoading(false);
+      });
+  }, []);
+
+  return (
+    <div className="animate-slideup">
+      {/* Header */}
+      <section className="bg-slate-950/65 text-white py-16 relative overflow-hidden border-b border-amber-500/20">
+        <div className="absolute inset-0 opacity-15 bg-[radial-gradient(circle_at_center,_var(--primary-gold))]" style={{ filter: 'blur(80px)' }} />
+        <div className="container-box text-center relative z-10">
+          <span className="text-xs uppercase font-extrabold text-amber-400 tracking-widest block">
+            Fellowship Circles
+          </span>
+          <h1 className="heading-primary font-serif font-bold text-white mt-2">
+            {t('ministriesTitle')}
+          </h1>
+          <p className="text-slate-300 text-sm max-w-xl mx-auto mt-4">
+            {t('ministriesSub')}
+          </p>
+        </div>
+      </section>
+
+      {/* Grid Spheres */}
+      <section className="container-box section-padding">
+        {loading ? (
+          <div className="text-center py-16 text-slate-300 font-semibold">
+            Fetching active ministries lists...
+          </div>
+        ) : (
+          <div className="grid-three">
+            {ministries.map((min) => (
+              <div 
+                key={min.id}
+                className="glass-panel overflow-hidden flex flex-col justify-between"
+              >
+                {/* Image block */}
+                <div className="relative aspect-video overflow-hidden bg-slate-900 flex items-center justify-center shrink-0">
+                  <img 
+                    src={min.image_url} 
+                    alt={min.name}
+                    className="w-full h-full object-cover opacity-80"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+                  <span className="absolute bottom-4 left-4 font-serif font-bold text-white text-lg leading-tight">
+                    {min.name}
+                  </span>
+                </div>
+
+                {/* Body block */}
+                <div className="p-6 flex-1 flex flex-col justify-between">
+                  <p className="text-slate-300 text-sm leading-relaxed mb-6">
+                    {min.description}
+                  </p>
+
+                  <div className="border-t border-amber-500/10 pt-4 flex flex-col gap-2 text-xs font-semibold text-slate-400">
+                    <span className="flex items-center gap-2">
+                      <User className="w-4 h-4 text-amber-400 shrink-0" />
+                      {t('leaderLabel')}: <strong className="text-white font-bold pl-0.5">{min.leader || 'Pastor Immanuel'}</strong>
+                    </span>
+                    <span className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
+                      {t('scheduleLabel')}: <strong className="text-white font-bold pl-0.5">{min.schedule}</strong>
+                    </span>
+                    <span className="flex items-center gap-2">
+                      <Tag className="w-4 h-4 text-amber-400 shrink-0" />
+                      {t('categoryLabel')}: <strong className="text-white font-bold pl-0.5">{min.category}</strong>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+    </div>
+  );
+};
+
+export default Ministries;
