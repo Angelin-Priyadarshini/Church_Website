@@ -1,7 +1,7 @@
 const https = require('https');
 const db = require('./config/db');
 
-// Helper to perform HTTPS request
+// Helper to perform HTTPS GET request
 function getHttps(url) {
   return new Promise((resolve, reject) => {
     const options = {
@@ -26,6 +26,50 @@ function getHttps(url) {
     }).on('error', reject);
   });
 }
+
+// Helper to perform HTTPS POST request
+function postHttps(url, body) {
+  return new Promise((resolve, reject) => {
+    const urlObj = new URL(url);
+    const postData = JSON.stringify(body);
+    const options = {
+      method: 'POST',
+      hostname: urlObj.hostname,
+      path: urlObj.pathname + urlObj.search,
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(postData),
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': '*/*',
+        'Origin': 'https://www.youtube.com',
+        'Referer': 'https://www.youtube.com/'
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          try {
+            resolve(JSON.parse(data));
+          } catch (e) {
+            reject(new Error(`JSON Parse Error: ${e.message}`));
+          }
+        } else {
+          reject(new Error(`HTTP ${res.statusCode}: ${data.substring(0, 500)}`));
+        }
+      });
+    });
+
+    req.on('error', reject);
+    req.write(postData);
+    req.end();
+  });
+}
+
+// Helper to sleep
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Decode HTML entities
 function decodeEntities(str) {
@@ -146,97 +190,193 @@ function parseDateFromTitle(title, relativeDateText) {
   return parseRelativeDate(relativeDateText);
 }
 
-// Parse videos from the YouTube HTML page (videos or live stream tab)
-function parseVideosFromHtml(html) {
+// Parse a single lockupViewModel object into a video structure
+function parseLockupViewModel(lockup) {
+  const videoId = lockup.contentId;
+  const rawTitle = lockup.metadata?.lockupMetadataViewModel?.title?.content || '';
+  const title = decodeEntities(rawTitle).trim();
+  
+  const metadataRows = lockup.metadata?.lockupMetadataViewModel?.metadata?.contentMetadataViewModel?.metadataRows;
+  let viewsText = '0 views';
+  let relativeDateText = 'Today';
+  if (metadataRows && metadataRows[0] && metadataRows[0].metadataParts) {
+    const parts = metadataRows[0].metadataParts;
+    if (parts[0] && parts[0].text) {
+      viewsText = parts[0].text.content || '';
+    }
+    if (parts[1] && parts[1].text) {
+      relativeDateText = parts[1].text.content || '';
+    }
+  }
+  
+  const upload_date = parseDateFromTitle(title, relativeDateText);
+  const view_count = parseInt(viewsText.replace(/[^\d]/g, ''), 10) || Math.floor(Math.random() * 80) + 120;
+  
+  let duration = '1:30:00';
+  const overlays = lockup.contentImage?.thumbnailViewModel?.overlays;
+  if (overlays && overlays.length > 0) {
+    const badgeOverlay = overlays.find(o => o.thumbnailBottomOverlayViewModel?.badges?.[0]?.thumbnailBadgeViewModel?.text);
+    if (badgeOverlay) {
+      duration = badgeOverlay.thumbnailBottomOverlayViewModel.badges[0].thumbnailBadgeViewModel.text;
+    }
+  }
+  
+  if (videoId && title) {
+    const { category, preacher } = classifySermon(title);
+    return {
+      youtube_video_id: videoId,
+      title,
+      description: `Live service broadcast from Assemblies of God Sharjah Tamil Church. Preached by ${preacher}.`,
+      upload_date,
+      category,
+      preacher,
+      duration,
+      view_count
+    };
+  }
+  return null;
+}
+
+// Parse videos and continuation token from initial HTML
+function parseInitialHtml(html) {
   const match = html.match(/var ytInitialData\s*=\s*({[\s\S]*?});<\/script>/);
   if (!match) {
-    console.warn('ytInitialData script not found. YouTube page structure may have changed.');
-    return [];
+    console.warn('ytInitialData script not found.');
+    return { videos: [], continuationToken: null };
   }
   
   const ytInitialData = JSON.parse(match[1]);
   const tabs = ytInitialData.contents?.twoColumnBrowseResultsRenderer?.tabs;
   if (!tabs || tabs.length === 0) {
     console.warn('Failed to parse YouTube tabs structure.');
-    return [];
+    return { videos: [], continuationToken: null };
   }
   
-  // Find the tab that is selected or contains richGridRenderer
   const activeTab = tabs.find(t => t.tabRenderer?.selected === true || t.tabRenderer?.content?.richGridRenderer);
   const richGrid = activeTab?.tabRenderer?.content?.richGridRenderer;
   
   if (!richGrid || !richGrid.contents) {
-    console.warn('Rich grid contents not found in YouTube JSON.');
-    return [];
+    console.warn('Rich grid contents not found.');
+    return { videos: [], continuationToken: null };
   }
   
   const videos = [];
+  let continuationToken = null;
   
   for (const item of richGrid.contents) {
-    const lockup = item.richItemRenderer?.content?.lockupViewModel;
-    if (!lockup) continue;
-    
-    const videoId = lockup.contentId;
-    const rawTitle = lockup.metadata?.lockupMetadataViewModel?.title?.content || '';
-    const title = decodeEntities(rawTitle).trim();
-    
-    const metadataRows = lockup.metadata?.lockupMetadataViewModel?.metadata?.contentMetadataViewModel?.metadataRows;
-    let viewsText = '0 views';
-    let relativeDateText = 'Today';
-    if (metadataRows && metadataRows[0] && metadataRows[0].metadataParts) {
-      const parts = metadataRows[0].metadataParts;
-      if (parts[0] && parts[0].text) {
-        viewsText = parts[0].text.content || '';
-      }
-      if (parts[1] && parts[1].text) {
-        relativeDateText = parts[1].text.content || '';
-      }
-    }
-    
-    const upload_date = parseDateFromTitle(title, relativeDateText);
-    const view_count = parseInt(viewsText.replace(/[^\d]/g, ''), 10) || Math.floor(Math.random() * 80) + 120;
-    
-    let duration = '1:30:00';
-    const overlays = lockup.contentImage?.thumbnailViewModel?.overlays;
-    if (overlays && overlays.length > 0) {
-      const badgeOverlay = overlays.find(o => o.thumbnailBottomOverlayViewModel?.badges?.[0]?.thumbnailBadgeViewModel?.text);
-      if (badgeOverlay) {
-        duration = badgeOverlay.thumbnailBottomOverlayViewModel.badges[0].thumbnailBadgeViewModel.text;
-      }
-    }
-    
-    if (videoId && title) {
-      const { category, preacher } = classifySermon(title);
-      videos.push({
-        youtube_video_id: videoId,
-        title,
-        description: `Live service broadcast from Assemblies of God Sharjah Tamil Church. Preached by ${preacher}.`,
-        upload_date,
-        category,
-        preacher,
-        duration,
-        view_count
-      });
+    if (item.richItemRenderer?.content?.lockupViewModel) {
+      const video = parseLockupViewModel(item.richItemRenderer.content.lockupViewModel);
+      if (video) videos.push(video);
+    } else if (item.continuationItemRenderer) {
+      continuationToken = item.continuationItemRenderer.continuationEndpoint?.continuationCommand?.token;
     }
   }
   
+  return { videos, continuationToken };
+}
+
+// Extract Innertube API Key from HTML
+function extractApiKey(html) {
+  const apiKeyMatch = html.match(/"INNERTUBE_API_KEY"\s*:\s*"([^"]+)"/);
+  return apiKeyMatch ? apiKeyMatch[1] : null;
+}
+
+// Fetch all continuation pages recursively
+async function fetchAllContinuations(apiKey, initialToken, originalUrl) {
+  const videos = [];
+  let token = initialToken;
+  let pageCount = 1;
+  const maxPages = 45; // Safety cap (allows fetching up to 1350 items, perfect for 1016 videos)
+
+  while (token && pageCount <= maxPages) {
+    console.log(`[Continuation] Fetching page ${pageCount + 1}...`);
+    try {
+      const payload = {
+        context: {
+          client: {
+            clientName: 'WEB',
+            clientVersion: '2.20260515.01.00',
+            originalUrl: originalUrl,
+            platform: 'DESKTOP',
+            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+          }
+        },
+        continuation: token
+      };
+
+      const url = `https://www.youtube.com/youtubei/v1/browse?key=${apiKey}`;
+      const res = await postHttps(url, payload);
+
+      if (!res.onResponseReceivedActions || res.onResponseReceivedActions.length === 0) {
+        console.warn(`[Continuation] No actions in response for page ${pageCount + 1}.`);
+        break;
+      }
+
+      const action = res.onResponseReceivedActions[0];
+      const continuationItems = action.appendContinuationItemsAction?.continuationItems;
+      if (!continuationItems || continuationItems.length === 0) {
+        console.warn(`[Continuation] No continuation items in response for page ${pageCount + 1}.`);
+        break;
+      }
+
+      let parsedCount = 0;
+      let nextToken = null;
+
+      for (const item of continuationItems) {
+        if (item.richItemRenderer?.content?.lockupViewModel) {
+          const video = parseLockupViewModel(item.richItemRenderer.content.lockupViewModel);
+          if (video) {
+            videos.push(video);
+            parsedCount++;
+          }
+        } else if (item.continuationItemRenderer) {
+          nextToken = item.continuationItemRenderer.continuationEndpoint?.continuationCommand?.token;
+        }
+      }
+
+      console.log(`[Continuation] Parsed ${parsedCount} videos from page ${pageCount + 1}.`);
+      token = nextToken;
+      pageCount++;
+
+      // Polite 500ms delay to prevent rate limits
+      await sleep(500);
+    } catch (err) {
+      console.error(`[Continuation] Error fetching page ${pageCount + 1}:`, err.message);
+      break;
+    }
+  }
+
   return videos;
 }
 
 async function run() {
-  console.log('Initiating Improved Keyless YouTube Synchronization...');
+  console.log('Initiating Improved Recursive Keyless YouTube Synchronization...');
   
   try {
     const allVideos = [];
     
     // 1. Fetch channel videos tab
+    let apiKey = null;
     try {
       console.log('Fetching videos from YouTube channel videos page...');
       const videosUrl = 'https://www.youtube.com/@AGSHARJAHTAMILCHURCH/videos';
       const videosHtml = await getHttps(videosUrl);
-      const videosParsed = parseVideosFromHtml(videosHtml);
-      console.log(`Parsed ${videosParsed.length} sermons from the videos tab.`);
-      allVideos.push(...videosParsed);
+      
+      apiKey = extractApiKey(videosHtml);
+      console.log('Extracted Innertube API Key:', apiKey ? 'Success' : 'Failed');
+      
+      const { videos: initialVideos, continuationToken } = parseInitialHtml(videosHtml);
+      console.log(`Parsed ${initialVideos.length} initial sermons from videos tab.`);
+      allVideos.push(...initialVideos);
+      
+      if (apiKey && continuationToken) {
+        console.log('Starting recursive crawling for videos tab...');
+        const continuationVideos = await fetchAllContinuations(apiKey, continuationToken, videosUrl);
+        console.log(`Recursively parsed ${continuationVideos.length} additional sermons from videos tab.`);
+        allVideos.push(...continuationVideos);
+      } else {
+        console.warn('Cannot run recursive crawl for videos: Key or Token is missing.');
+      }
     } catch (err) {
       console.error('Error fetching videos tab:', err.message);
     }
@@ -246,14 +386,30 @@ async function run() {
       console.log('Fetching videos from YouTube channel live page...');
       const liveUrl = 'https://www.youtube.com/@AGSHARJAHTAMILCHURCH/live';
       const liveHtml = await getHttps(liveUrl);
-      const liveParsed = parseVideosFromHtml(liveHtml);
-      console.log(`Parsed ${liveParsed.length} live services from the live tab.`);
       
-      // Merge and deduplicate by videoId
-      for (const v of liveParsed) {
+      const { videos: initialLiveVideos, continuationToken: liveContinuationToken } = parseInitialHtml(liveHtml);
+      console.log(`Parsed ${initialLiveVideos.length} initial live services from live tab.`);
+      
+      // Merge initial live streams
+      for (const v of initialLiveVideos) {
         if (!allVideos.some(av => av.youtube_video_id === v.youtube_video_id)) {
           allVideos.push(v);
         }
+      }
+      
+      if (apiKey && liveContinuationToken) {
+        console.log('Starting recursive crawling for live tab...');
+        const continuationLiveVideos = await fetchAllContinuations(apiKey, liveContinuationToken, liveUrl);
+        console.log(`Recursively parsed ${continuationLiveVideos.length} additional live services from live tab.`);
+        
+        // Merge continuation live streams
+        for (const v of continuationLiveVideos) {
+          if (!allVideos.some(av => av.youtube_video_id === v.youtube_video_id)) {
+            allVideos.push(v);
+          }
+        }
+      } else {
+        console.warn('Cannot run recursive crawl for live: Key or Token is missing.');
       }
     } catch (err) {
       console.error('Error fetching live tab:', err.message);

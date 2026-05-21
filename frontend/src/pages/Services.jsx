@@ -10,6 +10,7 @@ const Services = () => {
   const [filteredSermons, setFilteredSermons] = useState([]);
   const [selectedSermon, setSelectedSermon] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(18);
 
   // Search & Filter state variables
   const [searchQuery, setSearchQuery] = useState('');
@@ -84,6 +85,7 @@ const Services = () => {
     }
 
     setFilteredSermons(result);
+    setVisibleCount(18);
   }, [searchQuery, categoryFilter, preacherFilter, sortOrder, allSermons]);
 
   const handleSermonSelect = (sermon) => {
@@ -235,7 +237,7 @@ const Services = () => {
 
             {/* Grid layout */}
             <div className="grid-three">
-              {filteredSermons.map((sermon) => (
+              {filteredSermons.slice(0, visibleCount).map((sermon) => (
                 <article 
                   key={sermon.id}
                   id={`sermon-card-${sermon.id}`}
@@ -286,6 +288,18 @@ const Services = () => {
                 </article>
               ))}
             </div>
+
+            {visibleCount < filteredSermons.length && (
+              <div className="text-center mt-12">
+                <button
+                  id="load-more-btn"
+                  onClick={() => setVisibleCount(prev => prev + 18)}
+                  className="py-3 px-8 rounded-full font-bold bg-amber-500 hover:bg-amber-600 text-slate-950 transition-all duration-300 shadow-lg hover:shadow-amber-500/25 cursor-pointer inline-flex items-center gap-2"
+                >
+                  Load More Sermons
+                </button>
+              </div>
+            )}
           </div>
         )}
       </section>
