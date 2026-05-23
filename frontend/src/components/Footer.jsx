@@ -47,7 +47,7 @@ const Footer = () => {
             <ul className="flex flex-col gap-3 text-sm text-slate-400">
               <li>
                 <strong className="text-slate-300 block">Sharjah Main Assembly:</strong>
-                Sundays: 9:00 AM & 6:30 PM
+                Sundays: 6:00 AM & 9:00 AM
               </li>
               <li>
                 <strong className="text-slate-300 block">Ajman Worship Fellowship:</strong>
@@ -55,7 +55,7 @@ const Footer = () => {
               </li>
               <li>
                 <strong className="text-slate-300 block">Umm Al Quwain Assembly:</strong>
-                Thursdays: 8:00 PM
+                Wednesdays: 8:30 PM
               </li>
             </ul>
           </div>
@@ -115,8 +115,8 @@ const Footer = () => {
             >
               <div>
                 <MapPin className="w-6 h-6 text-amber-500 mx-auto mb-2 animate-bounce" />
-                <span className="block font-semibold text-slate-200">AG Worship Hall</span>
-                Sharjah Glass Area, Near Al Khan, Sharjah, UAE
+                <span className="block font-semibold text-slate-200">St. Martin's Anglican Church</span>
+                Sharjah, United Arab Emirates
               </div>
             </div>
           </div>

@@ -126,26 +126,33 @@ async function seedDatabase() {
       console.log('Users seeded successfully: Admin (admin@agstc.org), Moderator (moderator@agstc.org)');
     }
 
-    // 3. Seed Schedule if empty
-    const schedCount = await db.getAsync(`SELECT COUNT(*) as count FROM schedule`);
-    if (schedCount.count === 0) {
-      await db.runAsync(`INSERT INTO schedule (name, time, location, category, recurrence) VALUES (?, ?, ?, ?, ?)`,
-        ['Sunday Tamil Service', '09:00 AM - 11:30 AM', 'Main Worship Hall, Sharjah', 'Main Worship', 'Weekly']
-      );
-      await db.runAsync(`INSERT INTO schedule (name, time, location, category, recurrence) VALUES (?, ?, ?, ?, ?)`,
-        ['Sunday Youth Meeting', '04:30 PM - 06:30 PM', 'Fellowship Room, Sharjah', 'Youth', 'Weekly']
-      );
-      await db.runAsync(`INSERT INTO schedule (name, time, location, category, recurrence) VALUES (?, ?, ?, ?, ?)`,
-        ['Tuesday Sisters Fellowship', '10:00 AM - 12:00 PM', 'Sharjah Chapel Hall', 'Women', 'Weekly']
-      );
-      await db.runAsync(`INSERT INTO schedule (name, time, location, category, recurrence) VALUES (?, ?, ?, ?, ?)`,
-        ['Friday Midweek Power Prayer', '08:00 PM - 10:00 PM', 'Main Worship Hall, Sharjah', 'Prayer Meeting', 'Weekly']
-      );
-      await db.runAsync(`INSERT INTO schedule (name, time, location, category, recurrence) VALUES (?, ?, ?, ?, ?)`,
-        ['Ajman Home Fellowship', '07:30 PM - 09:30 PM', 'Ajman Cell Center', 'Fellowship', 'Weekly']
-      );
-      console.log('Schedules seeded successfully.');
-    }
+    // 3. Seed Schedule (Reset and seed to ensure updates apply instantly on redeployment)
+    await db.runAsync(`DELETE FROM schedule`);
+    await db.runAsync(`INSERT INTO schedule (name, time, location, category, recurrence) VALUES (?, ?, ?, ?, ?)`,
+      ['Sunday First Service', '06:00 AM - 08:30 AM', 'St. Martin\'s Anglican Church, Sharjah', 'Main Worship', 'Weekly']
+    );
+    await db.runAsync(`INSERT INTO schedule (name, time, location, category, recurrence) VALUES (?, ?, ?, ?, ?)`,
+      ['Sunday Second Service', '09:00 AM - 10:45 AM', 'St. Martin\'s Anglican Church, Sharjah', 'Main Worship', 'Weekly']
+    );
+    await db.runAsync(`INSERT INTO schedule (name, time, location, category, recurrence) VALUES (?, ?, ?, ?, ?)`,
+      ['Sunday School', '09:00 AM - 10:45 AM', 'St. Martin\'s Anglican Church, Sharjah', 'Sunday School', 'Weekly']
+    );
+    await db.runAsync(`INSERT INTO schedule (name, time, location, category, recurrence) VALUES (?, ?, ?, ?, ?)`,
+      ['Sunday Youth Service', '11:15 AM - 12:45 PM', 'St. Martin\'s Anglican Church, Sharjah', 'Youth', 'Weekly']
+    );
+    await db.runAsync(`INSERT INTO schedule (name, time, location, category, recurrence) VALUES (?, ?, ?, ?, ?)`,
+      ['Brothers & Sisters Meeting', '11:15 AM - 12:45 PM', 'St. Martin\'s Anglican Church, Sharjah', 'Fellowship', 'Monthly (2nd Sunday)']
+    );
+    await db.runAsync(`INSERT INTO schedule (name, time, location, category, recurrence) VALUES (?, ?, ?, ?, ?)`,
+      ['Thursday Midweek Service', '08:30 PM - 09:55 PM', 'St. Martin\'s Anglican Church, Sharjah', 'Prayer Meeting', 'Weekly']
+    );
+    await db.runAsync(`INSERT INTO schedule (name, time, location, category, recurrence) VALUES (?, ?, ?, ?, ?)`,
+      ['Saturday Fasting Prayer', '10:00 AM - 12:45 PM', 'St. Martin\'s Anglican Church, Sharjah', 'Prayer Meeting', 'Weekly']
+    );
+    await db.runAsync(`INSERT INTO schedule (name, time, location, category, recurrence) VALUES (?, ?, ?, ?, ?)`,
+      ['Umm Al Quwain Service', '08:30 PM - 10:00 PM', 'Umm Al Quwain Industrial District', 'Fellowship', 'Weekly']
+    );
+    console.log('Schedules successfully updated and seeded.');
 
     // 4. Seed Ministries if empty
     const minCount = await db.getAsync(`SELECT COUNT(*) as count FROM ministries`);
