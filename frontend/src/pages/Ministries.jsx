@@ -75,10 +75,6 @@ const Ministries = () => {
 
                   <div className="border-t border-amber-500/10 pt-4 flex flex-col gap-2 text-xs font-semibold text-slate-400">
                     <span className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-amber-400 shrink-0" />
-                      {t('leaderLabel')}: <strong className="text-white font-bold pl-0.5">{t(min.leader || 'Pastor Immanuel')}</strong>
-                    </span>
-                    <span className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
                       {t('scheduleLabel')}: <strong className="text-white font-bold pl-0.5">{t(min.schedule)}</strong>
                     </span>

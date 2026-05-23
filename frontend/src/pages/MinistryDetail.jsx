@@ -124,16 +124,6 @@ const MinistryDetail = () => {
             <div className="flex flex-col gap-4 text-sm font-semibold text-slate-300">
               <div className="flex items-start gap-3.5">
                 <div className="w-9 h-9 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
-                  <User className="w-4 h-4" />
-                </div>
-                <div>
-                  <span className="text-xs text-slate-400 block uppercase font-bold">{t('leaderLabel')}</span>
-                  <strong className="text-white text-base font-bold mt-0.5 block">{t(ministry.leader || 'Pastor Immanuel')}</strong>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3.5">
-                <div className="w-9 h-9 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
                   <Calendar className="w-4 h-4" />
                 </div>
                 <div>

@@ -6,6 +6,10 @@ import { Phone, Mail, MapPin } from 'lucide-react';
 const Footer = () => {
   const { t } = useLanguage();
 
+  const handleQuickLinkClick = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <footer className="bg-slate-900 text-slate-300 pt-16 pb-8 border-t-4 border-amber-500">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -25,15 +29,15 @@ const Footer = () => {
             </p>
             <div className="flex flex-col gap-2 mt-2 text-sm">
               <span className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-amber-500" />
-                Sharjah Worship Center, UAE
+                <MapPin className="w-4 h-4 text-amber-500 shrink-0" />
+                {t('agWorshipHallAddress') || "St. Martin's Anglican Church, Sharjah, UAE"}
               </span>
               <span className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-amber-500" />
+                <Phone className="w-4 h-4 text-amber-500 shrink-0" />
                 +971 50 764 6822
               </span>
               <span className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-amber-500" />
+                <Mail className="w-4 h-4 text-amber-500 shrink-0" />
                 ministry@agstc.org
               </span>
             </div>
@@ -46,16 +50,16 @@ const Footer = () => {
             </h4>
             <ul className="flex flex-col gap-3 text-sm text-slate-400">
               <li>
-                <strong className="text-slate-300 block">Sharjah Main Assembly:</strong>
-                Sundays: 6:00 AM & 9:00 AM
+                <strong className="text-slate-300 block">{t('Sharjah Main Assembly')}:</strong>
+                {t('Sundays')}: 6:00 AM & 9:00 AM
               </li>
               <li>
-                <strong className="text-slate-300 block">Ajman Worship Fellowship:</strong>
-                Saturdays: 7:30 PM
+                <strong className="text-slate-300 block">{t('Ajman Worship Fellowship')}:</strong>
+                {t('Saturdays')}: 7:30 PM
               </li>
               <li>
-                <strong className="text-slate-300 block">Umm Al Quwain Assembly:</strong>
-                Wednesdays: 8:30 PM
+                <strong className="text-slate-300 block">{t('Umm Al Quwain Assembly')}:</strong>
+                {t('Wednesdays')}: 8:30 PM - 10:00 PM
               </li>
             </ul>
           </div>
@@ -67,37 +71,37 @@ const Footer = () => {
             </h4>
             <ul className="grid grid-cols-2 gap-2 text-sm">
               <li>
-                <Link to="/" className="hover:text-amber-500 transition-colors">
+                <Link to="/" onClick={handleQuickLinkClick} className="hover:text-amber-500 transition-colors">
                   {t('navHome')}
                 </Link>
               </li>
               <li>
-                <Link to="/about" className="hover:text-amber-500 transition-colors">
+                <Link to="/about" onClick={handleQuickLinkClick} className="hover:text-amber-500 transition-colors">
                   {t('navAbout')}
                 </Link>
               </li>
               <li>
-                <Link to="/services" className="hover:text-amber-500 transition-colors">
+                <Link to="/services" onClick={handleQuickLinkClick} className="hover:text-amber-500 transition-colors">
                   {t('navServices')}
                 </Link>
               </li>
               <li>
-                <Link to="/ministries" className="hover:text-amber-500 transition-colors">
+                <Link to="/ministries" onClick={handleQuickLinkClick} className="hover:text-amber-500 transition-colors">
                   {t('navMinistries')}
                 </Link>
               </li>
               <li>
-                <Link to="/events" className="hover:text-amber-500 transition-colors">
+                <Link to="/events" onClick={handleQuickLinkClick} className="hover:text-amber-500 transition-colors">
                   {t('navEvents')}
                 </Link>
               </li>
               <li>
-                <Link to="/resources" className="hover:text-amber-500 transition-colors">
+                <Link to="/resources" onClick={handleQuickLinkClick} className="hover:text-amber-500 transition-colors">
                   {t('navResources')}
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="hover:text-amber-500 transition-colors">
+                <Link to="/contact" onClick={handleQuickLinkClick} className="hover:text-amber-500 transition-colors">
                   {t('navContact')}
                 </Link>
               </li>

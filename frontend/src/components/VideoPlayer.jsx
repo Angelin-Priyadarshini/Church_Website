@@ -1,7 +1,7 @@
 import React from 'react';
 import { Calendar, User, Eye, Play } from 'lucide-react';
 
-const VideoPlayer = ({ video, onClose }) => {
+const VideoPlayer = ({ video, onClose, autoplay = true }) => {
   if (!video) return null;
 
   return (
@@ -30,7 +30,7 @@ const VideoPlayer = ({ video, onClose }) => {
       <div className="relative w-full overflow-hidden" style={{ paddingTop: '56.25%' }}>
         <iframe
           className="absolute top-0 left-0 w-full h-full border-0"
-          src={`https://www.youtube.com/embed/${video.youtube_video_id}?autoplay=1&rel=0`}
+          src={`https://www.youtube.com/embed/${video.youtube_video_id}?autoplay=${autoplay ? 1 : 0}&rel=0`}
           title={video.title}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
