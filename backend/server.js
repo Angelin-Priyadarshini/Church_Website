@@ -46,6 +46,20 @@ app.get('/api/ministries', async (req, res) => {
   }
 });
 
+// Get single ministry details by ID
+app.get('/api/ministries/:id', async (req, res) => {
+  try {
+    const ministry = await db.getAsync(`SELECT * FROM ministries WHERE id = ?`, [req.params.id]);
+    if (!ministry) {
+      return res.status(404).json({ error: 'Ministry not found.' });
+    }
+    res.json(ministry);
+  } catch (err) {
+    console.error('Error fetching ministry details:', err);
+    res.status(500).json({ error: 'Server error fetching ministry details.' });
+  }
+});
+
 // Admin dashboard KPI summary endpoint directly inside server.js
 app.get('/api/dashboard/summary', async (req, res) => {
   try {

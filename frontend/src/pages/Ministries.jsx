@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { User, Calendar, Tag, ArrowRight } from 'lucide-react';
 import { API_BASE } from '../config';
 
 const Ministries = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [ministries, setMinistries] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -28,7 +29,7 @@ const Ministries = () => {
         <div className="absolute inset-0 opacity-15 bg-[radial-gradient(circle_at_center,_var(--primary-gold))]" style={{ filter: 'blur(80px)' }} />
         <div className="container-box text-center relative z-10">
           <span className="text-xs uppercase font-extrabold text-amber-400 tracking-widest block">
-            Fellowship Circles
+            {t('fellowshipCircles')}
           </span>
           <h1 className="heading-primary font-serif font-bold text-white mt-2">
             {t('ministriesTitle')}
@@ -43,50 +44,51 @@ const Ministries = () => {
       <section className="container-box section-padding">
         {loading ? (
           <div className="text-center py-16 text-slate-300 font-semibold">
-            Fetching active ministries lists...
+            {t('fetchingActiveMinistries')}
           </div>
         ) : (
           <div className="grid-three">
             {ministries.map((min) => (
-              <div 
+              <Link 
                 key={min.id}
-                className="glass-panel overflow-hidden flex flex-col justify-between"
+                to={`/ministries/${min.id}`}
+                className="glass-panel overflow-hidden flex flex-col justify-between group cursor-pointer text-left block"
               >
                 {/* Image block */}
                 <div className="relative aspect-video overflow-hidden bg-slate-900 flex items-center justify-center shrink-0">
                   <img 
                     src={min.image_url} 
-                    alt={min.name}
-                    className="w-full h-full object-cover opacity-80"
+                    alt={t(min.name)}
+                    className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
                   <span className="absolute bottom-4 left-4 font-serif font-bold text-white text-lg leading-tight">
-                    {min.name}
+                    {t(min.name)}
                   </span>
                 </div>
 
                 {/* Body block */}
                 <div className="p-6 flex-1 flex flex-col justify-between">
                   <p className="text-slate-300 text-sm leading-relaxed mb-6">
-                    {min.description}
+                    {t(min.description)}
                   </p>
 
                   <div className="border-t border-amber-500/10 pt-4 flex flex-col gap-2 text-xs font-semibold text-slate-400">
                     <span className="flex items-center gap-2">
                       <User className="w-4 h-4 text-amber-400 shrink-0" />
-                      {t('leaderLabel')}: <strong className="text-white font-bold pl-0.5">{min.leader || 'Pastor Immanuel'}</strong>
+                      {t('leaderLabel')}: <strong className="text-white font-bold pl-0.5">{t(min.leader || 'Pastor Immanuel')}</strong>
                     </span>
                     <span className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
-                      {t('scheduleLabel')}: <strong className="text-white font-bold pl-0.5">{min.schedule}</strong>
+                      {t('scheduleLabel')}: <strong className="text-white font-bold pl-0.5">{t(min.schedule)}</strong>
                     </span>
                     <span className="flex items-center gap-2">
                       <Tag className="w-4 h-4 text-amber-400 shrink-0" />
-                      {t('categoryLabel')}: <strong className="text-white font-bold pl-0.5">{min.category}</strong>
+                      {t('categoryLabel')}: <strong className="text-white font-bold pl-0.5">{t(min.category)}</strong>
                     </span>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

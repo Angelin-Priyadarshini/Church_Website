@@ -57,13 +57,13 @@ const Resources = () => {
         <div className="absolute inset-0 opacity-15 bg-[radial-gradient(circle_at_center,_var(--primary-gold))]" style={{ filter: 'blur(80px)' }} />
         <div className="container-box text-center relative z-10">
           <span className="text-xs uppercase font-extrabold text-amber-400 tracking-widest block">
-            Digital Altar Outlines
+            {t('digitalAltarOutlines')}
           </span>
           <h1 className="heading-primary font-serif font-bold text-white mt-2">
-            Library & Devotionals
+            {t('libraryDevotionals')}
           </h1>
           <p className="text-slate-300 text-sm max-w-xl mx-auto mt-4">
-            Equip your family altar fellowships and children bible studies with standard scripture devotionals and workbook guides.
+            {t('equipFamilyAltar')}
           </p>
         </div>
       </section>
@@ -95,7 +95,7 @@ const Resources = () => {
           >
             <span className="flex items-center gap-2">
               <FileText className="w-5 h-5" />
-              Download Guides
+              {t('downloadGuides')}
             </span>
           </button>
         </div>
@@ -105,7 +105,7 @@ const Resources = () => {
       <section className="container-box py-10">
         {loading ? (
           <div className="text-center py-16 text-slate-300 font-semibold">
-            Fetching resources library...
+            {t('fetchingResources')}
           </div>
         ) : activeTab === 'devotionals' ? (
           /* DEVOTIONALS PANEL */
@@ -118,7 +118,7 @@ const Resources = () => {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-[10px] uppercase font-bold text-amber-400 tracking-wider">
-                      {post.category}
+                      {t(post.category)}
                     </span>
                     <span className="flex items-center gap-1 text-xs text-slate-400 font-semibold">
                       <Clock className="w-3.5 h-3.5 text-amber-400" />
@@ -127,22 +127,22 @@ const Resources = () => {
                   </div>
                   
                   <h3 className="font-serif font-bold text-xl text-white leading-snug">
-                    {post.title}
+                    {t(post.title)}
                   </h3>
                 </div>
 
                 <p className="text-slate-300 text-sm leading-relaxed" style={{ whiteSpace: 'pre-line' }}>
-                  {post.content}
+                  {t(post.content)}
                 </p>
 
                 <div className="border-t border-amber-500/10 pt-3 flex items-center justify-between text-xs text-slate-400 font-semibold">
                   <span className="flex items-center gap-1">
                     <User className="w-3.5 h-3.5 text-amber-400" />
-                    Written by: <strong className="text-white">{post.author}</strong>
+                    {t('writtenBy')}: <strong className="text-white">{t(post.author)}</strong>
                   </span>
                   <span className="flex items-center gap-1">
                     <Bookmark className="w-3.5 h-3.5 text-amber-400" />
-                    Published: <strong className="text-white">{post.publish_date}</strong>
+                    {t('published')}: <strong className="text-white">{t(post.publish_date)}</strong>
                   </span>
                 </div>
               </article>
@@ -161,13 +161,13 @@ const Resources = () => {
                     PDF
                   </div>
                   <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1">
-                    {file.category}
+                    {t(file.category)}
                   </span>
                   <h3 className="font-serif font-bold text-base text-white mb-2 leading-snug">
-                    {file.title}
+                    {t(file.title)}
                   </h3>
                   <p className="text-slate-300 text-xs leading-relaxed mb-6">
-                    {file.description}
+                    {t(file.description)}
                   </p>
                 </div>
 

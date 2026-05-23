@@ -112,19 +112,21 @@ h1, h2, h3, h4 {
 }
 
 .heading-primary {
-  font-size: 3.8rem;
+  font-size: clamp(2.2rem, 6vw, 3.8rem);
   letter-spacing: -0.5px;
   background: linear-gradient(135deg, #fff 30%, var(--primary-gold) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  line-height: 1.25;
 }
 
 .heading-secondary {
-  font-size: 2.6rem;
+  font-size: clamp(1.8rem, 4.5vw, 2.6rem);
   position: relative;
   display: inline-block;
   margin-bottom: 2.2rem;
   color: var(--text-light);
+  line-height: 1.35;
 }
 
 .heading-secondary::after {
@@ -136,6 +138,15 @@ h1, h2, h3, h4 {
   height: 4px;
   background: linear-gradient(90deg, var(--primary-gold) 0%, var(--accent-gold-dark) 100%);
   border-radius: 2px;
+}
+
+/* Center underline when section heading is in a text-center parent */
+.text-center .heading-secondary {
+  text-align: center;
+}
+.text-center .heading-secondary::after {
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 /* Interactive Elements styling */
@@ -294,3 +305,23 @@ a {
     padding: 4.5rem 0;
   }
 }
+
+/* ==========================================
+   Tamil Connected Script & Typography Fixes
+   ========================================== */
+.lang-ta * {
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
+
+/* Apply sleek Inter sans-serif to all headings in Tamil for perfect readability and alignment */
+.lang-ta .heading-secondary,
+.lang-ta .heading-primary,
+.lang-ta .font-serif,
+.lang-ta h1,
+.lang-ta h2,
+.lang-ta h3,
+.lang-ta h4 {
+  font-family: var(--font-body) !important;
+}
+

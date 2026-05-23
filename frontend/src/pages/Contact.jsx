@@ -16,6 +16,7 @@ const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [countryCode, setCountryCode] = useState('+971');
  
   const handleInputChange = (e) => {
     setFormData(prev => ({
@@ -31,12 +32,16 @@ const Contact = () => {
     setSuccessMsg('');
  
     try {
+      const payload = {
+        ...formData,
+        phone: formData.phone ? `${countryCode} ${formData.phone}` : ''
+      };
       const res = await fetch(`${API_BASE}/api/contact`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
 
@@ -46,6 +51,7 @@ const Contact = () => {
 
       setSuccessMsg(data.message);
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+      setCountryCode('+971');
     } catch (err) {
       setErrorMsg(err.message || 'Error sending inquiry. Please try again.');
     } finally {
@@ -60,7 +66,7 @@ const Contact = () => {
         <div className="absolute inset-0 opacity-15 bg-[radial-gradient(circle_at_center,_var(--primary-gold))]" style={{ filter: 'blur(80px)' }} />
         <div className="container-box text-center relative z-10">
           <span className="text-xs uppercase font-extrabold text-amber-400 tracking-widest block">
-            Fellowship Intercessions
+            {t('fellowshipIntercessions')}
           </span>
           <h1 className="heading-primary font-serif font-bold text-white mt-2">
             {t('navContact')}
@@ -76,10 +82,10 @@ const Contact = () => {
         {/* Contact Form Column */}
         <div className="glass-panel p-6">
           <h3 className="font-serif font-bold text-xl text-white mb-2">
-            Send an Inquiry
+            {t('sendInquiry')}
           </h3>
           <p className="text-xs text-slate-300 mb-6">
-            Have questions about timings, free transport routing or counseling services? Drop us a line.
+            {t('haveQuestionsContact')}
           </p>
 
           {successMsg ? (
@@ -124,13 +130,35 @@ const Contact = () => {
                   <label className="text-xs font-bold text-slate-300 block mb-1">
                     {t('contactFormPhone')}
                   </label>
-                  <input 
-                    type="tel" 
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    className="input-control"
-                  />
+                  <div className="flex gap-2">
+                    <select
+                      value={countryCode}
+                      onChange={(e) => setCountryCode(e.target.value)}
+                      className="input-control w-28 shrink-0 bg-slate-900 border border-white/10 text-white text-xs font-bold focus:border-amber-500 cursor-pointer"
+                    >
+                      <option value="+971">🇦🇪 +971</option>
+                      <option value="+91">🇮🇳 +91</option>
+                      <option value="+968">🇴🇲 +968</option>
+                      <option value="+974">🇶🇦 +974</option>
+                      <option value="+973">🇧🇭 +973</option>
+                      <option value="+965">🇰🇼 +965</option>
+                      <option value="+966">🇸🇦 +966</option>
+                      <option value="+1">🇺🇸/🇨🇦 +1</option>
+                      <option value="+44">🇬🇧 +44</option>
+                      <option value="+65">🇸🇬 +65</option>
+                      <option value="+60">🇲🇾 +60</option>
+                      <option value="+94">🇱🇰 +94</option>
+                      <option value="+61">🇦🇺 +61</option>
+                    </select>
+                    <input 
+                      type="tel" 
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      className="input-control flex-1"
+                      placeholder={t('phoneNumberPlaceholder')}
+                    />
+                  </div>
                 </div>
 
                 <div>
@@ -149,7 +177,7 @@ const Contact = () => {
 
               <div>
                 <label className="text-xs font-bold text-slate-300 block mb-1">
-                  Message Content *
+                  {t('messageContent')} *
                 </label>
                 <textarea 
                   name="message"
@@ -171,7 +199,7 @@ const Contact = () => {
                 className="btn-primary justify-center w-full mt-2"
               >
                 <Send className="w-4 h-4" />
-                {isSubmitting ? 'Sending message...' : t('contactSubmitBtn')}
+                {isSubmitting ? t('sendingMessage') : t('contactSubmitBtn')}
               </button>
             </form>
           )}
@@ -182,22 +210,22 @@ const Contact = () => {
           {/* Main Info */}
           <div className="glass-panel p-6 text-slate-300">
             <h3 className="font-serif font-bold text-lg text-white mb-4">
-              Worship Sanctuary Details
+              {t('worshipSanctuaryDetails')}
             </h3>
 
             <div className="flex flex-col gap-4 text-sm">
               <div className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
                 <div>
-                  <strong className="text-white block">Physical Location:</strong>
-                  AG Worship Hall, Near Glass Area, Industrial Sector 5, Sharjah, United Arab Emirates
+                  <strong className="text-white block">{t('physicalLocation')}:</strong>
+                  {t('agWorshipHallAddress')}
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
                 <Phone className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
                 <div>
-                  <strong className="text-white block">Counseling Office / Dials:</strong>
+                  <strong className="text-white block">{t('counselingOfficeDials')}:</strong>
                   +971 50 764 6822
                 </div>
               </div>
@@ -205,7 +233,7 @@ const Contact = () => {
               <div className="flex items-start gap-3">
                 <Mail className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
                 <div>
-                  <strong className="text-white block">Email Queries:</strong>
+                  <strong className="text-white block">{t('emailQueries')}:</strong>
                   ministry@agstc.org
                 </div>
               </div>
@@ -216,17 +244,17 @@ const Contact = () => {
           <div className="glass-panel p-6">
             <h3 className="font-serif font-bold text-lg text-white mb-4 flex items-center gap-2">
               <Globe className="w-5 h-5 text-amber-400" />
-              Northern Emirates Branches
+              {t('northernEmiratesBranches')}
             </h3>
 
             <ul className="flex flex-col gap-4 text-sm text-slate-300">
               <li className="pb-3 border-b border-amber-500/10">
-                <strong className="text-amber-400 block">Ajman Fellowship Branch</strong>
-                Weekly cells gathering in Al Nuaimia center at Saturdays, 7:30 PM. Active transport shuttles operated.
+                <strong className="text-amber-400 block">{t('ajmanFellowshipBranch')}</strong>
+                {t('ajmanFellowshipDesc')}
               </li>
               <li>
-                <strong className="text-amber-400 block">Umm Al Quwain Cell Branch</strong>
-                Weekly fellowships at UAQ Industrial District on Thursdays, 8:00 PM. Pastoral care covered.
+                <strong className="text-amber-400 block">{t('uaqCellBranch')}</strong>
+                {t('uaqCellDesc')}
               </li>
             </ul>
           </div>

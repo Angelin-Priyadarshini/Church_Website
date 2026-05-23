@@ -7,20 +7,20 @@ const About = () => {
 
   const faithStatements = [
     {
-      title: 'The Scriptures Inspired',
-      desc: 'The Bible is the inspired, infallible Word of God, a divine revelation and the authoritative rule of faith and conduct.'
+      title: t('faithTitle1'),
+      desc: t('faithDesc1')
     },
     {
-      title: 'The One True God',
-      desc: 'The one true God has revealed Himself as the eternally self-existent \"I AM,\" the Creator of heaven and earth, manifested as Father, Son, and Holy Spirit.'
+      title: t('faithTitle2'),
+      desc: t('faithDesc2')
     },
     {
-      title: 'Salvation of Man',
-      desc: 'Man\'s only hope of redemption is through the shed blood of Jesus Christ the Son of God, received by faith and repentance.'
+      title: t('faithTitle3'),
+      desc: t('faithDesc3')
     },
     {
-      title: 'Baptism in the Holy Spirit',
-      desc: 'All believers are entitled to and should ardently expect the promise of the Father, the baptism in the Holy Spirit, which gives power for life and service.'
+      title: t('faithTitle4'),
+      desc: t('faithDesc4')
     }
   ];
 
@@ -37,7 +37,7 @@ const About = () => {
             {t('navAbout')}
           </h1>
           <p className="text-slate-300 text-sm max-w-xl mx-auto mt-4">
-            Established by grace as a spiritual refuge for Tamil families in the UAE since 1996.
+            {t('aboutHeaderSub')}
           </p>
         </div>
       </section>
@@ -46,16 +46,16 @@ const About = () => {
       <section className="section-padding container-box grid-two items-center">
         <div>
           <h2 className="heading-secondary">
-            Our Spiritual History
+            {t('aboutTitle')}
           </h2>
           <p className="text-slate-300 leading-relaxed mb-4">
-            Assemblies of God Sharjah Tamil Church (AGSTC) was founded with a divine burden to minister to the spiritual and social welfare of the Tamil expatriate workforce residing in Sharjah, Ajman, and nearby emirates.
+            {t('aboutPara1')}
           </p>
           <p className="text-slate-300 leading-relaxed mb-4">
-            What started as a small home cell meeting has blossomed under the dedicated pastoral leadership of Pastor Immanuel into a thriving sanctuary where hundreds of brothers and sisters gather weekly. The church acts as a priestly bridge, providing active transport cells to bring remote labor camp residents into fellowship.
+            {t('aboutPara2')}
           </p>
           <p className="text-amber-400 leading-relaxed font-bold text-base">
-            \"Our core mission is to establish peace, counsel, and gospel restoration for everyone walking through our doors.\"
+            "{t('aboutMission')}"
           </p>
         </div>
         
@@ -74,10 +74,10 @@ const About = () => {
         <div className="container-box">
           <div className="text-center mb-12">
             <span className="text-xs uppercase font-extrabold text-amber-400 tracking-widest block">
-              What We Believe
+              {t('whatWeBelieve')}
             </span>
-            <h2 className="font-serif font-bold text-3xl text-white mt-2">
-              Our Statements of Faith
+            <h2 className="heading-secondary">
+              {t('statementsOfFaith')}
             </h2>
           </div>
 
@@ -104,10 +104,10 @@ const About = () => {
       <section className="section-padding container-box">
         <div className="text-center mb-12">
           <span className="text-xs uppercase font-extrabold text-amber-400 tracking-widest block">
-            Milestones Timeline
+            {t('weeklySchedule') === 'வாராந்திர ஆராதனை நேரங்கள்' ? 'வரலாற்று மைல்கற்கள்' : 'Milestones Timeline'}
           </span>
           <h2 className="heading-secondary">
-            A Journey of Faith
+            {t('weeklySchedule') === 'வாராந்திர ஆராதனை நேரங்கள்' ? 'விசுவாசத்தின் பயணம்' : 'A Journey of Faith'}
           </h2>
         </div>
 
@@ -117,9 +117,9 @@ const About = () => {
             <div className="absolute left-4 top-2.5 w-4 h-4 rounded-full bg-amber-500 ring-4 ring-amber-950/50 shrink-0 z-10 animate-pulse" />
             <div className="glass-panel p-5 flex-1">
               <span className="text-xs font-extrabold text-amber-400">1996</span>
-              <h3 className="font-serif font-bold text-lg text-white mt-1">Humble Beginnings</h3>
+              <h3 className="font-serif font-bold text-lg text-white mt-1">{t('milestoneTitle1')}</h3>
               <p className="text-slate-300 text-xs mt-1">
-                Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.
+                {t('milestoneDesc1')}
               </p>
             </div>
           </div>
@@ -129,9 +129,9 @@ const About = () => {
             <div className="absolute left-4 top-2.5 w-4 h-4 rounded-full bg-amber-500 ring-4 ring-amber-950/50 shrink-0 z-10 animate-pulse" />
             <div className="glass-panel p-5 flex-1">
               <span className="text-xs font-extrabold text-amber-400">2005</span>
-              <h3 className="font-serif font-bold text-lg text-white mt-1">Transport fleet launched</h3>
+              <h3 className="font-serif font-bold text-lg text-white mt-1">{t('milestoneTitle2')}</h3>
               <p className="text-slate-300 text-xs mt-1">
-                Purchased our first shuttle bus to fetch Tamil laborers completely free of charge from far-flung industrial camps.
+                {t('milestoneDesc2')}
               </p>
             </div>
           </div>
@@ -141,9 +141,9 @@ const About = () => {
             <div className="absolute left-4 top-2.5 w-4 h-4 rounded-full bg-amber-500 ring-4 ring-amber-950/50 shrink-0 z-10 animate-pulse" />
             <div className="glass-panel p-5 flex-1">
               <span className="text-xs font-extrabold text-amber-400">2016</span>
-              <h3 className="font-serif font-bold text-lg text-white mt-1">Regional Branch Network</h3>
+              <h3 className="font-serif font-bold text-lg text-white mt-1">{t('milestoneTitle3')}</h3>
               <p className="text-slate-300 text-xs mt-1">
-                Formally established satellite cell fellowships in Ajman and Umm Al Quwain, expanding weekly ministries.
+                {t('milestoneDesc3')}
               </p>
             </div>
           </div>

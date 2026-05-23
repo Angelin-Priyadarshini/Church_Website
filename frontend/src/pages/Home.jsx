@@ -86,7 +86,7 @@ const Home = () => {
                 {t('featuredSermon')}
               </span>
               <h2 className="font-serif font-bold text-3xl text-white mt-2">
-                Join Us in Word & Spirit
+                {t('joinUsTitle')}
               </h2>
             </div>
             
@@ -128,9 +128,9 @@ const Home = () => {
               <tbody className="divide-y divide-slate-800">
                 {schedules.map((sched) => (
                   <tr key={sched.id} className="hover:bg-white/5 transition-colors">
-                    <td className="p-4 md:p-6 font-semibold text-slate-200">{sched.name}</td>
-                    <td className="p-4 md:p-6 text-amber-400 font-bold">{sched.time}</td>
-                    <td className="p-4 md:p-6 text-slate-300 font-medium">{sched.location}</td>
+                    <td className="p-4 md:p-6 font-semibold text-slate-200">{t(sched.name)}</td>
+                    <td className="p-4 md:p-6 text-amber-400 font-bold">{t(sched.time)}</td>
+                    <td className="p-4 md:p-6 text-slate-300 font-medium">{t(sched.location)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -146,9 +146,9 @@ const Home = () => {
             <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400">
               <Heart className="w-6 h-6" />
             </div>
-            <h3 className="font-serif font-bold text-xl text-white">Full Gospel Message</h3>
+            <h3 className="font-serif font-bold text-xl text-white">{t('valGospelTitle')}</h3>
             <p className="text-slate-300 text-sm">
-              We preach the complete work of Christ—salvation, baptism of the Holy Spirit, healing, and His imminent return.
+              {t('valGospelDesc')}
             </p>
           </div>
 
@@ -156,9 +156,9 @@ const Home = () => {
             <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400">
               <Shield className="w-6 h-6" />
             </div>
-            <h3 className="font-serif font-bold text-xl text-white">Spiritual Sanctuary</h3>
+            <h3 className="font-serif font-bold text-xl text-white">{t('valSanctuaryTitle')}</h3>
             <p className="text-slate-300 text-sm">
-              Serving as a spiritual shelter for the expatriate Tamil workforce, reinforcing their faith away from home.
+              {t('valSanctuaryDesc')}
             </p>
           </div>
 
@@ -166,9 +166,9 @@ const Home = () => {
             <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400">
               <HelpCircle className="w-6 h-6" />
             </div>
-            <h3 className="font-serif font-bold text-xl text-white">Outreach & Transport</h3>
+            <h3 className="font-serif font-bold text-xl text-white">{t('valOutreachTitle')}</h3>
             <p className="text-slate-300 text-sm">
-              Extending love through active weekly shuttles across neighboring northern emirates Ajman and Umm Al Quwain.
+              {t('valOutreachDesc')}
             </p>
           </div>
         </div>
@@ -197,15 +197,15 @@ const Home = () => {
                 </div>
                 <div className="mb-4">
                   <span className="text-[10px] uppercase font-bold text-amber-400 block mb-2">
-                    {test.category || 'Miracle'}
+                    {t(test.category) || 'Miracle'}
                   </span>
                   <p className="text-slate-200 text-sm leading-relaxed italic">
-                    "{test.story_text}"
+                    "{t(test.story_text)}"
                   </p>
                 </div>
                 <div className="border-t border-slate-800 pt-4 flex items-center justify-between">
                   <span className="font-bold text-sm text-slate-100">{test.author_name}</span>
-                  <span className="text-slate-400 text-[10px]">Verified Member</span>
+                  <span className="text-slate-400 text-[10px]">{t('verifiedMember')}</span>
                 </div>
               </div>
             ))}

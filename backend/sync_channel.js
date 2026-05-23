@@ -83,47 +83,111 @@ function decodeEntities(str) {
     .replace(/&apos;/g, "'");
 }
 
+function removeWorshipSection(title) {
+  const match = title.match(/\b(WORSHIP|WOR:|WOR\.|WORSIP)\b/i);
+  if (!match) return title;
+  
+  const startIdx = title.indexOf(match[0]);
+  const sub = title.substring(startIdx + match[0].length);
+  
+  const dividers = ['|', '-', '~'];
+  const andMatch = sub.match(/\b(and|&)\b/i);
+  if (andMatch) {
+    dividers.push(andMatch[0]);
+  }
+  
+  const colonCount = (sub.match(/:/g) || []).length;
+  if (colonCount >= 1) {
+    const firstColonIdx = sub.indexOf(':');
+    dividers.push(sub.substring(firstColonIdx, firstColonIdx + 1));
+  }
+  
+  let minIdx = -1;
+  dividers.forEach(d => {
+    const idx = sub.indexOf(d);
+    if (idx !== -1 && (minIdx === -1 || idx < minIdx)) {
+      minIdx = idx;
+    }
+  });
+  
+  if (minIdx !== -1) {
+    return title.substring(0, startIdx) + title.substring(startIdx + match[0].length + minIdx);
+  } else {
+    return title.substring(0, startIdx);
+  }
+}
+
 // Automatically classify sermons based on title keywords
 function classifySermon(title) {
   const t = title.toUpperCase();
   let category = 'Sunday Service';
-  if (t.includes('THURSDAY') || t.includes('MIDWEEK') || t.includes('வியாழன்') || t.includes('ஜெபம்')) {
-    category = 'Midweek Prayer';
-  } else if (t.includes('SISTERS') || t.includes('சகோதரிகள்') || t.includes('FELLOWSHIP')) {
-    category = 'Sisters Fellowship';
-  } else if (t.includes('NEW YEAR') || t.includes('புத்தாண்டு')) {
+
+  if (t.includes('NEW YEAR') || t.includes('புத்தாண்டு') || t.includes('YEAR END')) {
     category = 'New Year Service';
+  } else if (t.includes('CHRISTMAS') || t.includes('கிறிஸ்துமஸ்') || t.includes('அன்பின் விருந்து')) {
+    category = 'Christmas Service';
+  } else if (t.includes('GOOD FRIDAY') || t.includes('EASTER') || t.includes('உயிர்த்தெழுதல்')) {
+    category = 'Good Friday & Easter';
+  } else if (t.includes('VBS') || t.includes('CHILDREN') || t.includes('KIDS') || t.includes('QUIZ') || t.includes('MEMORY VERSE') || t.includes('சிறுவர்')) {
+    category = 'Youth & Children';
+  } else if (t.includes('YOUTH') || t.includes('வாலிபர்') || t.includes('இளைஞர்')) {
+    category = 'Youth & Children';
+  } else if (t.includes('SISTERS') || t.includes('சகோதரிகள்') || t.includes('பெண்கள்') || t.includes('WOMEN') || t.includes('FELLOWSHIP')) {
+    category = 'Sisters Fellowship';
+  } else if (t.includes('RETREAT') || t.includes('SPECIAL MEETING') || t.includes('SPECIAL SERVICE') || t.includes('FAMILY SEMINAR') || t.includes('CONFERENCE') || t.includes('கூட்டம்') || t.includes('விசேஷ')) {
+    category = 'Retreats & Special';
+  } else if (t.includes('FASTING') || t.includes('FASTNG') || t.includes('உபவாச') || t.includes('ALL NIGHT PRAYER') || t.includes('இரவு ஜெபம்')) {
+    category = 'Fasting Prayer';
+  } else if (t.includes('THURSDAY') || t.includes('MIDWEEK') || t.includes('MID WEEK') || t.includes('MID-WEEK') || t.includes('MONDAY') || t.includes('TUESDAY') || t.includes('WEDNESDAY') || t.includes('FRIDAY') || t.includes('SATURDAY') || t.includes('WEEKDAY') || t.includes('திங்கள்') || t.includes('செவ்வாய்') || t.includes('புதன்') || t.includes('வியாழன்') || t.includes('வெள்ளி') || t.includes('சனி') || t.includes('ஜெபம்') || t.includes('PRAYER CELL') || t.includes('COTTAGE') || t.includes('HOUSE PRAYER')) {
+    category = 'Midweek Prayer';
+  } else if (t.includes('SING SONG') || t.includes('பாடல்கள்')) {
+    category = 'Special Programs';
   }
 
-  let preacher = 'Pastor Immanuel';
-  if (t.includes('ANDREW') || t.includes('ஆண்ட்ரூ')) {
-    preacher = 'Rev. Andrew';
-  } else if (t.includes('PAULSAMY') || t.includes('பால்சாமி')) {
-    preacher = 'Asst. Past. Paulsamy';
-  } else if (t.includes('RUSKIN') || t.includes('RASKIN') || t.includes('ரஸ்கின்')) {
-    preacher = 'Bro. Ruskin';
-  } else if (t.includes('MARY') || t.includes('மேரி')) {
-    preacher = 'Sis. Mary Immanuel';
-  } else if (t.includes('BABU') || t.includes('பாபு')) {
-    preacher = 'Bro. Babu';
-  } else if (t.includes('DURAI') || t.includes('துரை')) {
-    preacher = 'Bro. Durai';
-  } else if (t.includes('REGILIN') || t.includes('ரெஜிலின்')) {
-    preacher = 'Pastor Regilin';
-  } else if (t.includes('GUNASEELAN') || t.includes('குணசீலன்')) {
-    preacher = 'Bro. Gunaseelan';
-  } else if (t.includes('JEYARAJ') || t.includes('ஜெயராஜ்')) {
-    preacher = 'Br. Jeyaraj';
-  } else if (t.includes('DINAKAR') || t.includes('தினகர்')) {
-    preacher = 'Br. Dinakar';
-  } else if (t.includes('QUBERT') || t.includes('க்யூபர்ட்')) {
-    preacher = 'Bro. Qubert';
-  } else if (t.includes('AUGUSTIN') || t.includes('அகஸ்டின்')) {
-    preacher = 'Bro. Augustin';
-  }
+  // Preacher section extraction using our new elegant removeWorshipSection
+  const preachTitle = removeWorshipSection(title);
+  const pt = preachTitle.toUpperCase();
 
-  return { category, preacher };
+  // Find all matching preachers and choose the one closest to the end (largest index)
+  const preacherCandidates = [
+    { name: 'Rev. Andrew', keywords: ['ANDREW', 'ஆண்ட்ரூ'] },
+    { name: 'Asst. Past. Paulsamy', keywords: ['PAULSAMY', 'பால்சாமி'] },
+    { name: 'Bro. Ruskin', keywords: ['RUSKIN', 'RASKIN', 'ரஸ்கின்'] },
+    { name: 'Sis. Mary Immanuel', keywords: ['MARY', 'மேரி'] },
+    { name: 'Bro. Babu', keywords: ['BABU', 'பாபு'] },
+    { name: 'Bro. Durai', keywords: ['DURAI', 'துரை'] },
+    { name: 'Pastor Regilin', keywords: ['REGILIN', 'ரெஜிலின்'] },
+    { name: 'Bro. Gunaseelan', keywords: ['GUNASEELAN', 'குணசீலன்'] },
+    { name: 'Br. Jeyaraj', keywords: ['JEYARAJ', 'ஜெயராஜ்'] },
+    { name: 'Br. Dinakar', keywords: ['DINAKAR', 'தினகர்'] },
+    { name: 'Bro. Qubert', keywords: ['QUBERT', 'க்யூபர்ட்'] },
+    { name: 'Bro. Augustine Jebakumar', keywords: ['JEBAKUMAR', 'ஜெபகுமார்'] },
+    { name: 'Bro. Augustin', keywords: ['AUGUSTIN', 'AUGUSTINE', 'அகஸ்டின்'] },
+    { name: 'Bro. Wesley', keywords: ['WESLEY', 'வெஸ்லி'] },
+    { name: 'Bro. Moses', keywords: ['MOSES', 'மோசே'] },
+    { name: 'Bro. Benny', keywords: ['BENNY', 'பென்னி'] }
+  ];
+
+  let bestPreacher = 'Pastor Immanuel';
+  let maxIndex = -1;
+
+  preacherCandidates.forEach(candidate => {
+    // Prevent guest preacher Bro. Augustine Jebakumar from matching local Bro. Augustin
+    if (candidate.name === 'Bro. Augustin' && (pt.includes('JEBAKUMAR') || pt.includes('ஜெபகுமார்'))) {
+      return;
+    }
+    candidate.keywords.forEach(keyword => {
+      const idx = pt.lastIndexOf(keyword);
+      if (idx > maxIndex) {
+        maxIndex = idx;
+        bestPreacher = candidate.name;
+      }
+    });
+  });
+
+  return { category, preacher: bestPreacher };
 }
+
 
 // Convert relative time string (e.g. "3 months ago", "2 days ago") into YYYY-MM-DD
 function parseRelativeDate(relativeStr) {
@@ -151,9 +215,11 @@ function parseRelativeDate(relativeStr) {
 
 // Advanced date parsing from title, with relative date fallback
 function parseDateFromTitle(title, relativeDateText) {
+  let cleanTitle = title.replace(/\s*([\/\.\-])\s*/g, '$1');
+  
   // Format 1: DD/MM/YY or DD/MM/YYYY or DD.MM.YY or DD.MM.YYYY or DD-MM-YY or DD-MM-YYYY
   const dateRegex = /\b(\d{1,2})[\/\.\-](\d{1,2})[\/\.\-](\d{2,4})\b/;
-  const match = title.match(dateRegex);
+  const match = cleanTitle.match(dateRegex);
   if (match) {
     let day = parseInt(match[1], 10);
     let month = parseInt(match[2], 10);
@@ -163,6 +229,56 @@ function parseDateFromTitle(title, relativeDateText) {
       year = 2000 + year;
     }
     
+    if (year > 2030) {
+      if (String(year).endsWith('24')) year = 2024;
+      else if (String(year).endsWith('25')) year = 2025;
+      else if (String(year).endsWith('26')) year = 2026;
+    }
+    
+    if (month >= 1 && month <= 12 && day >= 1 && day <= 31 && year >= 2000 && year <= 2030) {
+      const pad = (num) => String(num).padStart(2, '0');
+      return `${year}-${pad(month)}-${pad(day)}`;
+    }
+  }
+
+  // Format 1b: DD.MMYYYY (like 18.072024)
+  const noSepRegex = /\b(\d{1,2})[\/\.\-](\d{1,2})(\d{4})\b/;
+  const noSepMatch = cleanTitle.match(noSepRegex);
+  if (noSepMatch) {
+    let day = parseInt(noSepMatch[1], 10);
+    let month = parseInt(noSepMatch[2], 10);
+    let year = parseInt(noSepMatch[3], 10);
+    
+    if (year > 2030) {
+      if (String(year).endsWith('24')) year = 2024;
+      else if (String(year).endsWith('25')) year = 2025;
+      else if (String(year).endsWith('26')) year = 2026;
+    }
+
+    if (month >= 1 && month <= 12 && day >= 1 && day <= 31 && year >= 2000 && year <= 2030) {
+      const pad = (num) => String(num).padStart(2, '0');
+      return `${year}-${pad(month)}-${pad(day)}`;
+    }
+  }
+
+  // Format 1c: DD MM YYYY or DD MM YY (spaces)
+  const spaceRegex = /\b(\d{1,2})\s+(\d{1,2})\s+(\d{2,4})\b/;
+  const spaceMatch = cleanTitle.match(spaceRegex);
+  if (spaceMatch) {
+    let day = parseInt(spaceMatch[1], 10);
+    let month = parseInt(spaceMatch[2], 10);
+    let year = parseInt(spaceMatch[3], 10);
+    
+    if (year < 100) {
+      year = 2000 + year;
+    }
+    
+    if (year > 2030) {
+      if (String(year).endsWith('24')) year = 2024;
+      else if (String(year).endsWith('25')) year = 2025;
+      else if (String(year).endsWith('26')) year = 2026;
+    }
+
     if (month >= 1 && month <= 12 && day >= 1 && day <= 31 && year >= 2000 && year <= 2030) {
       const pad = (num) => String(num).padStart(2, '0');
       return `${year}-${pad(month)}-${pad(day)}`;
@@ -187,6 +303,23 @@ function parseDateFromTitle(title, relativeDateText) {
     }
   }
 
+  // Format 2b: e.g. "September 2016" or "September, 2016" or "Sept 2016"
+  const monthYearRegex = /\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s*,?\s*(\d{4})\b/i;
+  const monthYearMatch = cleanTitle.match(monthYearRegex);
+  if (monthYearMatch) {
+    let monthStr = monthYearMatch[1].substring(0, 3).toLowerCase();
+    let year = parseInt(monthYearMatch[2], 10);
+    const months = {
+      jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
+      jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12
+    };
+    let month = months[monthStr];
+    if (month && year >= 2000 && year <= 2030) {
+      const pad = (num) => String(num).padStart(2, '0');
+      return `${year}-${pad(month)}-01`;
+    }
+  }
+
   return parseRelativeDate(relativeDateText);
 }
 
@@ -201,11 +334,16 @@ function parseLockupViewModel(lockup) {
   let relativeDateText = 'Today';
   if (metadataRows && metadataRows[0] && metadataRows[0].metadataParts) {
     const parts = metadataRows[0].metadataParts;
-    if (parts[0] && parts[0].text) {
-      viewsText = parts[0].text.content || '';
-    }
-    if (parts[1] && parts[1].text) {
-      relativeDateText = parts[1].text.content || '';
+    if (parts.length === 1) {
+      const text = parts[0]?.text?.content || '';
+      if (text.toLowerCase().includes('streamed') || text.toLowerCase().includes('ago')) {
+        relativeDateText = text;
+      } else {
+        viewsText = text;
+      }
+    } else if (parts.length >= 2) {
+      viewsText = parts[0]?.text?.content || '';
+      relativeDateText = parts[1]?.text?.content || '';
     }
   }
   

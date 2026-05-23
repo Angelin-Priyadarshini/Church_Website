@@ -10,24 +10,24 @@ const HeroBanner = () => {
 
   const slides = [
     {
-      title: 'Experience Spiritual Sanctuary',
-      subtitle: 'A Tamil Assembly dedicated to deep spiritual grounding, active local cell fellowship, and sincere praise in Sharjah.',
+      title: t('heroTitle1'),
+      subtitle: t('heroSub1'),
       image: '/images/home-banner1.JPG',
       ctaText: t('watchSermons'),
       ctaLink: '/services',
       icon: <Play className="w-5 h-5" />
     },
     {
-      title: 'We Stand in Prayer With You',
-      subtitle: 'The Jeremiah Ministry and Sister circles are interceding daily. Submit your prayer points anonymously or publicly.',
+      title: t('heroTitle2'),
+      subtitle: t('heroSub2'),
       image: '/images/prayer.jpg',
       ctaText: t('requestPrayer'),
       ctaLink: '/contact',
       icon: <HeartHandshake className="w-5 h-5" />
     },
     {
-      title: 'Weekly Fellowship Assemblies',
-      subtitle: 'Join our regional prayer groups and weekly services in Sharjah, Ajman, and Umm Al Quwain. Safe transport shuttles are provided.',
+      title: t('heroTitle3'),
+      subtitle: t('heroSub3'),
       image: '/images/banner1.jpg',
       ctaText: t('navMinistries'),
       ctaLink: '/ministries',
@@ -80,7 +80,7 @@ const HeroBanner = () => {
           <div className="absolute inset-0 flex items-center">
             <div className="max-w-4xl mx-auto px-6 text-center md:text-left md:px-12 w-full flex flex-col gap-6 animate-slideup">
               <span className="text-xs uppercase tracking-widest font-extrabold text-amber-400 block">
-                AG Sharjah Tamil Church
+                {t('headerBrandSub')}
               </span>
               <h1 className="heading-primary font-serif font-bold text-white leading-tight max-w-3xl">
                 {slide.title}
@@ -100,7 +100,7 @@ const HeroBanner = () => {
                   onClick={() => navigate('/about')}
                   className="btn-secondary text-white border-white hover:bg-white hover:text-slate-900"
                 >
-                  Learn History
+                  {t('learnHistory')}
                 </button>
               </div>
             </div>

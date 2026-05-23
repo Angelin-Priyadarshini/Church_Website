@@ -10,6 +10,7 @@ const FloatingActions = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [countryCode, setCountryCode] = useState('+971');
 
   // Form states
   const [formData, setFormData] = useState({
@@ -36,12 +37,16 @@ const FloatingActions = () => {
     setSuccessMsg('');
 
     try {
+      const payload = {
+        ...formData,
+        phone: formData.phone ? `${countryCode} ${formData.phone}` : ''
+      };
       const res = await fetch('http://localhost:5000/api/prayers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
 
@@ -59,6 +64,7 @@ const FloatingActions = () => {
         category: 'Spiritual Growth',
         is_anonymous: false
       });
+      setCountryCode('+971');
     } catch (err) {
       setErrorMsg(err.message || 'Error processing prayer request.');
     } finally {
@@ -120,30 +126,51 @@ const FloatingActions = () => {
               </div>
             ) : (
               <form onSubmit={handlePrayerSubmit} className="flex flex-col gap-4">
-                <div className="flex gap-4">
-                  <div className="flex-1">
-                    <label className="text-xs font-bold text-amber-400 block mb-1">
-                      {t('contactFormName')}
-                    </label>
-                    <input 
-                      type="text" 
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      className="input-control" 
-                      disabled={formData.is_anonymous}
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="text-xs font-bold text-amber-400 block mb-1">
-                      {t('contactFormPhone')}
-                    </label>
+                <div>
+                  <label className="text-xs font-bold text-amber-400 block mb-1">
+                    {t('contactFormName')}
+                  </label>
+                  <input 
+                    type="text" 
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className="input-control" 
+                    disabled={formData.is_anonymous}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-amber-400 block mb-1">
+                    {t('contactFormPhone')}
+                  </label>
+                  <div className="flex gap-2">
+                    <select
+                      value={countryCode}
+                      onChange={(e) => setCountryCode(e.target.value)}
+                      className="input-control w-28 shrink-0 bg-slate-900 border border-white/10 text-white text-xs font-bold focus:border-amber-500 cursor-pointer"
+                    >
+                      <option value="+971">🇦🇪 +971</option>
+                      <option value="+91">🇮🇳 +91</option>
+                      <option value="+968">🇴🇲 +968</option>
+                      <option value="+974">🇶🇦 +974</option>
+                      <option value="+973">🇧🇭 +973</option>
+                      <option value="+965">🇰🇼 +965</option>
+                      <option value="+966">🇸🇦 +966</option>
+                      <option value="+1">🇺🇸/🇨🇦 +1</option>
+                      <option value="+44">🇬🇧 +44</option>
+                      <option value="+65">🇸🇬 +65</option>
+                      <option value="+60">🇲🇾 +60</option>
+                      <option value="+94">🇱🇰 +94</option>
+                      <option value="+61">🇦🇺 +61</option>
+                    </select>
                     <input 
                       type="tel" 
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className="input-control" 
+                      className="input-control flex-1"
+                      placeholder="Phone Number"
                     />
                   </div>
                 </div>

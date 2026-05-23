@@ -5,7 +5,7 @@ const { authenticateToken } = require('../middleware/auth');
 
 // GET /api/services (list cached services with filters)
 router.get('/', async (req, res) => {
-  const { search, category, preacher, sort } = req.query;
+  const { search, category, preacher, sort, limit } = req.query;
   let sql = `SELECT * FROM services WHERE 1=1`;
   const params = [];
 
@@ -25,11 +25,19 @@ router.get('/', async (req, res) => {
   }
 
   if (sort === 'oldest') {
-    sql += ` ORDER BY upload_date ASC`;
+    sql += ` ORDER BY upload_date ASC, id DESC`;
   } else if (sort === 'popular') {
-    sql += ` ORDER BY view_count DESC`;
+    sql += ` ORDER BY view_count DESC, upload_date DESC`;
   } else {
-    sql += ` ORDER BY upload_date DESC`;
+    sql += ` ORDER BY upload_date DESC, id ASC`;
+  }
+
+  if (limit) {
+    const parsedLimit = parseInt(limit, 10);
+    if (!isNaN(parsedLimit) && parsedLimit > 0) {
+      sql += ` LIMIT ?`;
+      params.push(parsedLimit);
+    }
   }
 
   try {
@@ -111,47 +119,111 @@ function parseISODuration(isoDuration) {
   return parts.join(':');
 }
 
+function removeWorshipSection(title) {
+  const match = title.match(/\b(WORSHIP|WOR:|WOR\.|WORSIP)\b/i);
+  if (!match) return title;
+  
+  const startIdx = title.indexOf(match[0]);
+  const sub = title.substring(startIdx + match[0].length);
+  
+  const dividers = ['|', '-', '~'];
+  const andMatch = sub.match(/\b(and|&)\b/i);
+  if (andMatch) {
+    dividers.push(andMatch[0]);
+  }
+  
+  const colonCount = (sub.match(/:/g) || []).length;
+  if (colonCount >= 1) {
+    const firstColonIdx = sub.indexOf(':');
+    dividers.push(sub.substring(firstColonIdx, firstColonIdx + 1));
+  }
+  
+  let minIdx = -1;
+  dividers.forEach(d => {
+    const idx = sub.indexOf(d);
+    if (idx !== -1 && (minIdx === -1 || idx < minIdx)) {
+      minIdx = idx;
+    }
+  });
+  
+  if (minIdx !== -1) {
+    return title.substring(0, startIdx) + title.substring(startIdx + match[0].length + minIdx);
+  } else {
+    return title.substring(0, startIdx);
+  }
+}
+
 // Automatically classify sermons based on title keywords
 function classifySermon(title) {
   const t = title.toUpperCase();
   let category = 'Sunday Service';
-  if (t.includes('THURSDAY') || t.includes('MIDWEEK') || t.includes('வியாழன்') || t.includes('ஜெபம்')) {
-    category = 'Midweek Prayer';
-  } else if (t.includes('SISTERS') || t.includes('சகோதரிகள்') || t.includes('FELLOWSHIP')) {
-    category = 'Sisters Fellowship';
-  } else if (t.includes('NEW YEAR') || t.includes('புத்தாண்டு')) {
+
+  if (t.includes('NEW YEAR') || t.includes('புத்தாண்டு') || t.includes('YEAR END')) {
     category = 'New Year Service';
+  } else if (t.includes('CHRISTMAS') || t.includes('கிறிஸ்துமஸ்') || t.includes('அன்பின் விருந்து')) {
+    category = 'Christmas Service';
+  } else if (t.includes('GOOD FRIDAY') || t.includes('EASTER') || t.includes('உயிர்த்தெழுதல்')) {
+    category = 'Good Friday & Easter';
+  } else if (t.includes('VBS') || t.includes('CHILDREN') || t.includes('KIDS') || t.includes('QUIZ') || t.includes('MEMORY VERSE') || t.includes('சிறுவர்')) {
+    category = 'Youth & Children';
+  } else if (t.includes('YOUTH') || t.includes('வாலிபர்') || t.includes('இளைஞர்')) {
+    category = 'Youth & Children';
+  } else if (t.includes('SISTERS') || t.includes('சகோதரிகள்') || t.includes('பெண்கள்') || t.includes('WOMEN') || t.includes('FELLOWSHIP')) {
+    category = 'Sisters Fellowship';
+  } else if (t.includes('RETREAT') || t.includes('SPECIAL MEETING') || t.includes('SPECIAL SERVICE') || t.includes('FAMILY SEMINAR') || t.includes('CONFERENCE') || t.includes('கூட்டம்') || t.includes('விசேஷ')) {
+    category = 'Retreats & Special';
+  } else if (t.includes('FASTING') || t.includes('FASTNG') || t.includes('உபவாச') || t.includes('ALL NIGHT PRAYER') || t.includes('இரவு ஜெபம்')) {
+    category = 'Fasting Prayer';
+  } else if (t.includes('THURSDAY') || t.includes('MIDWEEK') || t.includes('MID WEEK') || t.includes('MID-WEEK') || t.includes('MONDAY') || t.includes('TUESDAY') || t.includes('WEDNESDAY') || t.includes('FRIDAY') || t.includes('SATURDAY') || t.includes('WEEKDAY') || t.includes('திங்கள்') || t.includes('செவ்வாய்') || t.includes('புதன்') || t.includes('வியாழன்') || t.includes('வெள்ளி') || t.includes('சனி') || t.includes('ஜெபம்') || t.includes('PRAYER CELL') || t.includes('COTTAGE') || t.includes('HOUSE PRAYER')) {
+    category = 'Midweek Prayer';
+  } else if (t.includes('SING SONG') || t.includes('பாடல்கள்')) {
+    category = 'Special Programs';
   }
 
-  let preacher = 'Pastor Immanuel';
-  if (t.includes('ANDREW') || t.includes('ஆண்ட்ரூ')) {
-    preacher = 'Rev. Andrew';
-  } else if (t.includes('PAULSAMY') || t.includes('பால்சாமி')) {
-    preacher = 'Asst. Past. Paulsamy';
-  } else if (t.includes('RUSKIN') || t.includes('RASKIN') || t.includes('ரஸ்கின்')) {
-    preacher = 'Bro. Ruskin';
-  } else if (t.includes('MARY') || t.includes('மேரி')) {
-    preacher = 'Sis. Mary Immanuel';
-  } else if (t.includes('BABU') || t.includes('பாபு')) {
-    preacher = 'Bro. Babu';
-  } else if (t.includes('DURAI') || t.includes('துரை')) {
-    preacher = 'Bro. Durai';
-  } else if (t.includes('REGILIN') || t.includes('ரெஜிலின்')) {
-    preacher = 'Pastor Regilin';
-  } else if (t.includes('GUNASEELAN') || t.includes('குணசீலன்')) {
-    preacher = 'Bro. Gunaseelan';
-  } else if (t.includes('JEYARAJ') || t.includes('ஜெயராஜ்')) {
-    preacher = 'Br. Jeyaraj';
-  } else if (t.includes('DINAKAR') || t.includes('தினகர்')) {
-    preacher = 'Br. Dinakar';
-  } else if (t.includes('QUBERT') || t.includes('க்யூபர்ட்')) {
-    preacher = 'Bro. Qubert';
-  } else if (t.includes('AUGUSTIN') || t.includes('அகஸ்டின்')) {
-    preacher = 'Bro. Augustin';
-  }
+  // Preacher section extraction using our new elegant removeWorshipSection
+  const preachTitle = removeWorshipSection(title);
+  const pt = preachTitle.toUpperCase();
 
-  return { category, preacher };
+  // Find all matching preachers and choose the one closest to the end (largest index)
+  const preacherCandidates = [
+    { name: 'Rev. Andrew', keywords: ['ANDREW', 'ஆண்ட்ரூ'] },
+    { name: 'Asst. Past. Paulsamy', keywords: ['PAULSAMY', 'பால்சாமி'] },
+    { name: 'Bro. Ruskin', keywords: ['RUSKIN', 'RASKIN', 'ரஸ்கின்'] },
+    { name: 'Sis. Mary Immanuel', keywords: ['MARY', 'மேரி'] },
+    { name: 'Bro. Babu', keywords: ['BABU', 'பாபு'] },
+    { name: 'Bro. Durai', keywords: ['DURAI', 'துரை'] },
+    { name: 'Pastor Regilin', keywords: ['REGILIN', 'ரெஜிலின்'] },
+    { name: 'Bro. Gunaseelan', keywords: ['GUNASEELAN', 'குணசீலன்'] },
+    { name: 'Br. Jeyaraj', keywords: ['JEYARAJ', 'ஜெயராஜ்'] },
+    { name: 'Br. Dinakar', keywords: ['DINAKAR', 'தினகர்'] },
+    { name: 'Bro. Qubert', keywords: ['QUBERT', 'க்யூபர்ட்'] },
+    { name: 'Bro. Augustine Jebakumar', keywords: ['JEBAKUMAR', 'ஜெபகுமார்'] },
+    { name: 'Bro. Augustin', keywords: ['AUGUSTIN', 'AUGUSTINE', 'அகஸ்டின்'] },
+    { name: 'Bro. Wesley', keywords: ['WESLEY', 'வெஸ்லி'] },
+    { name: 'Bro. Moses', keywords: ['MOSES', 'மோசே'] },
+    { name: 'Bro. Benny', keywords: ['BENNY', 'பென்னி'] }
+  ];
+
+  let bestPreacher = 'Pastor Immanuel';
+  let maxIndex = -1;
+
+  preacherCandidates.forEach(candidate => {
+    // Prevent guest preacher Bro. Augustine Jebakumar from matching local Bro. Augustin
+    if (candidate.name === 'Bro. Augustin' && (pt.includes('JEBAKUMAR') || pt.includes('ஜெபகுமார்'))) {
+      return;
+    }
+    candidate.keywords.forEach(keyword => {
+      const idx = pt.lastIndexOf(keyword);
+      if (idx > maxIndex) {
+        maxIndex = idx;
+        bestPreacher = candidate.name;
+      }
+    });
+  });
+
+  return { category, preacher: bestPreacher };
 }
+
 
 // POST /api/services/sync (Sync with YouTube - Admin/Moderator locked)
 router.post('/sync', authenticateToken, async (req, res) => {

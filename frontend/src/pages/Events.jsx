@@ -18,6 +18,7 @@ const Events = () => {
   const [bookingSuccess, setBookingSuccess] = useState('');
   const [bookingError, setBookingError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [countryCode, setCountryCode] = useState('+971');
 
   const fetchEvents = async () => {
     try {
@@ -50,12 +51,16 @@ const Events = () => {
     setBookingSuccess('');
 
     try {
+      const payload = {
+        ...formData,
+        attendee_phone: formData.attendee_phone ? `${countryCode} ${formData.attendee_phone}` : ''
+      };
       const res = await fetch(`${API_BASE}/api/events/${activeBookingEvent.id}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
 
@@ -65,6 +70,7 @@ const Events = () => {
 
       setBookingSuccess(data.message);
       setFormData({ attendee_name: '', attendee_email: '', attendee_phone: '' });
+      setCountryCode('+971');
       // Reload events to sync the seats counts
       fetchEvents();
     } catch (err) {
@@ -81,7 +87,7 @@ const Events = () => {
         <div className="absolute inset-0 opacity-15 bg-[radial-gradient(circle_at_center,_var(--primary-gold))]" style={{ filter: 'blur(80px)' }} />
         <div className="container-box text-center relative z-10">
           <span className="text-xs uppercase font-extrabold text-amber-400 tracking-widest block">
-            Special Assemblies
+            {t('specialAssemblies')}
           </span>
           <h1 className="heading-primary font-serif font-bold text-white mt-2">
             {t('eventsHeader')}
@@ -96,11 +102,11 @@ const Events = () => {
       <section className="container-box section-padding">
         {loading ? (
           <div className="text-center py-16 text-slate-300 font-semibold">
-            Loading special calendar schedules...
+            {t('loadingSpecialCalendar')}
           </div>
         ) : events.length === 0 ? (
           <div className="text-center py-16 text-slate-300 glass-panel p-8">
-            No special events are currently listed for the coming month. Check back weekly!
+            {t('noSpecialEvents')}
           </div>
         ) : (
           <div className="grid-three">
@@ -129,24 +135,24 @@ const Events = () => {
                   <div className="p-6 flex-1 flex flex-col justify-between">
                     <div>
                       <h3 className="font-serif font-bold text-lg text-white mb-2">
-                        {evt.title}
+                        {t(evt.title)}
                       </h3>
                       <p className="text-slate-300 text-xs mb-4 line-clamp-3">
-                        {evt.description}
+                        {t(evt.description)}
                       </p>
                       
                       <div className="flex flex-col gap-2 text-xs font-semibold text-slate-400 mb-6">
                         <span className="flex items-center gap-2">
                           <Clock className="w-4 h-4 text-amber-400 shrink-0" />
-                          Time: <strong className="text-white font-bold pl-0.5">{evt.time}</strong>
+                          {t('evtTime')}: <strong className="text-white font-bold pl-0.5">{t(evt.time)}</strong>
                         </span>
                         <span className="flex items-center gap-2">
                           <MapPin className="w-4 h-4 text-amber-400 shrink-0" />
-                          Venue: <strong className="text-white font-bold pl-0.5">{evt.location}</strong>
+                          {t('evtVenue')}: <strong className="text-white font-bold pl-0.5">{t(evt.location)}</strong>
                         </span>
                         <span className="flex items-center gap-2">
                           <Users className="w-4 h-4 text-amber-400 shrink-0" />
-                          Limit: <strong className="text-white font-bold pl-0.5">{evt.capacity} Capacity</strong>
+                          {t('evtLimit')}: <strong className="text-white font-bold pl-0.5">{evt.capacity} {t('evtCapacity')}</strong>
                         </span>
                       </div>
                     </div>
@@ -196,10 +202,10 @@ const Events = () => {
             </button>
 
             <h3 className="text-lg font-bold font-serif mb-1 pr-8 text-white">
-              Seat Reservation / Register
+              {t('seatReservationRegister')}
             </h3>
             <span className="text-xs uppercase font-extrabold text-amber-400 tracking-wider block mb-4">
-              {activeBookingEvent.title}
+              {t(activeBookingEvent.title)}
             </span>
 
             {bookingSuccess ? (
@@ -210,7 +216,7 @@ const Events = () => {
                   onClick={() => setActiveBookingEvent(null)}
                   className="btn-primary py-2 px-6 text-xs mt-2"
                 >
-                  Close Modal
+                  {t('closeModal')}
                 </button>
               </div>
             ) : (
@@ -247,13 +253,35 @@ const Events = () => {
                   <label className="text-xs font-bold text-slate-300 block mb-1">
                     {t('contactFormPhone')}
                   </label>
-                  <input 
-                    type="tel" 
-                    name="attendee_phone"
-                    value={formData.attendee_phone}
-                    onChange={handleInputChange}
-                    className="input-control"
-                  />
+                  <div className="flex gap-2">
+                    <select
+                      value={countryCode}
+                      onChange={(e) => setCountryCode(e.target.value)}
+                      className="input-control w-28 shrink-0 bg-slate-900 border border-white/10 text-white text-xs font-bold focus:border-amber-500 cursor-pointer"
+                    >
+                      <option value="+971">🇦🇪 +971</option>
+                      <option value="+91">🇮🇳 +91</option>
+                      <option value="+968">🇴🇲 +968</option>
+                      <option value="+974">🇶🇦 +974</option>
+                      <option value="+973">🇧🇭 +973</option>
+                      <option value="+965">🇰🇼 +965</option>
+                      <option value="+966">🇸🇦 +966</option>
+                      <option value="+1">🇺🇸/🇨🇦 +1</option>
+                      <option value="+44">🇬🇧 +44</option>
+                      <option value="+65">🇸🇬 +65</option>
+                      <option value="+60">🇲🇾 +60</option>
+                      <option value="+94">🇱🇰 +94</option>
+                      <option value="+61">🇦🇺 +61</option>
+                    </select>
+                    <input 
+                      type="tel" 
+                      name="attendee_phone"
+                      value={formData.attendee_phone}
+                      onChange={handleInputChange}
+                      className="input-control flex-1"
+                      placeholder={t('phoneNumberPlaceholder')}
+                    />
+                  </div>
                 </div>
 
                 {bookingError && (
@@ -265,7 +293,7 @@ const Events = () => {
                   disabled={isSubmitting}
                   className="btn-primary justify-center w-full mt-2"
                 >
-                  {isSubmitting ? 'Registering seat...' : 'Confirm Ticket Booking'}
+                  {isSubmitting ? t('registeringSeat') : t('confirmTicketBooking')}
                 </button>
               </form>
             )}
