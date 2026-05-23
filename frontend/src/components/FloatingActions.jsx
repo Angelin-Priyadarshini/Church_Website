@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { Phone, HeartHandshake, DollarSign, X } from 'lucide-react';
+import { API_BASE } from '../config';
 
 const FloatingActions = () => {
   const { t } = useLanguage();
@@ -41,7 +42,7 @@ const FloatingActions = () => {
         ...formData,
         phone: formData.phone ? `${countryCode} ${formData.phone}` : ''
       };
-      const res = await fetch('http://localhost:5000/api/prayers', {
+      const res = await fetch(`${API_BASE}/api/prayers`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
