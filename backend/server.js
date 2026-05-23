@@ -17,6 +17,14 @@ const contactRoutes = require('./routes/contact');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Automatically seed database on boot (essential for empty server instances in cloud hostings like Render)
+const seedDatabase = require('./db/init');
+seedDatabase().then(() => {
+  console.log('[Database Bootstrapper]: System checks passed. Tables synchronized successfully.');
+}).catch((err) => {
+  console.error('[Database Bootstrapper]: Synchronization failed:', err);
+});
+
 // Middleware
 app.use(cors({
   origin: ["http://localhost:5173", "https://church-website-lilac-nine.vercel.app"]
