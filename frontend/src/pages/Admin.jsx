@@ -574,8 +574,12 @@ const Admin = () => {
                     >
                       <option value="Sunday Service">Sunday Service</option>
                       <option value="Midweek Prayer">Midweek Prayer</option>
-                      <option value="Sisters Fellowship">Sisters Fellowship</option>
                       <option value="New Year Service">New Year Service</option>
+                      <option value="Christmas Service">Christmas Service</option>
+                      <option value="Fasting Prayer">Fasting Prayer</option>
+                      <option value="Youth & Children">Youth & Children</option>
+                      <option value="Sisters Fellowship">Sisters Fellowship</option>
+                      <option value="Retreats & Special">Retreats & Special</option>
                     </select>
                   </div>
 
@@ -695,8 +699,12 @@ const Admin = () => {
                   <option value="">All Categories</option>
                   <option value="Sunday Service">Sunday Service</option>
                   <option value="Midweek Prayer">Midweek Prayer</option>
-                  <option value="Sisters Fellowship">Sisters Fellowship</option>
                   <option value="New Year Service">New Year Service</option>
+                  <option value="Christmas Service">Christmas Service</option>
+                  <option value="Fasting Prayer">Fasting Prayer</option>
+                  <option value="Youth & Children">Youth & Children</option>
+                  <option value="Sisters Fellowship">Sisters Fellowship</option>
+                  <option value="Retreats & Special">Retreats & Special</option>
                 </select>
 
                 <select 
@@ -707,10 +715,14 @@ const Admin = () => {
                   <option value="">All Preachers</option>
                   <option value="Pastor Immanuel">Pastor Immanuel</option>
                   <option value="Rev. Andrew">Rev. Andrew</option>
+                  <option value="Bro. Durai">Bro. Durai</option>
+                  <option value="Bro. William">Bro. William</option>
                   <option value="Asst. Past. Paulsamy">Asst. Past. Paulsamy</option>
                   <option value="Bro. Ruskin">Bro. Ruskin</option>
+                  <option value="Br. Jeyaraj">Br. Jeyaraj</option>
+                  <option value="Pastor Regilin">Pastor Regilin</option>
                   <option value="Sis. Mary Immanuel">Sis. Mary Immanuel</option>
-                  <option value="Bro. Babu">Bro. Babu</option>
+                  <option value="Bro. Gunaseelan">Bro. Gunaseelan</option>
                 </select>
               </div>
             </div>

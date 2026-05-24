@@ -187,6 +187,7 @@ function classifySermon(title) {
   // Find all matching preachers and choose the one closest to the end (largest index)
   const preacherCandidates = [
     { name: 'Rev. Andrew', keywords: ['ANDREW', 'ஆண்ட்ரூ'] },
+    { name: 'Bro. William', keywords: ['WILLIAM', 'வில்லியம்'] },
     { name: 'Asst. Past. Paulsamy', keywords: ['PAULSAMY', 'பால்சாமி'] },
     { name: 'Bro. Ruskin', keywords: ['RUSKIN', 'RASKIN', 'ரஸ்கின்'] },
     { name: 'Sis. Mary Immanuel', keywords: ['MARY', 'மேரி'] },

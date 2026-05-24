@@ -18,9 +18,30 @@ const Services = () => {
   const [preacherFilter, setPreacherFilter] = useState('');
   const [sortOrder, setSortOrder] = useState('newest');
 
-  // Dynamic filter dropdown list options
-  const [categories, setCategories] = useState([]);
-  const [preachers, setPreachers] = useState([]);
+  // Static filter lists
+  const STATIC_CATEGORIES = [
+    'Sunday Service',
+    'Midweek Prayer',
+    'New Year Service',
+    'Christmas Service',
+    'Fasting Prayer',
+    'Youth & Children',
+    'Sisters Fellowship',
+    'Retreats & Special'
+  ];
+
+  const STATIC_PREACHERS = [
+    'Pastor Immanuel',
+    'Rev. Andrew',
+    'Bro. Durai',
+    'Bro. William',
+    'Asst. Past. Paulsamy',
+    'Bro. Ruskin',
+    'Br. Jeyaraj',
+    'Pastor Regilin',
+    'Sis. Mary Immanuel',
+    'Bro. Gunaseelan'
+  ];
 
   // Fetch all sermons from backend on component mount
   const fetchAllSermons = async () => {
@@ -32,13 +53,6 @@ const Services = () => {
       const data = await res.json();
       
       setAllSermons(data);
-      
-      // Extract unique categories and preachers dynamically
-      const uniqueCats = [...new Set(data.map((s) => s.category).filter(Boolean))];
-      const uniquePreachers = [...new Set(data.map((s) => s.preacher).filter(Boolean))];
-      
-      setCategories(uniqueCats);
-      setPreachers(uniquePreachers);
     } catch (err) {
       console.error('Error fetching sermons catalog:', err);
     } finally {
@@ -169,7 +183,7 @@ const Services = () => {
           {/* Dynamic Select Filters */}
           <div className="flex flex-wrap gap-4 items-center justify-between w-full">
             <div className="flex flex-wrap gap-3 items-center flex-1">
-              {/* Dynamic Category Selector */}
+              {/* Static Category Selector */}
               <select 
                 id="sermon-category-select"
                 value={categoryFilter}
@@ -179,13 +193,13 @@ const Services = () => {
                 }}
                 className="input-control py-2.5 px-4 text-xs font-bold text-white bg-slate-900 border border-white/10 w-full sm:w-auto focus:border-amber-500 cursor-pointer"
               >
-                <option value="">{t('allCategories')} ({categories.length})</option>
-                {categories.map((cat) => (
+                <option value="">{t('allCategories')}</option>
+                {STATIC_CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>{t(cat)}</option>
                 ))}
               </select>
 
-              {/* Dynamic Preacher Selector */}
+              {/* Static Preacher Selector */}
               <select 
                 id="sermon-preacher-select"
                 value={preacherFilter}
@@ -195,8 +209,8 @@ const Services = () => {
                 }}
                 className="input-control py-2.5 px-4 text-xs font-bold text-white bg-slate-900 border border-white/10 w-full sm:w-auto focus:border-amber-500 cursor-pointer"
               >
-                <option value="">{t('allPreachers')} ({preachers.length})</option>
-                {preachers.map((preacher) => (
+                <option value="">{t('allPreachers')}</option>
+                {STATIC_PREACHERS.map((preacher) => (
                   <option key={preacher} value={preacher}>{t(preacher)}</option>
                 ))}
               </select>

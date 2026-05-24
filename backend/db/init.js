@@ -255,19 +255,19 @@ async function seedDatabase() {
         ['15/2/26 | SUNDAY SERVICE | Worship: Bro.Durai | PERFECT PEACE : Asst.Past.Paulsamy', 'Sunday Service live recording from Assemblies of God Sharjah Tamil Church. Special message on Perfect Peace by Asst. Past. Paulsamy, with worship led by Bro. Durai.', 'H4gf7y5mvlM', 'Sunday Service', '2:15:30', '2026-02-15', 'Asst. Past. Paulsamy', 450]
       );
       await db.runAsync(`INSERT INTO services (title, description, youtube_video_id, category, duration, upload_date, preacher, view_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        ['12/02/26 | THURSDAY SERVICE | Worship: Bro. Babu | “Strength For a New Season”: Bro. Raskin', 'Thursday Service recording from Assemblies of God Sharjah Tamil Church. Bro. Raskin shares a powerful message on "Strength for a New Season". Worship led by Bro. Babu.', 'fBUkKrNagaE', 'Thursday Service', '1:48:15', '2026-02-12', 'Bro. Ruskin', 320]
+        ['12/02/26 | THURSDAY SERVICE | Worship: Bro. Babu | “Strength For a New Season”: Bro. Raskin', 'Thursday Service recording from Assemblies of God Sharjah Tamil Church. Bro. Raskin shares a powerful message on "Strength for a New Season". Worship led by Bro. Babu.', 'fBUkKrNagaE', 'Midweek Prayer', '1:48:15', '2026-02-12', 'Bro. Ruskin', 320]
       );
       await db.runAsync(`INSERT INTO services (title, description, youtube_video_id, category, duration, upload_date, preacher, view_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         ['08/2/26 | SUNDAY SERVICE | Worship: Bro.William | Seed and its Results : Rev.Andrew', 'Sunday Worship Service. Rev. Andrew preaches on "Seed and its Results". Worship led by Bro. William.', 'nNqM7otHQ1o', 'Sunday Service', '2:05:40', '2026-02-08', 'Rev. Andrew', 380]
       );
       await db.runAsync(`INSERT INTO services (title, description, youtube_video_id, category, duration, upload_date, preacher, view_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        ['05/02/26 | THURSDAY SERVICE | Worship: Br.Dinakar | “Doors only God can Open”: Br.Jeyaraj', 'Thursday Midweek Service at AGSTC. Br. Jeyaraj preaches on "Doors only God can Open". Worship led by Br. Dinakar.', 'YEgSpruVq2M', 'Thursday Service', '1:52:10', '2026-02-05', 'Br. Jeyaraj', 290]
+        ['05/02/26 | THURSDAY SERVICE | Worship: Br.Dinakar | “Doors only God can Open”: Br.Jeyaraj', 'Thursday Midweek Service at AGSTC. Br. Jeyaraj preaches on "Doors only God can Open". Worship led by Br. Dinakar.', 'YEgSpruVq2M', 'Midweek Prayer', '1:52:10', '2026-02-05', 'Br. Jeyaraj', 290]
       );
       await db.runAsync(`INSERT INTO services (title, description, youtube_video_id, category, duration, upload_date, preacher, view_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         ['01/2/26 | SUNDAY SERVICE | Wor: Pas.Andrew | 5 Steps for a victorious life of faith: Pas.Immanuel', 'Sunday Service recording. Senior Pastor Immanuel preaches on "5 Steps for a Victorious Life of Faith". Worship led by Pastor Andrew.', 'spzGzjM48lc', 'Sunday Service', '2:22:15', '2026-02-01', 'Pastor Immanuel', 510]
       );
       await db.runAsync(`INSERT INTO services (title, description, youtube_video_id, category, duration, upload_date, preacher, view_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        ['23/01/26 | Thursday | Worship: Bro. Augustin | Claiming God\'s Promise | Message: Pastor. Regilin', 'Thursday service recording from Assemblies of God Sharjah Tamil Church. Pastor Regilin shares a message on "Claiming God\'s Promise". Worship led by Bro. Augustin.', '_3Xy8ASnk3Y', 'Thursday Service', '2:10:00', '2026-01-23', 'Pastor Regilin', 430]
+        ['23/01/26 | Thursday | Worship: Bro. Augustin | Claiming God\'s Promise | Message: Pastor. Regilin', 'Thursday service recording from Assemblies of God Sharjah Tamil Church. Pastor Regilin shares a message on "Claiming God\'s Promise". Worship led by Bro. Augustin.', '_3Xy8ASnk3Y', 'Midweek Prayer', '2:10:00', '2026-01-23', 'Pastor Regilin', 430]
       );
       await db.runAsync(`INSERT INTO services (title, description, youtube_video_id, category, duration, upload_date, preacher, view_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         ['01/01/26 | NEW YEAR SERVICE | Worship: Bro. Qubert | Message | Pastor.Immanuel', 'New Year Day Special Service at AGSTC. Senior Pastor Immanuel shares the New Year promise and message. Worship led by Bro. Qubert.', 'R9RCFux4S7A', 'New Year Service', '2:45:00', '2026-01-01', 'Pastor Immanuel', 780]
@@ -276,7 +276,7 @@ async function seedDatabase() {
         ['28/12/25 | SUNDAY SERVICE | Worship: Bro. Durai | Title: Living in the Light | Pastor Immanuel', 'Sunday worship recording. Pastor Immanuel preaches on living in the light of the Lord. Worship led by Bro. Durai.', 'spzGzjM48lc', 'Sunday Service', '2:10:00', '2025-12-28', 'Pastor Immanuel', 420]
       );
       await db.runAsync(`INSERT INTO services (title, description, youtube_video_id, category, duration, upload_date, preacher, view_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        ['25/12/25 | CHRISTMAS SPECIAL SERVICE | Worship: Choir | Message: Pastor Immanuel', 'Christmas Service live recording from Assembly of God Sharjah Tamil Church. Special message on Christ our Hope by Pastor Immanuel.', 'R9RCFux4S7A', 'New Year Service', '2:30:15', '2025-12-25', 'Pastor Immanuel', 690]
+        ['25/12/25 | CHRISTMAS SPECIAL SERVICE | Worship: Choir | Message: Pastor Immanuel', 'Christmas Service live recording from Assembly of God Sharjah Tamil Church. Special message on Christ our Hope by Pastor Immanuel.', 'R9RCFux4S7A', 'Christmas Service', '2:30:15', '2025-12-25', 'Pastor Immanuel', 690]
       );
       await db.runAsync(`INSERT INTO services (title, description, youtube_video_id, category, duration, upload_date, preacher, view_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         ['21/12/25 | SUNDAY SERVICE | Worship: Bro. Babu | Message: Sis. Mary Immanuel', 'Sunday Tamil Worship. Special message on the Grace of God by Sis. Mary Immanuel. Worship led by Bro. Babu.', '_3Xy8ASnk3Y', 'Sunday Service', '2:02:40', '2025-12-21', 'Sis. Mary Immanuel', 315]
