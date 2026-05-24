@@ -315,88 +315,19 @@ router.post('/sync', authenticateToken, async (req, res) => {
       }
       isFullSync = true;
     } else {
-      // 2. FALLBACK SYNC: Fetch YouTube's public RSS Feed (Gets the 15 latest uploads instantly)
-      const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
-      const xmlContent = await httpsGet(feedUrl);
+      // 2. FALLBACK SYNC: Run our high-performance keyless YouTube crawler (sync_channel.js)
+      console.log('[Sync Controller]: Running keyless YouTube channel crawler...');
+      const { syncChannelVideos } = require('../sync_channel');
+      const crawlStats = await syncChannelVideos();
       
-      const entryRegex = /<entry>([\s\S]*?)<\/entry>/g;
-      let match;
-      
-      while ((match = entryRegex.exec(xmlContent)) !== null) {
-        const entryText = match[1];
-        const videoIdMatch = entryText.match(/<yt:videoId>([^<]+)<\/yt:videoId>/);
-        const titleMatch = entryText.match(/<title>([^<]+)<\/title>/);
-        const publishedMatch = entryText.match(/<published>([^<]+)<\/published>/);
-        const descMatch = entryText.match(/<media:description>([\s\S]*?)<\/media:description>/);
-
-        if (videoIdMatch && titleMatch) {
-          const videoId = videoIdMatch[1].trim();
-          const rawTitle = titleMatch[1].trim();
-          const title = decodeEntities(rawTitle);
-          
-          const rawDesc = descMatch ? descMatch[1].trim() : '';
-          const description = decodeEntities(rawDesc);
-          
-          const published = publishedMatch ? publishedMatch[1].trim() : '';
-          const upload_date = published ? published.split('T')[0] : new Date().toISOString().split('T')[0];
-
-          const { category, preacher } = classifySermon(title);
-
-          syncedVideos.push({
-            youtube_video_id: videoId,
-            title,
-            description,
-            upload_date,
-            category,
-            preacher,
-            duration: '1:30:00' // Default placeholder for RSS feeds
-          });
-        }
-      }
+      return res.json({
+        message: 'Full keyless historical synchronization completed successfully.',
+        isFullSync: true,
+        videosSyncedCount: crawlStats.inserted,
+        videosUpdatedCount: crawlStats.updated,
+        totalCachedVideos: crawlStats.total
+      });
     }
-
-    // 3. Upsert Synced Videos into the database
-    let newSyncCount = 0;
-    let updatedSyncCount = 0;
-    
-    for (const video of syncedVideos) {
-      const exists = await db.getAsync(`SELECT id, title, description, category, preacher, duration, upload_date FROM services WHERE youtube_video_id = ?`, [video.youtube_video_id]);
-      
-      if (!exists) {
-        // Insert new sermon
-        await db.runAsync(
-          `INSERT INTO services (title, description, youtube_video_id, category, duration, upload_date, preacher, view_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-          [video.title, video.description, video.youtube_video_id, video.category, video.duration, video.upload_date, video.preacher, Math.floor(Math.random() * 80) + 120]
-        );
-        newSyncCount++;
-      } else {
-        // Update existing sermon metadata if changed (keeps things current with YouTube edits)
-        if (
-          exists.title !== video.title || 
-          exists.description !== video.description ||
-          exists.upload_date !== video.upload_date ||
-          (video.duration !== '1:30:00' && exists.duration !== video.duration)
-        ) {
-          await db.runAsync(
-            `UPDATE services SET title = ?, description = ?, upload_date = ?, duration = ? WHERE id = ?`,
-            [video.title, video.description, video.upload_date, video.duration !== '1:30:00' ? video.duration : exists.duration, exists.id]
-          );
-          updatedSyncCount++;
-        }
-      }
-    }
-
-    const totalCountData = await db.getAsync(`SELECT COUNT(*) as count FROM services`);
-
-    res.json({
-      message: isFullSync 
-        ? 'Full archive synchronization completed successfully.' 
-        : 'Zero-config sync completed successfully (15 latest broadcasts loaded). Configure YOUTUBE_API_KEY for full history.',
-      isFullSync,
-      videosSyncedCount: newSyncCount,
-      videosUpdatedCount: updatedSyncCount,
-      totalCachedVideos: totalCountData.count
-    });
   } catch (err) {
     console.error('YouTube synchronization failure:', err);
     res.status(500).json({ error: `YouTube feed sync failed: ${err.message}` });

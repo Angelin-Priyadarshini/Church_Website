@@ -595,11 +595,19 @@ async function run() {
     console.log(`Total Cached Videos in database: ${finalCount.count}`);
     console.log('====================================================');
     
+    return {
+      inserted,
+      updated,
+      total: finalCount.count
+    };
   } catch (err) {
     console.error('Scraping sync failure:', err);
-  } finally {
-    process.exit(0);
+    throw err;
   }
 }
 
-run();
+if (require.main === module) {
+  run().then(() => process.exit(0)).catch(() => process.exit(1));
+} else {
+  module.exports = { syncChannelVideos: run };
+}
