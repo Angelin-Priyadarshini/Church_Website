@@ -92,9 +92,17 @@ app.get('/api/dashboard/summary', async (req, res) => {
   }
 });
 
-// Root check endpoint
-app.get('/', (req, res) => {
-  res.json({ message: 'AGSTC Church Rest API online and running!' });
+// Serve React Frontend Static Files in Production
+const frontendPath = path.join(__dirname, '../frontend/dist');
+app.use(express.static(frontendPath));
+
+// Route wildcard: Route all non-API and non-resource requests to the React SPA index.html
+app.get('*', (req, res) => {
+  if (!req.path.startsWith('/api') && !req.path.startsWith('/resources')) {
+    res.sendFile(path.join(frontendPath, 'index.html'));
+  } else {
+    res.status(404).json({ error: 'Endpoint not found.' });
+  }
 });
 
 // Start Server
