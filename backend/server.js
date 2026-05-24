@@ -92,18 +92,29 @@ app.get('/api/dashboard/summary', async (req, res) => {
   }
 });
 
-// Serve React Frontend Static Files in Production
+// Serve React Frontend Static Files in Production with robust fallback checks
+const fs = require('fs');
 const frontendPath = path.join(__dirname, '../frontend/dist');
-app.use(express.static(frontendPath));
 
-// Route wildcard: Route all non-API and non-resource requests to the React SPA index.html
-app.get('*', (req, res) => {
-  if (!req.path.startsWith('/api') && !req.path.startsWith('/resources')) {
-    res.sendFile(path.join(frontendPath, 'index.html'));
-  } else {
-    res.status(404).json({ error: 'Endpoint not found.' });
-  }
-});
+if (fs.existsSync(frontendPath) && fs.existsSync(path.join(frontendPath, 'index.html'))) {
+  app.use(express.static(frontendPath));
+  
+  // Route wildcard: Route all non-API and non-resource requests to the React SPA index.html
+  app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api') && !req.path.startsWith('/resources')) {
+      res.sendFile(path.join(frontendPath, 'index.html'));
+    } else {
+      res.status(404).json({ error: 'Endpoint not found.' });
+    }
+  });
+} else {
+  console.warn('[Warning]: frontend/dist folder or index.html not found. React static client serving is disabled. Please compile the frontend using "npm run build" inside the frontend directory.');
+  
+  // Root fallback endpoint
+  app.get('/', (req, res) => {
+    res.json({ message: 'AGSTC Church REST API online and running! (Note: React frontend dist not built yet)' });
+  });
+}
 
 // Start Server
 app.listen(PORT, () => {
