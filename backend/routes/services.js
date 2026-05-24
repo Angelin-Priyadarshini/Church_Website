@@ -29,7 +29,7 @@ router.get('/', async (req, res) => {
   } else if (sort === 'popular') {
     sql += ` ORDER BY view_count DESC, upload_date DESC`;
   } else {
-    sql += ` ORDER BY upload_date DESC, id ASC`;
+    sql += ` ORDER BY upload_date DESC, id DESC`;
   }
 
   if (limit) {

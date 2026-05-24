@@ -286,13 +286,16 @@ function parseDateFromTitle(title, relativeDateText) {
     }
   }
   
-  // Format 2: e.g. "30th March 2020" or "2nd December,2020"
-  const textDateRegex = /\b(\d{1,2})(st|nd|rd|th)?\s+([A-Za-z]+)\s*,?\s*(\d{4})\b/;
+  // Format 2: e.g. "30th March 2020" or "14th Feb 20"
+  const textDateRegex = /\b(\d{1,2})(st|nd|rd|th)?\s+([A-Za-z]+)\s*,?\s*(\d{2,4})\b/;
   const textMatch = title.match(textDateRegex);
   if (textMatch) {
     let day = parseInt(textMatch[1], 10);
     let monthStr = textMatch[3].substring(0, 3).toLowerCase();
     let year = parseInt(textMatch[4], 10);
+    if (year < 100) {
+      year = 2000 + year;
+    }
     const months = {
       jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
       jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12
