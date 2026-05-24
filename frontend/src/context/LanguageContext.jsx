@@ -70,7 +70,7 @@ const translations = {
     footerSub: 'Established by grace as a spiritual home away from home since 1996.',
     branchesTitle: 'Our Branch Networks',
     quickLinks: 'Quick Navigation',
-    allRightsReserved: 'AGSTC.ORG - All Rights Reserved. Built with React and SQLite.',
+    allRightsReserved: 'AGSTC.ORG - All Rights Reserved.',
 
     headerBrandSub: 'Sharjah Tamil Church',
     learnHistory: 'Learn History',
@@ -280,7 +280,7 @@ const translations = {
     footerSub: '1996 முதல் கிருபையால் தூரதேசத்தில் அமைக்கப்பட்ட ஆவிக்குரிய இல்லம்.',
     branchesTitle: 'எங்கள் கிளை சபைகள்',
     quickLinks: 'வரைபடம்',
-    allRightsReserved: 'AGSTC.ORG - அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை. React மற்றும் SQLite கொண்டு உருவாக்கப்பட்டது.',
+    allRightsReserved: 'AGSTC.ORG - அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.',
 
     headerBrandSub: 'ஷார்ஜா தமிழ் சபை',
     learnHistory: 'சரித்திரம் அறிய',
@@ -329,7 +329,7 @@ const translations = {
     'Thursday Midweek Service': 'வியாழக்கிழமை வாராந்திர ஆராதனை',
     'Saturday Fasting Prayer': 'சனிக்கிழமை உபவாச ஜெபம்',
     'Umm Al Quwain Service': 'உம்-அல்-குவைன் கிளை ஆராதனை',
-    '06:00 AM - 08:30 AM': 'காலை 06:00 - 08:30 மணி',
+    '06:45 AM - 08:30 AM': 'காலை 06:45 - 08:30 மணி',
     '09:00 AM - 10:45 AM': 'காலை 09:00 - 10:45 மணி',
     '11:15 AM - 12:45 PM': 'மதியம் 11:15 - 12:45 மணி',
     '08:30 PM - 09:55 PM': 'இரவு 08:30 - 09:55 மணி',

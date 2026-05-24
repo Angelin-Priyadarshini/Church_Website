@@ -4,7 +4,7 @@ import { API_BASE } from '../config';
 import { 
   Lock, RefreshCw, BarChart2, Users, Calendar, 
   HeartHandshake, Check, Trash2, ArrowUpRight, HelpCircle,
-  Plus, Video
+  Plus, Video, Edit
 } from 'lucide-react';
 
 // Custom SVG YouTube Icon component to avoid lucide-react export mismatches
@@ -60,6 +60,18 @@ const Admin = () => {
   const [formSuccess, setFormSuccess] = useState('');
   const [formError, setFormError] = useState('');
   const [isSubmittingSermon, setIsSubmittingSermon] = useState(false);
+
+  // Devotionals Management State
+  const [devotionals, setDevotionals] = useState([]);
+  const [isSubmittingDevotional, setIsSubmittingDevotional] = useState(false);
+  const [editingDevotionalId, setEditingDevotionalId] = useState(null);
+  const [newDevotional, setNewDevotional] = useState({
+    title: '',
+    content: '',
+    author: 'Pastor Immanuel',
+    category: 'Daily Promise',
+    read_time_minutes: 3
+  });
   const fetchDashboardData = async () => {
     if (!token) return;
 
@@ -85,6 +97,13 @@ const Admin = () => {
       const srmRes = await fetch(`${API_BASE}/api/services`);
       const srmData = await srmRes.json();
       setSermons(srmData);
+
+      // 5. Fetch devotionals list
+      const devRes = await fetch(`${API_BASE}/api/blog`);
+      if (devRes.ok) {
+        const devData = await devRes.json();
+        setDevotionals(devData);
+      }
     } catch (err) {
       console.error('Error fetching dashboard records:', err);
     }
@@ -150,6 +169,99 @@ const Admin = () => {
     } finally {
       setIsSubmittingSermon(false);
     }
+  };
+
+  const handleSaveDevotional = async (e) => {
+    e.preventDefault();
+    setFormError('');
+    setFormSuccess('');
+    setIsSubmittingDevotional(true);
+
+    if (!newDevotional.title || !newDevotional.content) {
+      setFormError('Title and content are required.');
+      setIsSubmittingDevotional(false);
+      return;
+    }
+
+    try {
+      const url = editingDevotionalId 
+        ? `${API_BASE}/api/blog/${editingDevotionalId}` 
+        : `${API_BASE}/api/blog`;
+      const method = editingDevotionalId ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(newDevotional)
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to save devotional.');
+      }
+
+      setFormSuccess(editingDevotionalId ? 'Devotional updated successfully!' : 'Devotional published successfully!');
+      setNewDevotional({
+        title: '',
+        content: '',
+        author: 'Pastor Immanuel',
+        category: 'Daily Promise',
+        read_time_minutes: 3
+      });
+      setEditingDevotionalId(null);
+      fetchDashboardData();
+    } catch (err) {
+      setFormError(err.message);
+    } finally {
+      setIsSubmittingDevotional(false);
+    }
+  };
+
+  const handleDeleteDevotional = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this devotional?')) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/blog/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to delete devotional.');
+      }
+      fetchDashboardData();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleStartEditDevotional = (dev) => {
+    setEditingDevotionalId(dev.id);
+    setNewDevotional({
+      title: dev.title,
+      content: dev.content,
+      author: dev.author,
+      category: dev.category,
+      read_time_minutes: dev.read_time_minutes
+    });
+    setFormError('');
+    setFormSuccess('');
+    window.scrollTo({ top: 350, behavior: 'smooth' });
+  };
+
+  const handleCancelEditDevotional = () => {
+    setEditingDevotionalId(null);
+    setNewDevotional({
+      title: '',
+      content: '',
+      author: 'Pastor Immanuel',
+      category: 'Daily Promise',
+      read_time_minutes: 3
+    });
+    setFormError('');
+    setFormSuccess('');
   };
 
   useEffect(() => {
@@ -433,6 +545,15 @@ const Admin = () => {
             }`}
           >
             Special Bookings Roster
+          </button>
+
+          <button 
+            onClick={() => setActiveTab('devotionals')}
+            className={`pb-3 text-sm font-bold transition-all relative ${
+              activeTab === 'devotionals' ? 'text-amber-600 border-b-2 border-amber-500' : 'text-slate-400 hover:text-slate-700'
+            }`}
+          >
+            Devotionals Manager ({devotionals.length})
           </button>
         </div>
 
@@ -799,6 +920,150 @@ const Admin = () => {
                         </td>
                       </tr>
                     ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* 4. DEVOTIONALS MANAGER PANEL */}
+        {activeTab === 'devotionals' && (
+          <div className="flex flex-col gap-6">
+            {/* Add / Edit Form Block */}
+            <div className="glass-panel p-6 bg-white border-slate-200 shadow-sm">
+              <h3 className="font-serif font-bold text-lg text-slate-900 border-b border-slate-100 pb-3 mb-4">
+                {editingDevotionalId ? 'Edit Devotional Post' : 'Publish New Devotional / Daily Promise'}
+              </h3>
+              <form onSubmit={handleSaveDevotional} className="flex flex-col gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="md:col-span-2">
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Devotional Title *</label>
+                    <input 
+                      type="text"
+                      value={newDevotional.title}
+                      onChange={(e) => setNewDevotional({ ...newDevotional, title: e.target.value })}
+                      placeholder="e.g. Daily Promise - Isaiah 41:10"
+                      className="input-control w-full text-slate-950 bg-white"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Read Time (minutes)</label>
+                    <input 
+                      type="number"
+                      value={newDevotional.read_time_minutes}
+                      onChange={(e) => setNewDevotional({ ...newDevotional, read_time_minutes: parseInt(e.target.value, 10) || 3 })}
+                      className="input-control w-full text-slate-950 bg-white"
+                      min="1"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Author</label>
+                    <input 
+                      type="text"
+                      value={newDevotional.author}
+                      onChange={(e) => setNewDevotional({ ...newDevotional, author: e.target.value })}
+                      className="input-control w-full text-slate-950 bg-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Category</label>
+                    <select
+                      value={newDevotional.category}
+                      onChange={(e) => setNewDevotional({ ...newDevotional, category: e.target.value })}
+                      className="input-control w-full text-slate-950 bg-white"
+                    >
+                      <option value="Daily Promise">Daily Promise</option>
+                      <option value="Devotional reflection">Devotional reflection</option>
+                      <option value="Pastor Message">Pastor Message</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Devotional Content / Message *</label>
+                  <textarea 
+                    value={newDevotional.content}
+                    onChange={(e) => setNewDevotional({ ...newDevotional, content: e.target.value })}
+                    placeholder="Write the full scripture promise, daily meditation or pastoral message here..."
+                    className="input-control w-full text-slate-950 bg-white min-h-[160px]"
+                    required
+                  />
+                </div>
+
+                <div className="flex gap-3 justify-end border-t border-slate-100 pt-4 mt-2">
+                  {editingDevotionalId && (
+                    <button 
+                      type="button"
+                      onClick={handleCancelEditDevotional}
+                      className="btn-secondary py-2 px-6"
+                    >
+                      Cancel Edit
+                    </button>
+                  )}
+                  <button 
+                    type="submit"
+                    disabled={isSubmittingDevotional}
+                    className="btn-primary py-2 px-8"
+                  >
+                    {isSubmittingDevotional ? 'Saving devotional post...' : (editingDevotionalId ? 'Update Post' : 'Publish Devotional')}
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* List of Devotionals */}
+            <div className="glass-panel overflow-hidden bg-white border-slate-200 shadow-sm">
+              <table className="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr className="bg-slate-900 text-white font-bold text-xs uppercase tracking-wider">
+                    <th className="p-4">Date</th>
+                    <th className="p-4">Title</th>
+                    <th className="p-4">Category</th>
+                    <th className="p-4">Author</th>
+                    <th className="p-4 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 font-semibold text-slate-700">
+                  {devotionals.map((dev) => (
+                    <tr key={dev.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="p-4 text-slate-500 font-mono text-xs">
+                        {dev.publish_date ? dev.publish_date.split('T')[0] : ''}
+                      </td>
+                      <td className="p-4 text-slate-900 font-bold max-w-sm line-clamp-2 leading-tight">
+                        {dev.title}
+                      </td>
+                      <td className="p-4 text-slate-500 text-xs">
+                        <span className="px-1.5 py-0.5 bg-indigo-50 text-indigo-700 text-[10px] font-extrabold uppercase rounded">
+                          {dev.category}
+                        </span>
+                      </td>
+                      <td className="p-4 text-slate-600 text-xs">{dev.author}</td>
+                      <td className="p-4">
+                        <div className="flex gap-2 justify-center">
+                          <button 
+                            onClick={() => handleStartEditDevotional(dev)}
+                            className="p-1.5 rounded bg-amber-50 text-amber-600 hover:bg-amber-100"
+                            title="Edit Devotional"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteDevotional(dev.id)}
+                            className="p-1.5 rounded bg-red-50 text-red-600 hover:bg-red-100"
+                            title="Delete Devotional"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

@@ -51,7 +51,7 @@ const Footer = () => {
             <ul className="flex flex-col gap-3 text-sm text-slate-400">
               <li>
                 <strong className="text-slate-300 block">{t('Sharjah Main Assembly')}:</strong>
-                {t('Sundays')}: 6:00 AM & 9:00 AM
+                {t('Sundays')}: 6:45 AM & 9:00 AM
               </li>
               <li>
                 <strong className="text-slate-300 block">{t('Ajman Worship Fellowship')}:</strong>

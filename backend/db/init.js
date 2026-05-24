@@ -129,7 +129,7 @@ async function seedDatabase() {
     // 3. Seed Schedule (Reset and seed to ensure updates apply instantly on redeployment)
     await db.runAsync(`DELETE FROM schedule`);
     await db.runAsync(`INSERT INTO schedule (name, time, location, category, recurrence) VALUES (?, ?, ?, ?, ?)`,
-      ['Sunday First Service', '06:00 AM - 08:30 AM', 'St. Martin\'s Anglican Church, Sharjah', 'Main Worship', 'Weekly']
+      ['Sunday First Service', '06:45 AM - 08:30 AM', 'St. Martin\'s Anglican Church, Sharjah', 'Main Worship', 'Weekly']
     );
     await db.runAsync(`INSERT INTO schedule (name, time, location, category, recurrence) VALUES (?, ?, ?, ?, ?)`,
       ['Sunday Second Service', '09:00 AM - 10:45 AM', 'St. Martin\'s Anglican Church, Sharjah', 'Main Worship', 'Weekly']
