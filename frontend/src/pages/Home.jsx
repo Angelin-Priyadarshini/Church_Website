@@ -19,7 +19,7 @@ const Home = () => {
       try {
         const [schedRes, servRes, testRes] = await Promise.all([
           fetch(`${API_BASE}/api/schedule`),
-          fetch(`${API_BASE}/api/services?category=${encodeURIComponent('Sunday Service')}&limit=1`),
+          fetch(`${API_BASE}/api/services?category=${encodeURIComponent('Sunday Service')}&search=${encodeURIComponent('SUNDAY SERVICE')}&limit=1`),
           fetch(`${API_BASE}/api/testimonies`)
         ]);
         
