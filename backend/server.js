@@ -112,3 +112,29 @@ app.listen(PORT, () => {
   console.log(`Press Ctrl+C to stop.`);
   console.log(`====================================================`);
 });
+
+// Schedule automatic background YouTube synchronization
+const { syncChannelVideos } = require('./sync_channel');
+
+// Run initial background sync 30 seconds after server boot (so it doesn't block startup)
+setTimeout(async () => {
+  console.log('[Auto-Sync]: Triggering initial keyless background synchronization...');
+  try {
+    const stats = await syncChannelVideos();
+    console.log(`[Auto-Sync]: Initial load completed successfully! Total: ${stats.total} sermons.`);
+  } catch (err) {
+    console.error('[Auto-Sync]: Failure on initial sync:', err.message);
+  }
+}, 30000); // 30 seconds delay
+
+// Run periodic sync every 24 hours to check for new weekly uploads
+const DAILY_SYNC_INTERVAL = 24 * 60 * 60 * 1000;
+setInterval(async () => {
+  console.log('[Auto-Sync]: Triggering scheduled daily background synchronization...');
+  try {
+    const stats = await syncChannelVideos();
+    console.log(`[Auto-Sync]: Scheduled daily refresh completed! Total: ${stats.total} sermons.`);
+  } catch (err) {
+    console.error('[Auto-Sync]: Scheduled refresh failed:', err.message);
+  }
+}, DAILY_SYNC_INTERVAL);
