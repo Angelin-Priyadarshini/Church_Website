@@ -134,12 +134,31 @@ router.post('/register', async (req, res) => {
   }
 
   try {
-    const existingUser = await db.getAsync(`SELECT id FROM users WHERE email = ?`, [email]);
-    if (existingUser) {
-      return res.status(400).json({ error: 'Email is already registered.' });
-    }
-
+    const existingUser = await db.getAsync(`SELECT id, is_verified FROM users WHERE email = ?`, [email]);
     const passwordHash = bcrypt.hashSync(password, 10);
+
+    if (existingUser) {
+      if (existingUser.is_verified === 0) {
+        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+        await db.runAsync(
+          `UPDATE users SET name = ?, password_hash = ?, verification_code = ? WHERE id = ?`,
+          [name, passwordHash, verificationCode, existingUser.id]
+        );
+
+        sendVerificationEmail(email, name, verificationCode).catch(mailErr => {
+          console.error('SMTP background mailer error on re-register:', mailErr);
+          console.log(`[SMTP Mailer Error Code Backup]: ${verificationCode} for ${email}`);
+        });
+
+        return res.status(201).json({
+          message: 'This email is already registered but unverified. We have sent a new 6-digit verification code to your email.',
+          email
+        });
+      } else {
+        return res.status(400).json({ error: 'Email is already registered and verified. Please sign in.' });
+      }
+    }
 
     if (isAdminRegistering) {
       const assignedRole = role || 'user';
