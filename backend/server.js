@@ -31,28 +31,18 @@ seedDatabase().then(() => {
 // Middleware
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps, curl, or server-to-server)
+    // Allow requests with no origin (mobile apps, curl, server-to-server)
     if (!origin) return callback(null, true);
     
-    // Allow localhost on any port
+    // Allow localhost on any port (local development)
     if (origin.startsWith('http://localhost:')) return callback(null, true);
     
-    // Allow any Vercel preview domain
-    if (origin.endsWith('.vercel.app')) return callback(null, true);
-    
-    // Allow custom domains containing agstc.org
+    // Allow the production domain and any subdomains
     if (origin.includes('agstc.org')) return callback(null, true);
     
-    // Default allowed list
-    const allowed = [
-      "https://church-website-lilac-nine.vercel.app"
-    ];
-    if (allowed.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      // To prevent deployment blocks, fallback to allow in production while logging warning
-      callback(null, true);
-    }
+    // Fallback: allow in production while logging a warning
+    console.warn('[CORS Warning]: Unexpected origin:', origin);
+    callback(null, true);
   },
   credentials: true
 }));
@@ -100,21 +90,20 @@ const mountRoutes = (basePath = '') => {
   });
 };
 
-mountRoutes('');      // Standard endpoints
-mountRoutes('/new');  // Subdirectory endpoints
+mountRoutes(''); // All API routes served at root (agstc.org/api/...)
 
 // Serve React Frontend Static Files in Production with robust fallback checks
 const fs = require('fs');
 const frontendPath = path.join(__dirname, '../frontend/dist');
 
 if (fs.existsSync(frontendPath) && fs.existsSync(path.join(frontendPath, 'index.html'))) {
+  // Serve React build static assets
   app.use(express.static(frontendPath));
-  app.use('/new', express.static(frontendPath)); // Serve static files under /new prefix!
   
-  // Route wildcard: Route all non-API and non-resource requests to the React SPA index.html
+  // SPA fallback: send index.html for all non-API, non-resource routes
   app.get('*', (req, res) => {
-    const isApi = req.path.startsWith('/api') || req.path.startsWith('/new/api');
-    const isResource = req.path.startsWith('/resources') || req.path.startsWith('/new/resources');
+    const isApi = req.path.startsWith('/api');
+    const isResource = req.path.startsWith('/resources') || req.path.startsWith('/images');
     
     if (!isApi && !isResource) {
       res.sendFile(path.join(frontendPath, 'index.html'));
@@ -123,9 +112,8 @@ if (fs.existsSync(frontendPath) && fs.existsSync(path.join(frontendPath, 'index.
     }
   });
 } else {
-  console.warn('[Warning]: frontend/dist folder or index.html not found. React static client serving is disabled. Please compile the frontend using "npm run build" inside the frontend directory.');
+  console.warn('[Warning]: frontend/dist folder or index.html not found. React static client serving is disabled. Please build the frontend first: cd frontend && npm run build');
   
-  // Root fallback endpoint
   app.get('/', (req, res) => {
     res.json({ message: 'AGSTC Church REST API online and running! (Note: React frontend dist not built yet)' });
   });
