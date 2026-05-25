@@ -8,11 +8,34 @@ const HeroBanner = () => {
   const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const slides = [
+  // Dynamic Congregation Images loading with defaults fallback
+  const rawAboutImages = t('aboutImages');
+  let bannerImages = [];
+  if (rawAboutImages && rawAboutImages !== 'aboutImages') {
+    try {
+      bannerImages = JSON.parse(rawAboutImages);
+    } catch (e) {
+      bannerImages = [];
+    }
+  }
+
+  if (!Array.isArray(bannerImages) || bannerImages.length === 0) {
+    const singleImage = t('aboutImage');
+    if (singleImage && singleImage !== 'aboutImage' && singleImage !== '/images/home-banner1.JPG') {
+      bannerImages = [singleImage];
+    } else {
+      bannerImages = [
+        '/images/home-banner1.JPG',
+        '/images/prayer.jpg',
+        '/images/banner1.jpg'
+      ];
+    }
+  }
+
+  const baseSlides = [
     {
       title: t('heroTitle1'),
       subtitle: t('heroSub1'),
-      image: '/images/home-banner1.JPG',
       ctaText: t('watchSermons'),
       ctaLink: '/services',
       icon: <Play className="w-5 h-5" />
@@ -20,7 +43,6 @@ const HeroBanner = () => {
     {
       title: t('heroTitle2'),
       subtitle: t('heroSub2'),
-      image: '/images/prayer.jpg',
       ctaText: t('requestPrayer'),
       ctaLink: '/contact',
       icon: <HeartHandshake className="w-5 h-5" />
@@ -28,12 +50,20 @@ const HeroBanner = () => {
     {
       title: t('heroTitle3'),
       subtitle: t('heroSub3'),
-      image: '/images/banner1.jpg',
       ctaText: t('navMinistries'),
       ctaLink: '/ministries',
       icon: <HelpCircle className="w-5 h-5" />
     }
   ];
+
+  const slides = bannerImages.map((imgUrl, idx) => {
+    const base = baseSlides[idx % baseSlides.length];
+    return {
+      ...base,
+      image: imgUrl
+    };
+  });
+
 
   // Auto-play slides every 6 seconds
   useEffect(() => {

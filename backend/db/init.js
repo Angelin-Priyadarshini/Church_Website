@@ -43,8 +43,16 @@ async function seedDatabase() {
       leader TEXT,
       schedule TEXT,
       category TEXT,
-      image_url TEXT
+      image_url TEXT,
+      gallery_urls TEXT
     )`);
+
+    try {
+      await db.runAsync(`ALTER TABLE ministries ADD COLUMN gallery_urls TEXT`);
+      console.log('Migrated ministries table: added gallery_urls column.');
+    } catch (e) {
+      // Column already exists, ignore
+    }
 
     await db.runAsync(`CREATE TABLE IF NOT EXISTS prayers (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -107,6 +115,12 @@ async function seedDatabase() {
       file_type TEXT DEFAULT 'PDF',
       download_count INTEGER DEFAULT 0,
       category TEXT DEFAULT 'Bible Study'
+    )`);
+
+    await db.runAsync(`CREATE TABLE IF NOT EXISTS about_content (
+      key TEXT PRIMARY KEY,
+      en_val TEXT NOT NULL,
+      ta_val TEXT NOT NULL
     )`);
 
     console.log('Tables created successfully. Seeding initial data...');
@@ -367,6 +381,108 @@ async function seedDatabase() {
         ['AG Sharjah Devotional Guide - April 2011', 'Easter season reflection readings and daily devotionals guide.', '/resources/April_2011_6414a890-0e8c-4a2c-baf4-bacf5a1a949b.pdf', 'PDF', 110, 'Bible Study']
       );
       console.log('Download resources seeded.');
+    }
+
+    // 9. Seed Dynamic About Us Content if empty
+    const aboutCount = await db.getAsync(`SELECT COUNT(*) as count FROM about_content`);
+    if (aboutCount.count === 0) {
+      const defaultAbout = [
+        {
+          key: 'aboutHeaderSub',
+          en: 'Established by grace as a spiritual refuge for Tamil families in the UAE since 1996.',
+          ta: '1996 முதல் ஐக்கிய அரபு அமீரகத்தில் வாழும் தமிழ் குடும்பங்களின் ஆவிக்குரிய புகலிடமாக தேவ கிருபையால் நிறுவப்பட்டது.'
+        },
+        {
+          key: 'aboutTitle',
+          en: 'Our Spiritual History',
+          ta: 'எமது ஆவிக்குரிய சரித்திரம்'
+        },
+        {
+          key: 'aboutPara1',
+          en: 'Assemblies of God Sharjah Tamil Church (AGSTC) was founded with a divine burden to minister to the spiritual and social welfare of the Tamil expatriate workforce residing in Sharjah, Ajman, and nearby emirates.',
+          ta: 'ஏஜி ஷார்ஜா தமிழ் சபையானது (AGSTC) ஷார்ஜா, அஜ்மான் மற்றும் அருகில் உள்ள எமிரேட்களில் வசிக்கும் தமிழ் உழைப்பாளர் மக்களின் ஆவிக்குரிய மற்றும் சமூக நலனுக்காக ஊழியங்களைச் செய்ய வேண்டும் என்ற தாளாத பாரத்தோடு துவங்கப்பட்டது.'
+        },
+        {
+          key: 'aboutPara2',
+          en: 'What started as a small home cell meeting has blossomed under the dedicated pastoral leadership of Pastor Immanuel into a thriving sanctuary where hundreds of brothers and sisters gather weekly. The church acts as a priestly bridge, providing active transport cells to bring remote labor camp residents into fellowship.',
+          ta: 'ஒரு எளிய இல்ல ஜெபக் கூட்டமாகத் துவங்கப்பட்ட இந்த ஐக்கியம், தலைமை போதகர் இம்மானுவேல் அவர்களின் அர்ப்பணிப்புள்ள போதக பராமரிப்பின் கீழ், நூற்றுக்கணக்கான சகோதர சகோதரிகள் கூடி ஆராதிக்கும் ஒரு ஆசீர்வாதமான ஆலயமாக வளர்ந்துள்ளது. தூர முகாம்களில் வசிக்கும் தமிழ் தொழிலாளர்களை ஆராதனைக்கு அழைத்து வர பேருந்து ஊழியத்தின் மூலம் சபை ஒரு பாலமாக செயல்படுகிறது.'
+        },
+        {
+          key: 'aboutMission',
+          en: 'Our core mission is to establish peace, counsel, and gospel restoration for everyone walking through our doors.',
+          ta: 'எங்கள் ஆலயத்தின் பிரதான நோக்கம் எமது கதவுகளைத் தட்டும் ஒவ்வொரு ஆத்துமாவிற்கும் சமாதானம், ஆவிக்குரிய ஆலோசனை மற்றும் கிறிஸ்துவின் அன்பினால் உண்டாகும் மறுவாழ்வை அளிப்பதே ஆகும்.'
+        },
+        {
+          key: 'aboutImage',
+          en: '/images/home-banner1.JPG',
+          ta: '/images/home-banner1.JPG'
+        },
+        {
+          key: 'milestones',
+          en: JSON.stringify([
+            {"year": "1996", "titleEn": "Humble Beginnings", "titleTa": "எளிய ஆரம்பம்", "descEn": "Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.", "descTa": "ஷார்ஜாவில் ஒரு எளிய இல்ல ஜெபக் கூட்டமாகத் தொடங்கப்பட்டு, தூரதேசத்தில் வாழும் உழைப்பாளர்களை ஆவிக்குரிய ரீதியில் ஆதரிப்பதை நோக்கமாகக் கொண்டு ஆரம்பிக்கப்பட்டது."},
+            {"year": "2005", "titleEn": "Transport fleet launched", "titleTa": "போக்குவரத்து சேவை துவக்கம்", "descEn": "Purchased our first shuttle bus to fetch Tamil laborers completely free of charge from far-flung industrial camps.", "descTa": "தொழிலாளர்கள் எவ்வித சிரமமுமின்றி ஆராதனையில் கலந்து கொள்ள தூர முகாம்களில் இருந்து முற்றிலும் இலவசமாக அழைத்து வர முதல் பேருந்து வாங்கப்பட்டது."},
+            {"year": "2016", "titleEn": "Regional Branch Network", "titleTa": "கிளை சபைகள் விரிவாக்கம்", "descEn": "Formally established satellite cell fellowships in Ajman and Umm Al Quwain, expanding weekly ministries.", "descTa": "அண்டை எமிரேட்களான அஜ்மான் மற்றும் உம் அல் குவைனில் முறையான கிளை சபை ஐக்கியங்கள் ஏற்படுத்தப்பட்டு வாராந்திர ஊழியங்கள் விரிவுபடுத்தப்பட்டன."}
+          ]),
+          ta: JSON.stringify([
+            {"year": "1996", "titleEn": "Humble Beginnings", "titleTa": "எளிய ஆரம்பம்", "descEn": "Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.", "descTa": "ஷார்ஜாவில் ஒரு எளிய இல்ல ஜெபக் கூட்டமாகத் தொடங்கப்பட்டு, தூரதேசத்தில் வாழும் உழைப்பாளர்களை ஆவிக்குரிய ரீதியில் ஆதரிப்பதை நோக்கமாகக் கொண்டு ஆரம்பிக்கப்பட்டது."},
+            {"year": "2005", "titleEn": "Transport fleet launched", "titleTa": "போக்குவரத்து சேவை துவக்கம்", "descEn": "Purchased our first shuttle bus to fetch Tamil laborers completely free of charge from far-flung industrial camps.", "descTa": "தொழிலாளர்கள் எவ்வித சிரமமுமின்றி ஆராதனையில் கலந்து கொள்ள தூர முகாம்களில் இருந்து முற்றிலும் இலவசமாக அழைத்து வர முதல் பேருந்து வாங்கப்பட்டது."},
+            {"year": "2016", "titleEn": "Regional Branch Network", "titleTa": "கிளை சபைகள் விரிவாக்கம்", "descEn": "Formally established satellite cell fellowships in Ajman and Umm Al Quwain, expanding weekly ministries.", "descTa": "அண்டை எமிரேட்களான அஜ்மான் மற்றும் உம் அல் குவைனில் முறையான கிளை சபை ஐக்கியங்கள் ஏற்படுத்தப்பட்டு வாராந்திர ஊழியங்கள் விரிவுபடுத்தப்பட்டன."}
+          ])
+        },
+        {
+          key: 'faithStatements',
+          en: JSON.stringify([
+            {"titleEn": "The Scriptures Inspired", "titleTa": "வேதவசனங்களின் தெய்வீக உத்வேகம்", "descEn": "The Bible is the inspired, infallible Word of God, a divine revelation and the authoritative rule of faith and conduct.", "descTa": "சத்திய வேதாகமம் தேவ ஆவியினால் அருளப்பட்டதும், தவறுகளற்றதும், விசுவாசத்திற்கும் ஜீவியத்திற்கும் அதிகாரம் கொண்ட தேவ வெளிப்பாடாகும்."},
+            {"titleEn": "The One True God", "titleTa": "ஒரே மெய்யான தேவன்", "descEn": "The one true God has revealed Himself as the eternally self-existent \"I AM,\" the Creator of heaven and earth, manifested as Father, Son, and Holy Spirit.", "descTa": "ஒரே மெய்யான தேவன் தம்மை நித்திய சுயம்புவாகிய \"நான் இருக்கிறவராக இருக்கிறேன்\" என்றும், வானத்தையும் பூமியையும் படைத்த சிருஷ்டிகராகவும், பிதா, குமாரன், பரிசுத்த ஆவியாக வெளிப்படுத்தியுள்ளார்."},
+            {"titleEn": "Salvation of Man", "titleTa": "மனிதனின் இரட்சிப்பு", "descEn": "Man's only hope of redemption is through the shed blood of Jesus Christ the Son of God, received by faith and repentance.", "descTa": "தேவ குமாரனாகிய இயேசு கிறிஸ்துவின் சிந்தப்பட்ட இரத்தத்தின் மூலமே மனிதனுக்கு மீட்பு உண்டு, இது விசுவாசத்தாலும் மனந்திரும்புதலாலும் பெறப்படுகிறது."},
+            {"titleEn": "Baptism in the Holy Spirit", "titleTa": "பரிசுத்த ஆவியின் அபிஷேகம்", "descEn": "All believers are entitled to and should ardently expect the promise of the Father, the baptism in the Holy Spirit, which gives power for life and service.", "descTa": "விசுவாசிகள் அனைவரும் பிதாவின் வாக்குத்தத்தமாகிய பரிசுத்த ஆவியின் அபிஷேகத்தை ஆவலோடு எதிர்பார்க்க வேண்டும், இது கிறிஸ்தவ ஜீவியத்திற்கும் ஊழியத்திற்கும் வல்லமையளிக்கிறது."}
+          ]),
+          ta: JSON.stringify([
+            {"titleEn": "The Scriptures Inspired", "titleTa": "வேதவசனங்களின் தெய்வீக உத்வேகம்", "descEn": "The Bible is the inspired, infallible Word of God, a divine revelation and the authoritative rule of faith and conduct.", "descTa": "சத்திய வேதாகமம் தேவ ஆவியினால் அருளப்பட்டதும், தவறுகளற்றதும், விசுவாசத்திற்கும் ஜீவியத்திற்கும் அதிகாரம் கொண்ட தேவ வெளிப்பாடாகும்."},
+            {"titleEn": "The One True God", "titleTa": "ஒரே மெய்யான தேவன்", "descEn": "The one true God has revealed Himself as the eternally self-existent \"I AM,\" the Creator of heaven and earth, manifested as Father, Son, and Holy Spirit.", "descTa": "ஒரே மெய்யான தேவன் தம்மை நித்திய சுயம்புவாகிய \"நான் இருக்கிறவராக இருக்கிறேன்\" என்றும், வானத்தையும் பூமியையும் படைத்த சிருஷ்டிகராகவும், பிதா, குமாரன், பரிசுத்த ஆவியாக வெளிப்படுத்தியுள்ளார்."},
+            {"titleEn": "Salvation of Man", "titleTa": "மனிதனின் இரட்சிப்பு", "descEn": "Man's only hope of redemption is through the shed blood of Jesus Christ the Son of God, received by faith and repentance.", "descTa": "தேவ குமாரனாகிய இயேசு கிறிஸ்துவின் சிந்தப்பட்ட இரத்தத்தின் மூலமே மனிதனுக்கு மீட்பு உண்டு, இது விசுவாசத்தாலும் மனந்திரும்புதலாலும் பெறப்படுகிறது."},
+            {"titleEn": "Baptism in the Holy Spirit", "titleTa": "பரிசுத்த ஆவியின் அபிஷேகம்", "descEn": "All believers are entitled to and should ardently expect the promise of the Father, the baptism in the Holy Spirit, which gives power for life and service.", "descTa": "விசுவாசிகள் அனைவரும் பிதாவின் வாக்குத்தத்தமாகிய பரிசுத்த ஆவியின் அபிஷேகத்தை ஆவலோடு எதிர்பார்க்க வேண்டும், இது கிறிஸ்தவ ஜீவியத்திற்கும் ஊழியத்திற்கும் வல்லமையளிக்கிறது."}
+          ])
+        }
+      ];
+
+      for (const item of defaultAbout) {
+        await db.runAsync(`INSERT INTO about_content (key, en_val, ta_val) VALUES (?, ?, ?)`,
+          [item.key, item.en, item.ta]
+        );
+      }
+      console.log('About us content seeded successfully.');
+    } else {
+      // Ensure milestones, faithStatements, and aboutImage exist for migrated existing databases
+      const keysToCheck = ['aboutImage', 'milestones', 'faithStatements'];
+      for (const key of keysToCheck) {
+        const exists = await db.getAsync(`SELECT key FROM about_content WHERE key = ?`, [key]);
+        if (!exists) {
+          let enVal = '';
+          let taVal = '';
+          if (key === 'aboutImage') {
+            enVal = '/images/home-banner1.JPG';
+            taVal = '/images/home-banner1.JPG';
+          } else if (key === 'milestones') {
+            enVal = JSON.stringify([
+              {"year": "1996", "titleEn": "Humble Beginnings", "titleTa": "எளிய ஆரம்பம்", "descEn": "Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.", "descTa": "ஷார்ஜாவில் ஒரு எளிய இல்ல ஜபக் கூட்டமாகத் தொடங்கப்பட்டு, தூரதேசத்தில் வாழும் உழைப்பாளர்களை ஆவிக்குரிய ரீதியில் ஆதரிப்பதை நோக்கமாகக் கொண்டு ஆரம்பிக்கப்பட்டது."},
+              {"year": "2005", "titleEn": "Transport fleet launched", "titleTa": "போக்குவரத்து சேவை துவக்கம்", "descEn": "Purchased our first shuttle bus to fetch Tamil laborers completely free of charge from far-flung industrial camps.", "descTa": "தொழிலாளர்கள் எவ்வித சிரமமுமின்றி ஆராதனையில் கலந்து கொள்ள தூர முகாம்களில் இருந்து முற்றிலும் இலவசமாக அழைத்து வர முதல் பேருந்து வாங்கப்பட்டது."},
+              {"year": "2016", "titleEn": "Regional Branch Network", "titleTa": "கிளை சபைகள் விரிவாக்கம்", "descEn": "Formally established satellite cell fellowships in Ajman and Umm Al Quwain, expanding weekly ministries.", "descTa": "அண்டை எமிரேட்களான அஜ்மான் மற்றும் உம் அல் குவைனில் முறையான கிளை சபை ஐக்கியங்கள் ஏற்படுத்தப்பட்டு வாராந்திர ஊழியங்கள் விரிவுபடுத்தப்பட்டன."}
+            ]);
+            taVal = enVal;
+          } else if (key === 'faithStatements') {
+            enVal = JSON.stringify([
+              {"titleEn": "The Scriptures Inspired", "titleTa": "வேதவசனங்களின் தெய்வீக உத்வேகம்", "descEn": "The Bible is the inspired, infallible Word of God, a divine revelation and the authoritative rule of faith and conduct.", "descTa": "சத்திய வேதாகமம் தேவ ஆவியினால் அருளப்பட்டதும், தவறுகளற்றதும், விசுவாசத்திற்கும் ஜீவியத்திற்கும் அதிகாரம் கொண்ட தேவ வெளிப்பாடாகும்."},
+              {"titleEn": "The One True God", "titleTa": "ஒரே மெய்யான தேவன்", "descEn": "The one true God has revealed Himself as the eternally self-existent \"I AM,\" the Creator of heaven and earth, manifested as Father, Son, and Holy Spirit.", "descTa": "ஒரே மெய்யான தேவன் தம்மை நித்திய சுயம்புவாகிய \"நான் இருக்கிறவராக இருக்கிறேன்\" என்றும், வானத்தையும் பூமியையும் படைத்த சிருஷ்டிகராகவும், பிதா, குமாரன், பரிசுத்த ஆவியாக வெளிப்படுத்தியுள்ளார்."},
+              {"titleEn": "Salvation of Man", "titleTa": "மனிதனின் இரட்சிப்பு", "descEn": "Man's only hope of redemption is through the shed blood of Jesus Christ the Son of God, received by faith and repentance.", "descTa": "தேவ குமாரனாகிய இயேசு கிறிஸ்துவின் சிந்தப்பட்ட இரத்தத்தின் மூலமே மனிதனுக்கு மீட்பு உண்டு, இது விசுவாசத்தாலும் மனந்திரும்புதலாலும் பெறப்படுகிறது."},
+              {"titleEn": "Baptism in the Holy Spirit", "titleTa": "பரிசுத்த ஆவியின் அபிஷேகம்", "descEn": "All believers are entitled to and should ardently expect the promise of the Father, the baptism in the Holy Spirit, which gives power for life and service.", "descTa": "விசுவாசிகள் அனைவரும் பிதாவின் வாக்குத்தத்தமாகிய பரிசுத்த ஆவியின் அபிஷேகத்தை ஆவலோடு எதிர்பார்க்க வேண்டும், இது கிறிஸ்தவ ஜீவியத்திற்கும் ஊழியத்திற்கும் வல்லமையளிக்கிறது."}
+            ]);
+            taVal = enVal;
+          }
+          await db.runAsync(`INSERT INTO about_content (key, en_val, ta_val) VALUES (?, ?, ?)`, [key, enVal, taVal]);
+        }
+      }
     }
 
     console.log('Database initialization and seeding completed successfully!');

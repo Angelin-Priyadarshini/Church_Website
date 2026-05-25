@@ -60,6 +60,32 @@ router.post('/', authenticateToken, async (req, res) => {
   }
 });
 
+// PUT /api/resources/:id (Admin update resource)
+router.put('/:id', authenticateToken, async (req, res) => {
+  const { title, description, file_url, file_type, category } = req.body;
+
+  if (!title || !file_url) {
+    return res.status(400).json({ error: 'Title and file path url are required.' });
+  }
+
+  try {
+    const exists = await db.getAsync(`SELECT id FROM resources WHERE id = ?`, [req.params.id]);
+    if (!exists) {
+      return res.status(404).json({ error: 'Resource not found.' });
+    }
+
+    await db.runAsync(
+      `UPDATE resources SET title = ?, description = ?, file_url = ?, file_type = ?, category = ? WHERE id = ?`,
+      [title, description, file_url, file_type || 'PDF', category || 'Bible Study', req.params.id]
+    );
+
+    res.json({ message: 'Study resource updated successfully.' });
+  } catch (err) {
+    console.error('Error updating resource:', err);
+    res.status(500).json({ error: 'Server error updating study resource.' });
+  }
+});
+
 // DELETE /api/resources/:id (Admin delete)
 router.delete('/:id', authenticateToken, async (req, res) => {
   try {

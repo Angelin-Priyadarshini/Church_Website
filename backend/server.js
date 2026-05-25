@@ -13,6 +13,9 @@ const testimoniesRoutes = require('./routes/testimonies');
 const blogRoutes = require('./routes/blog');
 const resourcesRoutes = require('./routes/resources');
 const contactRoutes = require('./routes/contact');
+const aboutRoutes = require('./routes/about');
+const ministriesRoutes = require('./routes/ministries');
+const uploadRoutes = require('./routes/upload');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -33,6 +36,7 @@ app.use(express.json());
 
 // Serving static files for resources uploads
 app.use('/resources', express.static(path.join(__dirname, 'public/resources')));
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
 // Mount routers
 app.use('/api/auth', authRoutes);
@@ -44,31 +48,9 @@ app.use('/api/testimonies', testimoniesRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/resources', resourcesRoutes);
 app.use('/api/contact', contactRoutes);
-
-// Dynamic Ministries route directly inside server.js for simplicity and performance
-app.get('/api/ministries', async (req, res) => {
-  try {
-    const ministries = await db.allAsync(`SELECT * FROM ministries ORDER BY name ASC`);
-    res.json(ministries);
-  } catch (err) {
-    console.error('Error fetching ministries:', err);
-    res.status(500).json({ error: 'Server error fetching ministries.' });
-  }
-});
-
-// Get single ministry details by ID
-app.get('/api/ministries/:id', async (req, res) => {
-  try {
-    const ministry = await db.getAsync(`SELECT * FROM ministries WHERE id = ?`, [req.params.id]);
-    if (!ministry) {
-      return res.status(404).json({ error: 'Ministry not found.' });
-    }
-    res.json(ministry);
-  } catch (err) {
-    console.error('Error fetching ministry details:', err);
-    res.status(500).json({ error: 'Server error fetching ministry details.' });
-  }
-});
+app.use('/api/about', aboutRoutes);
+app.use('/api/ministries', ministriesRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Admin dashboard KPI summary endpoint directly inside server.js
 app.get('/api/dashboard/summary', async (req, res) => {

@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { API_BASE } from '../config';
 
 const LanguageContext = createContext();
 
@@ -499,6 +500,23 @@ export const LanguageProvider = ({ children }) => {
   const [language, setLanguage] = useState(() => {
     return localStorage.getItem('agstc_lang') || 'en';
   });
+  const [dynamicAbout, setDynamicAbout] = useState(null);
+
+  const fetchDynamicAbout = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/about`);
+      if (res.ok) {
+        const data = await res.json();
+        setDynamicAbout(data);
+      }
+    } catch (err) {
+      console.error('Error fetching dynamic about content:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchDynamicAbout();
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('agstc_lang', language);
@@ -512,11 +530,14 @@ export const LanguageProvider = ({ children }) => {
   };
 
   const t = (key) => {
+    if (dynamicAbout && dynamicAbout[language] && dynamicAbout[language][key] !== undefined) {
+      return dynamicAbout[language][key];
+    }
     return translations[language][key] || key;
   };
 
   return (
-    <LanguageContext.Provider value={{ language, toggleLanguage, t }}>
+    <LanguageContext.Provider value={{ language, toggleLanguage, t, fetchDynamicAbout, dynamicAbout }}>
       {children}
     </LanguageContext.Provider>
   );
