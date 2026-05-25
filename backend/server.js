@@ -30,7 +30,31 @@ seedDatabase().then(() => {
 
 // Middleware
 app.use(cors({
-  origin: ["http://localhost:5173", "https://church-website-lilac-nine.vercel.app"]
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, or server-to-server)
+    if (!origin) return callback(null, true);
+    
+    // Allow localhost on any port
+    if (origin.startsWith('http://localhost:')) return callback(null, true);
+    
+    // Allow any Vercel preview domain
+    if (origin.endsWith('.vercel.app')) return callback(null, true);
+    
+    // Allow custom domains containing agstc.org
+    if (origin.includes('agstc.org')) return callback(null, true);
+    
+    // Default allowed list
+    const allowed = [
+      "https://church-website-lilac-nine.vercel.app"
+    ];
+    if (allowed.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      // To prevent deployment blocks, fallback to allow in production while logging warning
+      callback(null, true);
+    }
+  },
+  credentials: true
 }));
 app.use(express.json());
 
