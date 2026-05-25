@@ -117,6 +117,32 @@ router.post('/:id/register', async (req, res) => {
   }
 });
 
+// PUT /api/events/:id (Admin update event)
+router.put('/:id', authenticateToken, async (req, res) => {
+  const { title, description, date, time, location, image_url, capacity } = req.body;
+
+  if (!title || !date || !time || !location) {
+    return res.status(400).json({ error: 'Title, date, time and location are required.' });
+  }
+
+  try {
+    const exists = await db.getAsync(`SELECT id FROM events WHERE id = ?`, [req.params.id]);
+    if (!exists) {
+      return res.status(404).json({ error: 'Event not found.' });
+    }
+
+    await db.runAsync(
+      `UPDATE events SET title = ?, description = ?, date = ?, time = ?, location = ?, image_url = ?, capacity = ? WHERE id = ?`,
+      [title, description, date, time, location, image_url || 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800', capacity || 100, req.params.id]
+    );
+
+    res.json({ message: 'Event updated successfully.' });
+  } catch (err) {
+    console.error('Error updating event:', err);
+    res.status(500).json({ error: 'Server error updating event.' });
+  }
+});
+
 // DELETE /api/events/:id (Admin delete event)
 router.delete('/:id', authenticateToken, async (req, res) => {
   try {

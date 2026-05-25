@@ -164,6 +164,55 @@ const MinistryDetail = () => {
           </div>
         </div>
       </section>
+
+      {/* 3. Photo Gallery Section */}
+      {(() => {
+        let gallery = [];
+        if (ministry.gallery_urls) {
+          try {
+            gallery = typeof ministry.gallery_urls === 'string' ? JSON.parse(ministry.gallery_urls) : ministry.gallery_urls;
+          } catch (e) {
+            gallery = [];
+          }
+        }
+        if (!Array.isArray(gallery)) {
+          gallery = [];
+        }
+
+        if (gallery.length === 0) return null;
+
+        return (
+          <section className="container-box py-12 border-t border-slate-900/60">
+            <div className="text-center mb-8 animate-slideup">
+              <span className="text-xs uppercase font-extrabold text-amber-400 tracking-widest block">
+                {language === 'ta' ? 'புகைப்பட தொகுப்பு' : 'Photo Gallery'}
+              </span>
+              <h2 className="heading-secondary mt-1">
+                {language === 'ta' ? 'ஊழியத்தின் புகைப்படங்கள்' : 'Ministry Moments'}
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 animate-slideup">
+              {gallery.map((url, idx) => (
+                <div 
+                  key={idx} 
+                  className="relative overflow-hidden aspect-square rounded-xl border border-white/10 bg-slate-950 group shadow-lg hover:border-amber-500/35 transition-all duration-300"
+                >
+                  <img 
+                    src={url} 
+                    alt={`Ministry moment ${idx + 1}`}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-slate-950/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+      })()}
     </div>
   );
 };
