@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { User, Calendar, Tag, ArrowRight } from 'lucide-react';
-import { API_BASE } from '../config';
+import { API_BASE, resolveImageUrl } from '../config';
 
 const Ministries = () => {
   const { t, language } = useLanguage();
@@ -57,7 +57,7 @@ const Ministries = () => {
                 {/* Image block */}
                 <div className="relative aspect-video overflow-hidden bg-slate-900 flex items-center justify-center shrink-0">
                   <img 
-                    src={min.image_url} 
+                    src={resolveImageUrl(min.image_url)} 
                     alt={t(min.name)}
                     className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500"
                   />

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { ShieldAlert, BookOpen, Clock, Heart, Users } from 'lucide-react';
+import { resolveImageUrl } from '../config';
 
 const About = () => {
   const { t, language } = useLanguage();
@@ -152,7 +153,7 @@ const About = () => {
         <div className="relative">
           <div className="absolute -inset-1 rounded-2xl bg-amber-500/20 blur opacity-45 pointer-events-none animate-pulse" />
           <img 
-            src={getAboutImage()} 
+            src={resolveImageUrl(getAboutImage())} 
             alt="Church Congregation"
             className="relative w-full h-[360px] object-cover rounded-2xl shadow-2xl border border-amber-500/20"
             onError={(e) => {
