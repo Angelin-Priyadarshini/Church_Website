@@ -29,8 +29,10 @@ function ScrollToTop() {
 }
 
 function App() {
+  const routerBasename = window.location.pathname.startsWith('/new') ? '/new' : '/';
+
   return (
-    <Router basename="/new">
+    <Router basename={routerBasename}>
       <ScrollToTop />
       <AuthProvider>
         <LanguageProvider>
