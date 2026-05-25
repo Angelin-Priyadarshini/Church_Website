@@ -1149,7 +1149,7 @@ const Admin = () => {
           </div>
           <div>
             <h2 className="font-serif font-bold text-2xl text-slate-900 leading-tight">
-              {authMode === 'login' && 'Assemblies Portal'}
+              {authMode === 'login' && 'Login'}
               {authMode === 'register' && 'Believer Registration'}
               {authMode === 'verify' && 'Email Verification'}
             </h2>

@@ -203,10 +203,10 @@ const translations = {
     
     fellowshipCircles: 'Fellowship Circles',
     fetchingActiveMinistries: 'Fetching active ministries lists...',
-    adminPortal: 'Admin Portal',
+    adminPortal: 'Login',
     adminDashboard: 'Dashboard',
     adminDashboardTitle: 'Admin Dashboard',
-    adminPortalLogin: 'Admin Portal Login'
+    adminPortalLogin: 'Login'
   },
   ta: {
     navHome: 'முதற்பக்கம்',
@@ -489,10 +489,10 @@ const translations = {
     
     fellowshipCircles: 'சபையின் ஐக்கியங்கள்',
     fetchingActiveMinistries: 'ஊழியங்கள் பட்டியலை ஏற்றுகிறது...',
-    adminPortal: 'நிர்வாகி நுழைவு',
+    adminPortal: 'உள்நுழை',
     adminDashboard: 'நிர்வாகி பகுதி',
     adminDashboardTitle: 'நிர்வாகி பலகை',
-    adminPortalLogin: 'நிர்வாகி உள்நுழைவு'
+    adminPortalLogin: 'உள்நுழை'
   }
 };
 
