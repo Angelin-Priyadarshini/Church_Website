@@ -68,6 +68,26 @@ function postHttps(url, body) {
   });
 }
 
+// Format ISO 8601 duration strings (e.g. PT2H15M30S) to standard format (H:MM:SS)
+function parseISODuration(isoDuration) {
+  if (!isoDuration) return '1:30:00';
+  const matches = isoDuration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!matches) return '1:30:00';
+  const hours = parseInt(matches[1] || 0, 10);
+  const minutes = parseInt(matches[2] || 0, 10);
+  const seconds = parseInt(matches[3] || 0, 10);
+  
+  const parts = [];
+  if (hours > 0) {
+    parts.push(hours);
+    parts.push(String(minutes).padStart(2, '0'));
+  } else {
+    parts.push(minutes);
+  }
+  parts.push(String(seconds).padStart(2, '0'));
+  return parts.join(':');
+}
+
 // Helper to sleep
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -492,6 +512,132 @@ async function fetchAllContinuations(apiKey, initialToken, originalUrl) {
 }
 
 async function run() {
+  const apiKey = process.env.YOUTUBE_API_KEY;
+  if (apiKey) {
+    console.log('Initiating YouTube Data API-based Synchronization (Auto-Sync Mode)...');
+    try {
+      const allVideos = [];
+      const uploadsPlaylistId = 'UU510Q7Wp2N7uXpB4R_Z-u5Q';
+      let pageToken = '';
+      let fetchedAll = false;
+      let apiCallCount = 0;
+      const maxApiCalls = 25; // Safety cap (handles up to 1250 videos)
+
+      while (!fetchedAll && apiCallCount < maxApiCalls) {
+        apiCallCount++;
+        const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=50&playlistId=${uploadsPlaylistId}&key=${apiKey}&pageToken=${pageToken}`;
+        
+        const resData = await getHttps(url);
+        const resJson = JSON.parse(resData);
+        
+        if (!resJson.items || resJson.items.length === 0) {
+          break;
+        }
+
+        const batchVideos = [];
+        const videoIds = [];
+
+        for (const item of resJson.items) {
+          const snippet = item.snippet;
+          const videoId = snippet.resourceId ? snippet.resourceId.videoId : null;
+          if (!videoId) continue;
+
+          const title = snippet.title || 'Untitled Sermon';
+          const description = snippet.description || '';
+          const publishedAt = item.contentDetails?.videoPublishedAt || snippet.publishedAt || '';
+          const upload_date = publishedAt ? publishedAt.split('T')[0] : new Date().toISOString().split('T')[0];
+
+          const { category, preacher } = classifySermon(title);
+
+          batchVideos.push({
+            youtube_video_id: videoId,
+            title,
+            description,
+            upload_date,
+            category,
+            preacher,
+            duration: '1:30:00'
+          });
+          videoIds.push(videoId);
+        }
+
+        // Batch fetch accurate durations
+        if (videoIds.length > 0) {
+          try {
+            const durUrl = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoIds.join(',')}&key=${apiKey}`;
+            const durData = await getHttps(durUrl);
+            const durJson = JSON.parse(durData);
+            if (durJson.items) {
+              const durationMap = {};
+              for (const durItem of durJson.items) {
+                durationMap[durItem.id] = parseISODuration(durItem.contentDetails?.duration);
+              }
+              for (const v of batchVideos) {
+                if (durationMap[v.youtube_video_id]) {
+                  v.duration = durationMap[v.youtube_video_id];
+                }
+              }
+            }
+          } catch (durErr) {
+            console.error('Error fetching video durations:', durErr.message);
+          }
+        }
+
+        allVideos.push(...batchVideos);
+
+        if (resJson.nextPageToken) {
+          pageToken = resJson.nextPageToken;
+        } else {
+          fetchedAll = true;
+        }
+      }
+
+      console.log(`Total unique sermons fetched via YouTube Data API: ${allVideos.length}`);
+
+      // Upsert into database
+      console.log('Writing sermon records to SQLite database...');
+      let inserted = 0;
+      let updated = 0;
+
+      for (const v of allVideos) {
+        const exists = await db.getAsync(`SELECT id, title, upload_date FROM services WHERE youtube_video_id = ?`, [v.youtube_video_id]);
+        
+        if (!exists) {
+          await db.runAsync(
+            `INSERT INTO services (title, description, youtube_video_id, category, duration, upload_date, preacher, view_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            [v.title, v.description, v.youtube_video_id, v.category, v.duration, v.upload_date, v.preacher, 0]
+          );
+          inserted++;
+        } else {
+          if (exists.title !== v.title || exists.upload_date !== v.upload_date) {
+            await db.runAsync(
+              `UPDATE services SET title = ?, upload_date = ?, category = ?, duration = ?, preacher = ? WHERE id = ?`,
+              [v.title, v.upload_date, v.category, v.duration, v.preacher, exists.id]
+            );
+            updated++;
+          }
+        }
+      }
+
+      const finalCount = await db.getAsync(`SELECT COUNT(*) as count FROM services`);
+
+      console.log('====================================================');
+      console.log(`Synchronization Complete (API Mode)!`);
+      console.log(`New Videos Inserted: ${inserted}`);
+      console.log(`Videos Updated: ${updated}`);
+      console.log(`Total Cached Videos in database: ${finalCount.count}`);
+      console.log('====================================================');
+
+      return {
+        inserted,
+        updated,
+        total: finalCount.count
+      };
+    } catch (err) {
+      console.error('YouTube Data API sync failure, falling back to keyless scraper...', err.message);
+    }
+  }
+
   console.log('Initiating Improved Recursive Keyless YouTube Synchronization...');
   
   try {
