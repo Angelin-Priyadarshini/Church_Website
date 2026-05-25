@@ -2,15 +2,14 @@
   "name": "agstc-church-website",
   "version": "1.0.0",
   "description": "Assemblies of God Sharjah Tamil Church - Full Stack Website",
-  "main": "backend/server.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node backend/server.js",
-    "build": "cd frontend && npm install && npm run build",
-    "install:all": "cd frontend && npm install && cd ../backend && npm install",
-    "dev": "node backend/server.js"
+    "start": "node server.js",
+    "build": "cd frontend && npm install && npm run build && cd ../backend && npm install",
+    "dev": "node server.js"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": "20.x"
   },
   "author": "AGSTC",
   "license": "ISC"
