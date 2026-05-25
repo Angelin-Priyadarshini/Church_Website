@@ -211,8 +211,10 @@ function classifySermon(title) {
 
 
 // Convert relative time string (e.g. "3 months ago", "2 days ago") into YYYY-MM-DD
+// Only resolves recent relative dates (days/weeks). Returns null for months/years ago
+// so old videos without a parseable title date don't get stamped with today's date.
 function parseRelativeDate(relativeStr) {
-  if (!relativeStr) return new Date().toISOString().split('T')[0];
+  if (!relativeStr) return null;
   if (/^\d{4}-\d{2}-\d{2}$/.test(relativeStr)) {
     return relativeStr;
   }
@@ -224,17 +226,17 @@ function parseRelativeDate(relativeStr) {
   
   if (text.includes('day')) {
     now.setDate(now.getDate() - val);
+    return now.toISOString().split('T')[0];
   } else if (text.includes('week')) {
     now.setDate(now.getDate() - (val * 7));
-  } else if (text.includes('month')) {
-    now.setMonth(now.getMonth() - val);
-  } else if (text.includes('year')) {
-    now.setFullYear(now.getFullYear() - val);
-  } else if (text.includes('hour') || text.includes('minute')) {
-    // Keep today's date
+    return now.toISOString().split('T')[0];
+  } else if (text.includes('hour') || text.includes('minute') || text.includes('second') || text.includes('just now')) {
+    return now.toISOString().split('T')[0];
   }
   
-  return now.toISOString().split('T')[0];
+  // For "X months ago" or "X years ago" we can't reliably guess the date,
+  // so return null — the title-based parser is the only reliable source.
+  return null;
 }
 
 // Advanced date parsing from title, with relative date fallback

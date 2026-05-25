@@ -25,11 +25,11 @@ router.get('/', async (req, res) => {
   }
 
   if (sort === 'oldest') {
-    sql += ` ORDER BY upload_date ASC, id DESC`;
+    sql += ` ORDER BY upload_date ASC NULLS LAST, id ASC`;
   } else if (sort === 'popular') {
-    sql += ` ORDER BY view_count DESC, upload_date DESC`;
+    sql += ` ORDER BY view_count DESC, upload_date DESC NULLS LAST`;
   } else {
-    sql += ` ORDER BY upload_date DESC, id DESC`;
+    sql += ` ORDER BY upload_date DESC NULLS LAST, id DESC`;
   }
 
   if (limit) {
@@ -121,7 +121,7 @@ function parseISODuration(isoDuration) {
 
 // Convert relative time string or return raw YYYY-MM-DD directly
 function parseRelativeDate(relativeStr) {
-  if (!relativeStr) return new Date().toISOString().split('T')[0];
+  if (!relativeStr) return null;
   if (/^\d{4}-\d{2}-\d{2}$/.test(relativeStr)) {
     return relativeStr;
   }
@@ -132,14 +132,15 @@ function parseRelativeDate(relativeStr) {
   
   if (text.includes('day')) {
     now.setDate(now.getDate() - val);
+    return now.toISOString().split('T')[0];
   } else if (text.includes('week')) {
     now.setDate(now.getDate() - (val * 7));
-  } else if (text.includes('month')) {
-    now.setMonth(now.getMonth() - val);
-  } else if (text.includes('year')) {
-    now.setFullYear(now.getFullYear() - val);
+    return now.toISOString().split('T')[0];
+  } else if (text.includes('hour') || text.includes('minute') || text.includes('second')) {
+    return now.toISOString().split('T')[0];
   }
-  return now.toISOString().split('T')[0];
+  // months/years ago — can't reliably guess, return null
+  return null;
 }
 
 // Advanced date parsing from title, with relative date fallback

@@ -89,18 +89,23 @@ const Services = () => {
     }
 
     // 4. Chronological date & popularity sorting
-    // Parse upload_date safely — fall back to epoch 0 if missing/invalid
+    // Parse upload_date safely — null/missing dates sort to the bottom
     const toDate = (dateStr) => {
-      if (!dateStr) return 0;
+      if (!dateStr) return -Infinity;
       const ts = Date.parse(dateStr);
-      return isNaN(ts) ? 0 : ts;
+      return isNaN(ts) ? -Infinity : ts;
     };
 
     if (sortOrder === 'oldest') {
       result.sort((a, b) => {
-        const dateDiff = toDate(a.upload_date) - toDate(b.upload_date);
+        const da = toDate(a.upload_date), db_ = toDate(b.upload_date);
+        // nulls go to the bottom even in oldest-first view
+        if (da === -Infinity && db_ === -Infinity) return a.id - b.id;
+        if (da === -Infinity) return 1;
+        if (db_ === -Infinity) return -1;
+        const dateDiff = da - db_;
         if (dateDiff !== 0) return dateDiff;
-        return a.id - b.id; // same date: lower id (older insert) first
+        return a.id - b.id;
       });
     } else if (sortOrder === 'popular') {
       result.sort((a, b) => {
@@ -109,11 +114,15 @@ const Services = () => {
         return toDate(b.upload_date) - toDate(a.upload_date);
       });
     } else {
-      // Default: newest first
+      // Default: newest first, nulls at bottom
       result.sort((a, b) => {
-        const dateDiff = toDate(b.upload_date) - toDate(a.upload_date);
+        const da = toDate(a.upload_date), db_ = toDate(b.upload_date);
+        if (da === -Infinity && db_ === -Infinity) return b.id - a.id;
+        if (da === -Infinity) return 1;
+        if (db_ === -Infinity) return -1;
+        const dateDiff = db_ - da;
         if (dateDiff !== 0) return dateDiff;
-        return b.id - a.id; // same date: higher id (newer insert) first
+        return b.id - a.id;
       });
     }
 
@@ -329,7 +338,7 @@ const Services = () => {
                       </span>
                       <span className="flex items-center gap-1.5" title="Broadcast upload date">
                         <Calendar className="w-3.5 h-3.5 text-amber-400" />
-                        {t(sermon.upload_date)}
+                        {sermon.upload_date ? t(sermon.upload_date) : <span className="text-slate-500 italic">Date unknown</span>}
                       </span>
                     </div>
                   </div>
