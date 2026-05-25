@@ -364,117 +364,24 @@ function classifySermon(title) {
 
 // POST /api/services/sync (Sync with YouTube - Admin/Moderator locked)
 router.post('/sync', authenticateToken, async (req, res) => {
-  const channelId = 'UC510Q7Wp2N7uXpB4R_Z-u5Q';
-  const apiKey = process.env.YOUTUBE_API_KEY;
-  
-  console.log(`Triggering YouTube sync. API Key available: ${!!apiKey}`);
-
   try {
-    let syncedVideos = [];
-    let isFullSync = false;
-
-    if (apiKey) {
-      // 1. ADVANCED SYNC: Query YouTube Data API for uploads playlist
-      // The uploads playlist ID is typically the Channel ID with 'UU' instead of 'UC'
-      const uploadsPlaylistId = 'UU510Q7Wp2N7uXpB4R_Z-u5Q';
-      let pageToken = '';
-      let fetchedAll = false;
-      let apiCallCount = 0;
-      const maxApiCalls = 15; // Safety cap (handles up to 750 videos)
-
-      while (!fetchedAll && apiCallCount < maxApiCalls) {
-        apiCallCount++;
-        const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=50&playlistId=${uploadsPlaylistId}&key=${apiKey}&pageToken=${pageToken}`;
-        
-        const resData = await httpsGet(url);
-        const resJson = JSON.parse(resData);
-        
-        if (!resJson.items || resJson.items.length === 0) {
-          break;
-        }
-
-        const batchVideos = [];
-        const videoIds = [];
-
-        for (const item of resJson.items) {
-          const snippet = item.snippet;
-          const videoId = snippet.resourceId ? snippet.resourceId.videoId : null;
-          if (!videoId) continue;
-
-          const title = snippet.title || 'Untitled Sermon';
-          const description = snippet.description || '';
-          const publishedAt = item.contentDetails?.videoPublishedAt || snippet.publishedAt || '';
-          let upload_date = publishedAt ? publishedAt.split('T')[0] : new Date().toISOString().split('T')[0];
-          
-          const parsedTitleDate = parseDateFromTitle(title, upload_date);
-          if (parsedTitleDate) {
-            upload_date = parsedTitleDate;
-          }
-
-          const { category, preacher } = classifySermon(title);
-
-          batchVideos.push({
-            youtube_video_id: videoId,
-            title,
-            description,
-            upload_date,
-            category,
-            preacher,
-            duration: '1:30:00' // Default if video duration query fails
-          });
-          videoIds.push(videoId);
-        }
-
-        // Batch fetch accurate durations
-        if (videoIds.length > 0) {
-          try {
-            const durUrl = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoIds.join(',')}&key=${apiKey}`;
-            const durData = await httpsGet(durUrl);
-            const durJson = JSON.parse(durData);
-            if (durJson.items) {
-              const durationMap = {};
-              for (const durItem of durJson.items) {
-                durationMap[durItem.id] = parseISODuration(durItem.contentDetails?.duration);
-              }
-              for (const v of batchVideos) {
-                if (durationMap[v.youtube_video_id]) {
-                  v.duration = durationMap[v.youtube_video_id];
-                }
-              }
-            }
-          } catch (durErr) {
-            console.error('Error fetching video durations:', durErr.message);
-          }
-        }
-
-        syncedVideos.push(...batchVideos);
-
-        if (resJson.nextPageToken) {
-          pageToken = resJson.nextPageToken;
-        } else {
-          fetchedAll = true;
-        }
-      }
-      isFullSync = true;
-    } else {
-      // 2. FALLBACK SYNC: Run our high-performance keyless YouTube crawler (sync_channel.js)
-      console.log('[Sync Controller]: Running keyless YouTube channel crawler...');
-      const { syncChannelVideos } = require('../sync_channel');
-      const crawlStats = await syncChannelVideos();
-      
-      return res.json({
-        message: 'Full keyless historical synchronization completed successfully.',
-        isFullSync: true,
-        videosSyncedCount: crawlStats.inserted,
-        videosUpdatedCount: crawlStats.updated,
-        totalCachedVideos: crawlStats.total
-      });
-    }
+    console.log('[Sync Controller]: Running YouTube channel synchronization...');
+    const { syncChannelVideos } = require('../sync_channel');
+    const crawlStats = await syncChannelVideos();
+    
+    return res.json({
+      message: 'YouTube synchronization completed successfully.',
+      isFullSync: true,
+      videosSyncedCount: crawlStats.inserted,
+      videosUpdatedCount: crawlStats.updated,
+      totalCachedVideos: crawlStats.total
+    });
   } catch (err) {
     console.error('YouTube synchronization failure:', err);
     res.status(500).json({ error: `YouTube feed sync failed: ${err.message}` });
   }
 });
+
 
 // POST /api/services (Admin manual add sermon)
 router.post('/', authenticateToken, async (req, res) => {

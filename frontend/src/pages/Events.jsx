@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { Calendar, Clock, MapPin, Users, Ticket, CheckCircle, X } from 'lucide-react';
-import { API_BASE } from '../config';
+import { API_BASE, resolveImageUrl } from '../config';
 
 const Events = () => {
   const { t } = useLanguage();
@@ -122,7 +122,7 @@ const Events = () => {
                   {/* Image cover */}
                   <div className="relative aspect-video overflow-hidden bg-slate-900 shrink-0">
                     <img 
-                      src={evt.image_url} 
+                      src={resolveImageUrl(evt.image_url)} 
                       alt={evt.title}
                       className="w-full h-full object-cover"
                     />

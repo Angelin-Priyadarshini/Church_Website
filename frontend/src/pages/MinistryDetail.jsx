@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { User, Calendar, Tag, ArrowLeft, ArrowRight, HeartHandshake, PhoneCall } from 'lucide-react';
-import { API_BASE } from '../config';
+import { API_BASE, resolveImageUrl } from '../config';
 
 const MinistryDetail = () => {
   const { id } = useParams();
@@ -91,7 +91,7 @@ const MinistryDetail = () => {
         <div className="lg:col-span-8 flex flex-col gap-6">
           <div className="relative overflow-hidden aspect-video rounded-2xl border border-white/10 bg-slate-950 shadow-2xl">
             <img 
-              src={ministry.image_url} 
+              src={resolveImageUrl(ministry.image_url)} 
               alt={ministry.name}
               className="w-full h-full object-cover opacity-80"
             />
@@ -199,7 +199,7 @@ const MinistryDetail = () => {
                   className="relative overflow-hidden aspect-square rounded-xl border border-white/10 bg-slate-950 group shadow-lg hover:border-amber-500/35 transition-all duration-300"
                 >
                   <img 
-                    src={url} 
+                    src={resolveImageUrl(url)} 
                     alt={`Ministry moment ${idx + 1}`}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     onError={(e) => {
