@@ -30,7 +30,7 @@ function ScrollToTop() {
 
 function App() {
   return (
-    <Router>
+    <Router basename="/new">
       <ScrollToTop />
       <AuthProvider>
         <LanguageProvider>

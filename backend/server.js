@@ -38,41 +38,46 @@ app.use(express.json());
 app.use('/resources', express.static(path.join(__dirname, 'public/resources')));
 app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
-// Mount routers
-app.use('/api/auth', authRoutes);
-app.use('/api/services', servicesRoutes);
-app.use('/api/schedule', scheduleRoutes);
-app.use('/api/prayers', prayersRoutes);
-app.use('/api/events', eventsRoutes);
-app.use('/api/testimonies', testimoniesRoutes);
-app.use('/api/blog', blogRoutes);
-app.use('/api/resources', resourcesRoutes);
-app.use('/api/contact', contactRoutes);
-app.use('/api/about', aboutRoutes);
-app.use('/api/ministries', ministriesRoutes);
-app.use('/api/upload', uploadRoutes);
+// Mount routers supporting both standard relative roots and proxy /new roots
+const mountRoutes = (basePath = '') => {
+  app.use(`${basePath}/api/auth`, authRoutes);
+  app.use(`${basePath}/api/services`, servicesRoutes);
+  app.use(`${basePath}/api/schedule`, scheduleRoutes);
+  app.use(`${basePath}/api/prayers`, prayersRoutes);
+  app.use(`${basePath}/api/events`, eventsRoutes);
+  app.use(`${basePath}/api/testimonies`, testimoniesRoutes);
+  app.use(`${basePath}/api/blog`, blogRoutes);
+  app.use(`${basePath}/api/resources`, resourcesRoutes);
+  app.use(`${basePath}/api/contact`, contactRoutes);
+  app.use(`${basePath}/api/about`, aboutRoutes);
+  app.use(`${basePath}/api/ministries`, ministriesRoutes);
+  app.use(`${basePath}/api/upload`, uploadRoutes);
 
-// Admin dashboard KPI summary endpoint directly inside server.js
-app.get('/api/dashboard/summary', async (req, res) => {
-  try {
-    const totalViews = await db.getAsync(`SELECT SUM(view_count) as total FROM services`);
-    const pendingPrayers = await db.getAsync(`SELECT COUNT(*) as count FROM prayers WHERE status = 'Pending'`);
-    const totalRegistrations = await db.getAsync(`SELECT COUNT(*) as count FROM event_registrations`);
-    const totalEvents = await db.getAsync(`SELECT COUNT(*) as count FROM events`);
-    const testimoniesCount = await db.getAsync(`SELECT COUNT(*) as count FROM testimonies`);
-    
-    res.json({
-      sermonViews: totalViews.total || 0,
-      testimoniesCount: testimoniesCount.count || 0,
-      pendingPrayers: pendingPrayers.count || 0,
-      totalEvents: totalEvents.count || 0,
-      totalBookings: totalRegistrations.count || 0
-    });
-  } catch (err) {
-    console.error('Error compiling dashboard summary:', err);
-    res.status(500).json({ error: 'Server error generating dashboard analytics.' });
-  }
-});
+  // Admin dashboard KPI summary endpoint
+  app.get(`${basePath}/api/dashboard/summary`, async (req, res) => {
+    try {
+      const totalViews = await db.getAsync(`SELECT SUM(view_count) as total FROM services`);
+      const pendingPrayers = await db.getAsync(`SELECT COUNT(*) as count FROM prayers WHERE status = 'Pending'`);
+      const totalRegistrations = await db.getAsync(`SELECT COUNT(*) as count FROM event_registrations`);
+      const totalEvents = await db.getAsync(`SELECT COUNT(*) as count FROM events`);
+      const testimoniesCount = await db.getAsync(`SELECT COUNT(*) as count FROM testimonies`);
+      
+      res.json({
+        sermonViews: totalViews.total || 0,
+        testimoniesCount: testimoniesCount.count || 0,
+        pendingPrayers: pendingPrayers.count || 0,
+        totalEvents: totalEvents.count || 0,
+        totalBookings: totalRegistrations.count || 0
+      });
+    } catch (err) {
+      console.error('Error compiling dashboard summary:', err);
+      res.status(500).json({ error: 'Server error generating dashboard analytics.' });
+    }
+  });
+};
+
+mountRoutes('');      // Standard endpoints
+mountRoutes('/new');  // Subdirectory endpoints
 
 // Serve React Frontend Static Files in Production with robust fallback checks
 const fs = require('fs');
@@ -80,10 +85,14 @@ const frontendPath = path.join(__dirname, '../frontend/dist');
 
 if (fs.existsSync(frontendPath) && fs.existsSync(path.join(frontendPath, 'index.html'))) {
   app.use(express.static(frontendPath));
+  app.use('/new', express.static(frontendPath)); // Serve static files under /new prefix!
   
   // Route wildcard: Route all non-API and non-resource requests to the React SPA index.html
   app.get('*', (req, res) => {
-    if (!req.path.startsWith('/api') && !req.path.startsWith('/resources')) {
+    const isApi = req.path.startsWith('/api') || req.path.startsWith('/new/api');
+    const isResource = req.path.startsWith('/resources') || req.path.startsWith('/new/resources');
+    
+    if (!isApi && !isResource) {
       res.sendFile(path.join(frontendPath, 'index.html'));
     } else {
       res.status(404).json({ error: 'Endpoint not found.' });
