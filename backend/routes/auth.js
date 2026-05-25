@@ -126,24 +126,17 @@ router.post('/register', async (req, res) => {
 
     if (existingUser) {
       if (existingUser.is_verified === 0) {
-        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-
+        // Auto-verify and update the unverified account so they can log in immediately
         await db.runAsync(
-          `UPDATE users SET name = ?, password_hash = ?, verification_code = ? WHERE id = ?`,
-          [name, passwordHash, verificationCode, existingUser.id]
+          `UPDATE users SET name = ?, password_hash = ?, is_verified = 1, verification_code = NULL WHERE id = ?`,
+          [name, passwordHash, existingUser.id]
         );
-
-        sendVerificationEmail(email, name, verificationCode).catch(mailErr => {
-          console.error('SMTP background mailer error on re-register:', mailErr);
-          console.log(`[SMTP Mailer Error Code Backup]: ${verificationCode} for ${email}`);
-        });
-
         return res.status(201).json({
-          message: 'This email is already registered but unverified. We have sent a new 6-digit verification code to your email.',
+          message: 'Registration successful! You can now log in.',
           email
         });
       } else {
-        return res.status(400).json({ error: 'Email is already registered and verified. Please sign in.' });
+        return res.status(400).json({ error: 'Email is already registered. Please sign in.' });
       }
     }
 
@@ -155,22 +148,13 @@ router.post('/register', async (req, res) => {
       );
       res.status(201).json({ message: `Successfully registered ${assignedRole} user: ${name}` });
     } else {
-      // Public believer registration with 6-digit verification code
-      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-
+      // Public believer registration — auto-verified (email verification temporarily disabled)
       await db.runAsync(
-        `INSERT INTO users (name, email, password_hash, role, is_verified, verification_code) VALUES (?, ?, ?, ?, ?, ?)`,
-        [name, email, passwordHash, 'user', 0, verificationCode]
+        `INSERT INTO users (name, email, password_hash, role, is_verified) VALUES (?, ?, ?, ?, ?)`,
+        [name, email, passwordHash, 'user', 1]
       );
-
-      // Trigger email asynchronously in the background (prevents blocking HTTP response, making registration extremely fast!)
-      sendVerificationEmail(email, name, verificationCode).catch(mailErr => {
-        console.error('SMTP background mailer error:', mailErr);
-        console.log(`[SMTP Mailer Error Code Backup]: ${verificationCode} for ${email}`);
-      });
-
       res.status(201).json({
-        message: 'Registration successful! A 6-digit verification code has been sent to your email.',
+        message: 'Registration successful! You can now log in.',
         email
       });
     }
