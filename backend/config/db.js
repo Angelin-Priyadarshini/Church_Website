@@ -1,6 +1,11 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
-const dbPath = path.resolve(__dirname, '../church.db');
+
+// On Render, use the persistent disk mount path so data survives redeploys.
+// Locally and on other hosts, fall back to the backend root directory.
+const dbPath = process.env.NODE_ENV === 'production' && require('fs').existsSync('/data')
+  ? '/data/church.db'
+  : path.resolve(__dirname, '../church.db');
 
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
