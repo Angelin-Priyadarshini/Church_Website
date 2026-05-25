@@ -2,42 +2,31 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const db = require('../config/db');
 const { authenticateToken, JWT_SECRET } = require('../middleware/auth');
 
-// Nodemailer SMTP Transporter setup - highly secure SSL direct connection with certificate fallback for cloud VPS
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
-  auth: {
-    user: 'agsharjahtamil@gmail.com',
-    pass: process.env.EMAIL_PASS
-  },
-  tls: {
-    rejectUnauthorized: false // Bypasses self-signed handshake restrictions on host providers like Hostinger/Render
-  }
-});
+// Resend HTTP-based email client (works on all cloud hosts - no SMTP port blocking)
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // Helper function to send email with 6-digit code
 async function sendVerificationEmail(email, name, verificationCode) {
-  if (!process.env.EMAIL_PASS) {
+  if (!resend) {
     console.log(`\n==================================================`);
-    console.log(`[VERIFICATION EMAIL FALLBACK]`);
+    console.log(`[VERIFICATION EMAIL FALLBACK - No RESEND_API_KEY set]`);
     console.log(`To: ${email}`);
     console.log(`Code: ${verificationCode}`);
-    console.log(`Please set EMAIL_PASS in your environment for live emails.`);
+    console.log(`Set RESEND_API_KEY in your environment for live emails.`);
     console.log(`==================================================\n`);
     return true;
   }
 
-  const mailOptions = {
-    from: `"AG Sharjah Tamil Church" <agsharjahtamil@gmail.com>`,
+  await resend.emails.send({
+    from: 'AG Sharjah Tamil Church <onboarding@resend.dev>',
     to: email,
     subject: `${verificationCode} is your AGSTC Verification Code`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 /images/logo.png auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
         <h2 style="color: #6366f1; text-align: center;">AG Sharjah Tamil Church</h2>
         <hr style="border: 0; border-top: 1px solid #eeeeee;" />
         <p>Dear ${name},</p>
@@ -49,13 +38,11 @@ async function sendVerificationEmail(email, name, verificationCode) {
         <hr style="border: 0; border-top: 1px solid #eeeeee; margin-top: 30px;" />
         <p style="text-align: center; font-size: 12px; color: #9ca3af;">
           Assemblies of God Sharjah Tamil Church, Sharjah, UAE<br/>
-          Email: agsharjahtamil@gmail.com | Website: agstc.org
+          Email: agsharjahtamil@gmail.com | Website: agsharjah.org
         </p>
       </div>
     `
-  };
-
-  await transporter.sendMail(mailOptions);
+  });
 }
 
 // POST /api/auth/login

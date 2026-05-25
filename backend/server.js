@@ -40,8 +40,8 @@ app.use(cors({
     // Allow any Vercel preview domain
     if (origin.endsWith('.vercel.app')) return callback(null, true);
     
-    // Allow custom domains containing agstc.org
-    if (origin.includes('agstc.org')) return callback(null, true);
+    // Allow custom domains containing agsharjah.org
+    if (origin.includes('agsharjah.org')) return callback(null, true);
     
     // Default allowed list
     const allowed = [
