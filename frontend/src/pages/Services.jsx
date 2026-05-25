@@ -89,24 +89,31 @@ const Services = () => {
     }
 
     // 4. Chronological date & popularity sorting
+    // Parse upload_date safely — fall back to epoch 0 if missing/invalid
+    const toDate = (dateStr) => {
+      if (!dateStr) return 0;
+      const ts = Date.parse(dateStr);
+      return isNaN(ts) ? 0 : ts;
+    };
+
     if (sortOrder === 'oldest') {
       result.sort((a, b) => {
-        const dateDiff = new Date(a.upload_date) - new Date(b.upload_date);
+        const dateDiff = toDate(a.upload_date) - toDate(b.upload_date);
         if (dateDiff !== 0) return dateDiff;
-        return b.id - a.id; // stable fallback: oldest first (larger id first if inserted newest first)
+        return a.id - b.id; // same date: lower id (older insert) first
       });
     } else if (sortOrder === 'popular') {
       result.sort((a, b) => {
         const viewDiff = (b.view_count || 0) - (a.view_count || 0);
         if (viewDiff !== 0) return viewDiff;
-        return new Date(b.upload_date) - new Date(a.upload_date);
+        return toDate(b.upload_date) - toDate(a.upload_date);
       });
     } else {
       // Default: newest first
       result.sort((a, b) => {
-        const dateDiff = new Date(b.upload_date) - new Date(a.upload_date);
+        const dateDiff = toDate(b.upload_date) - toDate(a.upload_date);
         if (dateDiff !== 0) return dateDiff;
-        return a.id - b.id; // stable fallback: newest first (smaller id first if inserted newest first)
+        return b.id - a.id; // same date: higher id (newer insert) first
       });
     }
 
