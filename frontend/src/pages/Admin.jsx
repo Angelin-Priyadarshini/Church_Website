@@ -5,7 +5,7 @@ import { API_BASE } from '../config';
 import { 
   Lock, RefreshCw, BarChart2, Users, Calendar, 
   HeartHandshake, Check, Trash2, ArrowUpRight, HelpCircle,
-  Plus, Video, Edit
+  Plus, Video, Edit, LogOut
 } from 'lucide-react';
 
 // Custom SVG YouTube Icon component to avoid lucide-react export mismatches
@@ -23,13 +23,34 @@ const YoutubeIcon = (props) => (
 
 const Admin = () => {
   const { user, token, login, logout, isModerator } = useAuth();
-  const { fetchDynamicAbout } = useLanguage();
+  const { fetchDynamicAbout, language, t } = useLanguage();
   
   // Auth Form State
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  // Believer Registration & Verification State
+  const [authMode, setAuthMode] = useState('login'); // 'login' | 'register' | 'verify'
+  const [regName, setRegName] = useState('');
+  const [regEmail, setRegEmail] = useState('');
+  const [regPassword, setRegPassword] = useState('');
+  const [regConfirmPassword, setRegConfirmPassword] = useState('');
+  const [verificationEmail, setVerificationEmail] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+
+  // Believer Dashboard State
+  const [believerPrayers, setBelieverPrayers] = useState([]);
+  const [myPrayersLoading, setMyPrayersLoading] = useState(true);
+  const [submittingPrayer, setSubmittingPrayer] = useState(false);
+  const [prayerSuccess, setPrayerSuccess] = useState('');
+  const [newPrayerText, setNewPrayerText] = useState('');
+  const [newPrayerCategory, setNewPrayerCategory] = useState('Healing');
+  const [newPrayerAnonymous, setNewPrayerAnonymous] = useState(false);
+  const [newPrayerPhone, setNewPrayerPhone] = useState('');
 
   // Dashboard Data State
   const [summary, setSummary] = useState(null);
@@ -849,6 +870,7 @@ const Admin = () => {
     e.preventDefault();
     setIsLoggingIn(true);
     setAuthError('');
+    setFormSuccess('');
 
     try {
       const res = await fetch(`${API_BASE}/api/auth/login`, {
@@ -859,6 +881,11 @@ const Admin = () => {
       const data = await res.json();
 
       if (!res.ok) {
+        if (res.status === 403 && data.requiresVerification) {
+          setVerificationEmail(data.email || email);
+          setAuthMode('verify');
+          throw new Error('Your email has not been verified yet. We have sent you a verification code.');
+        }
         throw new Error(data.error || 'Authentication failed');
       }
 
@@ -869,6 +896,189 @@ const Admin = () => {
       setIsLoggingIn(false);
     }
   };
+
+  const handleRegisterSubmit = async (e) => {
+    e.preventDefault();
+    setAuthError('');
+    setFormSuccess('');
+
+    if (regPassword !== regConfirmPassword) {
+      setAuthError('Passwords do not match.');
+      return;
+    }
+
+    setIsLoggingIn(true);
+
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          name: regName, 
+          email: regEmail, 
+          password: regPassword 
+        })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Registration failed');
+      }
+
+      setVerificationEmail(regEmail);
+      setAuthMode('verify');
+      setFormSuccess('Registration successful! Please check your email for the 6-digit verification code.');
+    } catch (err) {
+      setAuthError(err.message || 'Error creating your believer account.');
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  const handleVerifySubmit = async (e) => {
+    e.preventDefault();
+    setIsVerifying(true);
+    setAuthError('');
+    setFormSuccess('');
+
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          email: verificationEmail, 
+          code: verificationCode 
+        })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Verification failed');
+      }
+
+      setFormSuccess('Your email has been verified successfully! You can now log in.');
+      setAuthMode('login');
+      setEmail(verificationEmail);
+      setVerificationCode('');
+    } catch (err) {
+      setAuthError(err.message || 'Invalid or expired verification code.');
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    setIsResending(true);
+    setAuthError('');
+    setFormSuccess('');
+
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/resend-code`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: verificationEmail })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Resending code failed');
+      }
+
+      setFormSuccess('A new 6-digit verification code has been sent to your email.');
+    } catch (err) {
+      setAuthError(err.message || 'Error resending verification code.');
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  const fetchBelieverPrayers = async () => {
+    if (!token) return;
+    setMyPrayersLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/prayers/my-requests`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setBelieverPrayers(data);
+      }
+    } catch (err) {
+      console.error('Error fetching believer prayers:', err);
+    } finally {
+      setMyPrayersLoading(false);
+    }
+  };
+
+  const handleBelieverPrayerSubmit = async (e) => {
+    e.preventDefault();
+    setPrayerSuccess('');
+    setActionError('');
+    setSubmittingPrayer(true);
+
+    if (!newPrayerText) {
+      setActionError('Please enter your prayer request.');
+      setSubmittingPrayer(false);
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/api/prayers`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          request_text: newPrayerText,
+          category: newPrayerCategory,
+          is_anonymous: newPrayerAnonymous ? 1 : 0,
+          phone: newPrayerPhone
+        })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to submit prayer request.');
+      }
+
+      setPrayerSuccess('Your prayer request has been submitted successfully! The intercessors team is interceding for you.');
+      setNewPrayerText('');
+      setNewPrayerPhone('');
+      setNewPrayerAnonymous(false);
+      fetchBelieverPrayers();
+    } catch (err) {
+      setActionError(err.message || 'Error submitting request.');
+    } finally {
+      setSubmittingPrayer(false);
+    }
+  };
+
+  const handleToggleAnswered = async (id, currentAnswered) => {
+    try {
+      const targetState = !currentAnswered;
+      const res = await fetch(`${API_BASE}/api/prayers/${id}/answered`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ is_answered: targetState ? 1 : 0 })
+      });
+      if (res.ok) {
+        setBelieverPrayers(prev => prev.map(p => p.id === id ? { ...p, is_answered: targetState ? 1 : 0, status: targetState ? 'Answered' : 'Pending' } : p));
+        fetchBelieverPrayers();
+      }
+    } catch (err) {
+      console.error('Error toggling answered:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (token && user && user.role === 'user') {
+      fetchBelieverPrayers();
+    }
+  }, [token, user]);
 
   const handleSyncYoutube = async () => {
     setIsSyncing(true);
@@ -933,66 +1143,447 @@ const Admin = () => {
   if (!user) {
     return (
       <section className="section-padding container-box max-w-md">
-        <div className="glass-panel p-8 bg-white border border-slate-200 text-center flex flex-col gap-6">
+        <div className="glass-panel p-8 bg-white border border-slate-200 text-center flex flex-col gap-6 shadow-2xl rounded-2xl animate-fadein">
           <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto mb-2">
             <Lock className="w-6 h-6" />
           </div>
           <div>
             <h2 className="font-serif font-bold text-2xl text-slate-900 leading-tight">
-              Administrative Portal
+              {authMode === 'login' && 'Assemblies Portal'}
+              {authMode === 'register' && 'Believer Registration'}
+              {authMode === 'verify' && 'Email Verification'}
             </h2>
             <p className="text-xs text-slate-400 mt-1">
-              Authorized church moderators and pastors only.
+              {authMode === 'login' && 'Log in to place prayer requests or manage features.'}
+              {authMode === 'register' && 'Create your account to submit and track prayers.'}
+              {authMode === 'verify' && `We sent a 6-digit verification code to ${verificationEmail}.`}
             </p>
           </div>
 
-          <form onSubmit={handleLoginSubmit} className="flex flex-col gap-4 text-left">
-            <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1">
-                Email Address
-              </label>
-              <input 
-                type="email" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@agstc.org"
-                className="input-control"
-                required
-              />
+          {formSuccess && (
+            <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs rounded-lg text-left">
+              {formSuccess}
             </div>
+          )}
 
-            <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1">
-                Security Password
-              </label>
-              <input 
-                type="password" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="input-control"
-                required
-              />
+          {authError && (
+            <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg text-left">
+              {authError}
             </div>
+          )}
 
-            {authError && (
-              <span className="text-xs font-semibold text-red-600 block">{authError}</span>
-            )}
+          {authMode === 'login' && (
+            <form onSubmit={handleLoginSubmit} className="flex flex-col gap-4 text-left">
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Email Address
+                </label>
+                <input 
+                  type="email" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@example.com"
+                  className="input-control w-full p-2.5 border border-slate-200 rounded-lg text-slate-900 focus:outline-none focus:border-amber-500"
+                  required
+                />
+              </div>
 
-            <button 
-              type="submit" 
-              disabled={isLoggingIn}
-              className="btn-primary justify-center w-full mt-2"
-            >
-              {isLoggingIn ? 'Verifying authority keys...' : 'Authorize Login'}
-            </button>
-          </form>
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Security Password
+                </label>
+                <input 
+                  type="password" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="input-control w-full p-2.5 border border-slate-200 rounded-lg text-slate-900 focus:outline-none focus:border-amber-500"
+                  required
+                />
+              </div>
 
-          <span className="text-[10px] text-slate-400">
-            Forgot credentials? Contact systems@agstc.org.
-          </span>
+              <button 
+                type="submit" 
+                disabled={isLoggingIn}
+                className="btn-primary justify-center w-full mt-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-lg transition-colors flex items-center gap-2"
+              >
+                {isLoggingIn ? 'Verifying authority keys...' : 'Authorize Login'}
+              </button>
+            </form>
+          )}
+
+          {authMode === 'register' && (
+            <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-4 text-left">
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Your Full Name
+                </label>
+                <input 
+                  type="text" 
+                  value={regName}
+                  onChange={(e) => setRegName(e.target.value)}
+                  placeholder="John Doe"
+                  className="input-control w-full p-2.5 border border-slate-200 rounded-lg text-slate-900 focus:outline-none focus:border-amber-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Email Address
+                </label>
+                <input 
+                  type="email" 
+                  value={regEmail}
+                  onChange={(e) => setRegEmail(e.target.value)}
+                  placeholder="believer@gmail.com"
+                  className="input-control w-full p-2.5 border border-slate-200 rounded-lg text-slate-900 focus:outline-none focus:border-amber-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Password
+                </label>
+                <input 
+                  type="password" 
+                  value={regPassword}
+                  onChange={(e) => setRegPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="input-control w-full p-2.5 border border-slate-200 rounded-lg text-slate-900 focus:outline-none focus:border-amber-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Confirm Password
+                </label>
+                <input 
+                  type="password" 
+                  value={regConfirmPassword}
+                  onChange={(e) => setRegConfirmPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="input-control w-full p-2.5 border border-slate-200 rounded-lg text-slate-900 focus:outline-none focus:border-amber-500"
+                  required
+                />
+              </div>
+
+              <button 
+                type="submit" 
+                disabled={isLoggingIn}
+                className="btn-primary justify-center w-full mt-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-lg transition-colors flex items-center gap-2"
+              >
+                {isLoggingIn ? 'Creating account...' : 'Complete Registration'}
+              </button>
+            </form>
+          )}
+
+          {authMode === 'verify' && (
+            <form onSubmit={handleVerifySubmit} className="flex flex-col gap-4 text-left">
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  6-Digit Verification Code
+                </label>
+                <input 
+                  type="text" 
+                  maxLength="6"
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value)}
+                  placeholder="123456"
+                  className="w-full text-center text-2xl font-bold tracking-[8px] p-2.5 border border-slate-200 rounded-lg text-slate-900 focus:outline-none focus:border-amber-500"
+                  required
+                />
+              </div>
+
+              <button 
+                type="submit" 
+                disabled={isVerifying}
+                className="btn-primary justify-center w-full mt-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-lg transition-colors flex items-center gap-2"
+              >
+                {isVerifying ? 'Verifying code...' : 'Verify & Activate'}
+              </button>
+
+              <div className="flex justify-between items-center mt-2">
+                <button 
+                  type="button"
+                  onClick={handleResendCode}
+                  disabled={isResending}
+                  className="text-xs text-amber-600 font-bold hover:underline bg-transparent border-0 cursor-pointer text-left"
+                >
+                  {isResending ? 'Sending...' : 'Resend Verification Code'}
+                </button>
+                <button 
+                  type="button"
+                  onClick={() => setAuthMode('login')}
+                  className="text-xs text-slate-400 hover:underline bg-transparent border-0 cursor-pointer"
+                >
+                  Back to Sign In
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* Toggle link */}
+          {authMode !== 'verify' && (
+            <div className="border-t border-slate-100 pt-4 mt-2">
+              {authMode === 'login' ? (
+                <p className="text-xs text-slate-500">
+                  Are you a believer in the congregation?{' '}
+                  <button 
+                    onClick={() => { setAuthMode('register'); setAuthError(''); setFormSuccess(''); }}
+                    className="text-amber-600 font-bold hover:underline bg-transparent border-0 cursor-pointer"
+                  >
+                    Register here
+                  </button>
+                </p>
+              ) : (
+                <p className="text-xs text-slate-500">
+                  Already registered?{' '}
+                  <button 
+                    onClick={() => { setAuthMode('login'); setAuthError(''); setFormSuccess(''); }}
+                    className="text-amber-600 font-bold hover:underline bg-transparent border-0 cursor-pointer"
+                  >
+                    Sign in here
+                  </button>
+                </p>
+              )}
+            </div>
+          )}
         </div>
       </section>
+    );
+  }
+
+  // Render Believer Portal if role === 'user'
+  if (user && user.role === 'user') {
+    return (
+      <div className="min-h-screen bg-slate-900 text-slate-100 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto flex flex-col gap-8">
+          
+          {/* Header Panel */}
+          <div className="glass-panel p-8 bg-slate-950/80 border border-slate-800 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-2xl">
+            <div>
+              <span className="text-amber-400 text-xs font-bold uppercase tracking-widest block mb-1">
+                Welcome to your Believer Portal
+              </span>
+              <h1 className="font-serif font-bold text-3xl text-white tracking-tight">
+                Shalom, {user.name}
+              </h1>
+              <p className="text-sm text-slate-400 mt-1">
+                Manage your prayer requests, track answers, and stay connected in fellowship.
+              </p>
+            </div>
+            
+            <button 
+              onClick={() => { logout(); }}
+              className="px-5 py-2.5 rounded-lg border border-red-500/30 bg-red-950/20 text-red-400 text-sm font-semibold hover:bg-red-500/20 hover:text-white transition-all flex items-center gap-2"
+            >
+              <LogOut className="w-4 h-4" />
+              Sign Out
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Side: Submit Prayer Form */}
+            <div className="lg:col-span-1 flex flex-col gap-6">
+              <div className="glass-panel p-6 bg-slate-950/80 border border-slate-800 rounded-xl shadow-xl">
+                <div className="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center mb-4">
+                  <HeartHandshake className="w-5 h-5" />
+                </div>
+                <h3 className="font-serif font-bold text-lg text-white mb-1">
+                  Place a Prayer Request
+                </h3>
+                <p className="text-xs text-slate-400 mb-4">
+                  Our intercession team and pastor will stand in agreement with you.
+                </p>
+
+                <form onSubmit={handleBelieverPrayerSubmit} className="flex flex-col gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-slate-300 block mb-1">
+                      Prayer Category
+                    </label>
+                    <select 
+                      value={newPrayerCategory}
+                      onChange={(e) => setNewPrayerCategory(e.target.value)}
+                      className="w-full bg-slate-900 border border-slate-800 text-white rounded-lg p-2.5 text-sm focus:border-amber-500 focus:outline-none transition-colors"
+                    >
+                      <option value="Healing">Healing & Deliverance</option>
+                      <option value="Provision">Financial Provision & Job</option>
+                      <option value="Family">Family Blessing & Peace</option>
+                      <option value="Outreach">Outreach & Salvation</option>
+                      <option value="Spiritual">Spiritual Growth</option>
+                      <option value="Other">Other Personal Needs</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-300 block mb-1">
+                      Contact Phone (Optional)
+                    </label>
+                    <input 
+                      type="text"
+                      value={newPrayerPhone}
+                      onChange={(e) => setNewPrayerPhone(e.target.value)}
+                      placeholder="+971 50 XXXXXXX"
+                      className="w-full bg-slate-900 border border-slate-800 text-white rounded-lg p-2.5 text-sm focus:border-amber-500 focus:outline-none transition-colors"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-300 block mb-1">
+                      Request Details
+                    </label>
+                    <textarea 
+                      value={newPrayerText}
+                      onChange={(e) => setNewPrayerText(e.target.value)}
+                      placeholder="Please share what you would like us to pray for..."
+                      rows="4"
+                      className="w-full bg-slate-900 border border-slate-800 text-white rounded-lg p-2.5 text-sm focus:border-amber-500 focus:outline-none transition-colors resize-none"
+                      required
+                    ></textarea>
+                  </div>
+
+                  <div className="flex items-center gap-2 py-1">
+                    <input 
+                      type="checkbox"
+                      id="anonymousCheck"
+                      checked={newPrayerAnonymous}
+                      onChange={(e) => setNewPrayerAnonymous(e.target.checked)}
+                      className="w-4 h-4 rounded bg-slate-900 border-slate-800 text-amber-500 focus:ring-amber-500/20"
+                    />
+                    <label htmlFor="anonymousCheck" className="text-xs text-slate-300 cursor-pointer">
+                      Submit anonymously to the intercessors team
+                    </label>
+                  </div>
+
+                  {prayerSuccess && (
+                    <div className="p-3 bg-emerald-950/30 border border-emerald-500/30 text-emerald-400 text-xs rounded-lg">
+                      {prayerSuccess}
+                    </div>
+                  )}
+
+                  {actionError && (
+                    <div className="p-3 bg-red-950/30 border border-red-500/30 text-red-400 text-xs rounded-lg">
+                      {actionError}
+                    </div>
+                  )}
+
+                  <button 
+                    type="submit"
+                    disabled={submittingPrayer}
+                    className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2"
+                  >
+                    {submittingPrayer ? 'Sending Request...' : 'Send Prayer Request'}
+                    <ArrowUpRight className="w-4 h-4" />
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            {/* Right Side: Tracker List */}
+            <div className="lg:col-span-2 flex flex-col gap-6">
+              <div className="glass-panel p-6 bg-slate-950/80 border border-slate-800 rounded-xl shadow-xl min-h-[400px]">
+                <h3 className="font-serif font-bold text-xl text-white mb-1">
+                  Your Prayer Request Tracker
+                </h3>
+                <p className="text-xs text-slate-400 mb-6">
+                  See the status of your requests and mark when God has answered your prayers!
+                </p>
+
+                {myPrayersLoading ? (
+                  <div className="flex flex-col items-center justify-center py-12 gap-3">
+                    <RefreshCw className="w-8 h-8 text-amber-400 animate-spin" />
+                    <span className="text-xs text-slate-400">Loading your prayer requests...</span>
+                  </div>
+                ) : believerPrayers.length === 0 ? (
+                  <div className="text-center py-16 px-4 border border-dashed border-slate-800 rounded-xl">
+                    <HeartHandshake className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+                    <p className="text-slate-300 text-sm font-semibold">No prayer requests placed yet</p>
+                    <p className="text-slate-500 text-xs mt-1">Submit a request on the left to begin tracking.</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-4">
+                    {believerPrayers.map((pray) => {
+                      const isAnswered = pray.is_answered === 1 || pray.status === 'Answered';
+                      return (
+                        <div 
+                          key={pray.id} 
+                          className={`p-5 rounded-xl border transition-all duration-300 ${
+                            isAnswered 
+                              ? 'border-emerald-500/20 bg-emerald-950/10 shadow-lg' 
+                              : 'border-slate-800 bg-slate-900/40 hover:border-slate-700'
+                          }`}
+                        >
+                          <div className="flex flex-wrap justify-between items-start gap-3 mb-3">
+                            <div className="flex items-center gap-2">
+                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-300 border border-slate-700">
+                                {pray.category}
+                              </span>
+                              <span className="text-[10px] text-slate-500">
+                                {new Date(pray.created_at).toLocaleDateString('en-US', {
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric'
+                                })}
+                              </span>
+                            </div>
+
+                            {/* Status Badge */}
+                            <div className="flex items-center gap-2">
+                              {isAnswered ? (
+                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                  Answered! Hallelujah
+                                </span>
+                              ) : pray.status === 'Prayed' ? (
+                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center gap-1">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+                                  Prayed for by Intercessors
+                                </span>
+                              ) : (
+                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                                  Pending Prayer
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <p className="text-sm text-slate-200 leading-relaxed mb-4 whitespace-pre-line">
+                            {pray.request_text}
+                          </p>
+
+                          <div className="flex items-center justify-between border-t border-slate-800/80 pt-3 mt-1">
+                            <span className="text-[10px] text-slate-500">
+                              {pray.is_anonymous === 1 ? 'Submitted Anonymously' : 'Shared with Prayer Team'}
+                            </span>
+                            
+                            <button
+                              type="button"
+                              onClick={() => handleToggleAnswered(pray.id, pray.is_answered === 1)}
+                              className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
+                                isAnswered
+                                  ? 'bg-emerald-500 text-slate-950 hover:bg-emerald-600'
+                                  : 'border border-slate-700 text-slate-300 hover:bg-slate-800 hover:border-slate-600'
+                              }`}
+                            >
+                              <Check className={`w-3.5 h-3.5 ${isAnswered ? 'stroke-[3px]' : ''}`} />
+                              {isAnswered ? 'Answered!' : 'Mark Answered'}
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
     );
   }
 

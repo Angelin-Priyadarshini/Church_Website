@@ -12,6 +12,8 @@ async function seedDatabase() {
       email TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
       role TEXT NOT NULL DEFAULT 'user',
+      is_verified INTEGER DEFAULT 0,
+      verification_code TEXT,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     )`);
 
@@ -63,8 +65,33 @@ async function seedDatabase() {
       category TEXT NOT NULL,
       status TEXT DEFAULT 'Pending',
       is_anonymous INTEGER DEFAULT 0,
+      user_id INTEGER DEFAULT NULL,
+      is_answered INTEGER DEFAULT 0,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     )`);
+
+    // Run Migrations for Users and Prayers columns
+    try {
+      await db.runAsync(`ALTER TABLE users ADD COLUMN is_verified INTEGER DEFAULT 0`);
+      console.log('Migrated users table: added is_verified column.');
+    } catch (e) {}
+    try {
+      await db.runAsync(`ALTER TABLE users ADD COLUMN verification_code TEXT`);
+      console.log('Migrated users table: added verification_code column.');
+    } catch (e) {}
+    try {
+      await db.runAsync(`ALTER TABLE prayers ADD COLUMN user_id INTEGER DEFAULT NULL`);
+      console.log('Migrated prayers table: added user_id column.');
+    } catch (e) {}
+    try {
+      await db.runAsync(`ALTER TABLE prayers ADD COLUMN is_answered INTEGER DEFAULT 0`);
+      console.log('Migrated prayers table: added is_answered column.');
+    } catch (e) {}
+
+    // Ensure all pre-existing admin/moderator users are marked as verified
+    try {
+      await db.runAsync(`UPDATE users SET is_verified = 1 WHERE role IN ('admin', 'moderator')`);
+    } catch (e) {}
 
     await db.runAsync(`CREATE TABLE IF NOT EXISTS events (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -131,11 +158,11 @@ async function seedDatabase() {
       const adminHash = bcrypt.hashSync('password123', 10);
       const modHash = bcrypt.hashSync('password123', 10);
       
-      await db.runAsync(`INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)`, 
-        ['Senior Pastor Immanuel', 'admin@agstc.org', adminHash, 'admin']
+      await db.runAsync(`INSERT INTO users (name, email, password_hash, role, is_verified) VALUES (?, ?, ?, ?, ?)`, 
+        ['Senior Pastor Immanuel', 'admin@agstc.org', adminHash, 'admin', 1]
       );
-      await db.runAsync(`INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)`, 
-        ['Prayer Coordinator Barathi', 'moderator@agstc.org', modHash, 'moderator']
+      await db.runAsync(`INSERT INTO users (name, email, password_hash, role, is_verified) VALUES (?, ?, ?, ?, ?)`, 
+        ['Prayer Coordinator Barathi', 'moderator@agstc.org', modHash, 'moderator', 1]
       );
       console.log('Users seeded successfully: Admin (admin@agstc.org), Moderator (moderator@agstc.org)');
     }

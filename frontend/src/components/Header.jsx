@@ -25,6 +25,14 @@ const Header = () => {
     { path: '/contact', label: t('navContact') },
   ];
 
+  const dashboardLabel = user?.role === 'user' 
+    ? (language === 'ta' ? 'எனது பலகை' : 'My Dashboard') 
+    : t('adminDashboard');
+
+  const dashboardTitleLabel = user?.role === 'user' 
+    ? (language === 'ta' ? 'எனது பலகை' : 'My Dashboard') 
+    : t('adminDashboardTitle');
+
   return (
     <nav className="glass-nav sticky top-0 z-50 w-full" style={{ position: 'sticky' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -78,7 +86,7 @@ const Header = () => {
                   className="flex items-center gap-1.5 text-xs xl:text-sm font-semibold text-slate-200 hover:text-amber-400"
                 >
                   <User className="w-4 h-4" />
-                  {t('adminDashboard')}
+                  {dashboardLabel}
                 </Link>
                 <button 
                   onClick={handleLogout}
@@ -141,7 +149,7 @@ const Header = () => {
                   className="flex items-center gap-2 text-base font-semibold text-slate-200 hover:text-amber-400"
                 >
                   <User className="w-5 h-5" />
-                  {t('adminDashboardTitle')}
+                  {dashboardTitleLabel}
                 </Link>
                 <button 
                   onClick={() => { setIsOpen(false); handleLogout(); }}
