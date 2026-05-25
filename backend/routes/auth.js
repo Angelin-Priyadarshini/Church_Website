@@ -152,13 +152,11 @@ router.post('/register', async (req, res) => {
         [name, email, passwordHash, 'user', 0, verificationCode]
       );
 
-      try {
-        await sendVerificationEmail(email, name, verificationCode);
-      } catch (mailErr) {
-        console.error('SMTP mailer error:', mailErr);
-        // Log backup verification code so the developer/pastor can see it in terminal
+      // Trigger email asynchronously in the background (prevents blocking HTTP response, making registration extremely fast!)
+      sendVerificationEmail(email, name, verificationCode).catch(mailErr => {
+        console.error('SMTP background mailer error:', mailErr);
         console.log(`[SMTP Mailer Error Code Backup]: ${verificationCode} for ${email}`);
-      }
+      });
 
       res.status(201).json({
         message: 'Registration successful! A 6-digit verification code has been sent to your email.',
@@ -226,12 +224,11 @@ router.post('/resend-code', async (req, res) => {
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     await db.runAsync(`UPDATE users SET verification_code = ? WHERE id = ?`, [verificationCode, user.id]);
 
-    try {
-      await sendVerificationEmail(email, user.name, verificationCode);
-    } catch (mailErr) {
-      console.error('SMTP mailer error:', mailErr);
+    // Trigger email asynchronously in the background
+    sendVerificationEmail(email, user.name, verificationCode).catch(mailErr => {
+      console.error('SMTP background mailer error:', mailErr);
       console.log(`[SMTP Mailer Error Code Backup]: ${verificationCode} for ${email}`);
-    }
+    });
 
     res.json({ message: 'A new 6-digit verification code has been sent to your email.' });
   } catch (err) {
