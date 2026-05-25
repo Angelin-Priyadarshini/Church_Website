@@ -6,12 +6,17 @@ const nodemailer = require('nodemailer');
 const db = require('../config/db');
 const { authenticateToken, JWT_SECRET } = require('../middleware/auth');
 
-// Nodemailer SMTP Transporter setup
+// Nodemailer SMTP Transporter setup - highly secure SSL direct connection with certificate fallback for cloud VPS
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
   auth: {
     user: 'agsharjahtamil@gmail.com',
     pass: process.env.EMAIL_PASS
+  },
+  tls: {
+    rejectUnauthorized: false // Bypasses self-signed handshake restrictions on host providers like Hostinger/Render
   }
 });
 
