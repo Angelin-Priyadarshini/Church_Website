@@ -38,7 +38,7 @@ const Footer = () => {
               </span>
               <span className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-amber-500 shrink-0" />
-                ministry@agstc.org
+                admin@agstc.org
               </span>
             </div>
           </div>

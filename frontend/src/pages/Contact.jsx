@@ -234,7 +234,7 @@ const Contact = () => {
                 <Mail className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
                 <div>
                   <strong className="text-white block">{t('emailQueries')}:</strong>
-                  ministry@agstc.org
+                  admin@agstc.org
                 </div>
               </div>
             </div>
