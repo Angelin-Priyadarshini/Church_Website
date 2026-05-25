@@ -213,6 +213,9 @@ function classifySermon(title) {
 // Convert relative time string (e.g. "3 months ago", "2 days ago") into YYYY-MM-DD
 function parseRelativeDate(relativeStr) {
   if (!relativeStr) return new Date().toISOString().split('T')[0];
+  if (/^\d{4}-\d{2}-\d{2}$/.test(relativeStr)) {
+    return relativeStr;
+  }
   const now = new Date();
   const text = relativeStr.toLowerCase();
   

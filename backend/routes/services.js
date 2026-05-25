@@ -119,6 +119,142 @@ function parseISODuration(isoDuration) {
   return parts.join(':');
 }
 
+// Convert relative time string or return raw YYYY-MM-DD directly
+function parseRelativeDate(relativeStr) {
+  if (!relativeStr) return new Date().toISOString().split('T')[0];
+  if (/^\d{4}-\d{2}-\d{2}$/.test(relativeStr)) {
+    return relativeStr;
+  }
+  const now = new Date();
+  const text = relativeStr.toLowerCase();
+  const numberMatch = text.match(/(\d+)/);
+  const val = numberMatch ? parseInt(numberMatch[1], 10) : 1;
+  
+  if (text.includes('day')) {
+    now.setDate(now.getDate() - val);
+  } else if (text.includes('week')) {
+    now.setDate(now.getDate() - (val * 7));
+  } else if (text.includes('month')) {
+    now.setMonth(now.getMonth() - val);
+  } else if (text.includes('year')) {
+    now.setFullYear(now.getFullYear() - val);
+  }
+  return now.toISOString().split('T')[0];
+}
+
+// Advanced date parsing from title, with relative date fallback
+function parseDateFromTitle(title, relativeDateText) {
+  let cleanTitle = title.replace(/\s*([\/\.\-])\s*/g, '$1');
+  
+  // Format 1: DD/MM/YY or DD/MM/YYYY or DD.MM.YY or DD.MM.YYYY or DD-MM-YY or DD-MM-YYYY
+  const dateRegex = /\b(\d{1,2})[\/\.\-](\d{1,2})[\/\.\-](\d{2,4})\b/;
+  const match = cleanTitle.match(dateRegex);
+  if (match) {
+    let day = parseInt(match[1], 10);
+    let month = parseInt(match[2], 10);
+    let year = parseInt(match[3], 10);
+    
+    if (year < 100) {
+      year = 2000 + year;
+    }
+    
+    if (year > 2030) {
+      if (String(year).endsWith('24')) year = 2024;
+      else if (String(year).endsWith('25')) year = 2025;
+      else if (String(year).endsWith('26')) year = 2026;
+    }
+    
+    if (month >= 1 && month <= 12 && day >= 1 && day <= 31 && year >= 2000 && year <= 2030) {
+      const pad = (num) => String(num).padStart(2, '0');
+      return `${year}-${pad(month)}-${pad(day)}`;
+    }
+  }
+
+  // Format 1b: DD.MMYYYY (like 18.072024)
+  const noSepRegex = /\b(\d{1,2})[\/\.\-](\d{1,2})(\d{4})\b/;
+  const noSepMatch = cleanTitle.match(noSepRegex);
+  if (noSepMatch) {
+    let day = parseInt(noSepMatch[1], 10);
+    let month = parseInt(noSepMatch[2], 10);
+    let year = parseInt(noSepMatch[3], 10);
+    
+    if (year > 2030) {
+      if (String(year).endsWith('24')) year = 2024;
+      else if (String(year).endsWith('25')) year = 2025;
+      else if (String(year).endsWith('26')) year = 2026;
+    }
+
+    if (month >= 1 && month <= 12 && day >= 1 && day <= 31 && year >= 2000 && year <= 2030) {
+      const pad = (num) => String(num).padStart(2, '0');
+      return `${year}-${pad(month)}-${pad(day)}`;
+    }
+  }
+
+  // Format 1c: DD MM YYYY or DD MM YY (spaces)
+  const spaceRegex = /\b(\d{1,2})\s+(\d{1,2})\s+(\d{2,4})\b/;
+  const spaceMatch = cleanTitle.match(spaceRegex);
+  if (spaceMatch) {
+    let day = parseInt(spaceMatch[1], 10);
+    let month = parseInt(spaceMatch[2], 10);
+    let year = parseInt(spaceMatch[3], 10);
+    
+    if (year < 100) {
+      year = 2000 + year;
+    }
+    
+    if (year > 2030) {
+      if (String(year).endsWith('24')) year = 2024;
+      else if (String(year).endsWith('25')) year = 2025;
+      else if (String(year).endsWith('26')) year = 2026;
+    }
+
+    if (month >= 1 && month <= 12 && day >= 1 && day <= 31 && year >= 2000 && year <= 2030) {
+      const pad = (num) => String(num).padStart(2, '0');
+      return `${year}-${pad(month)}-${pad(day)}`;
+    }
+  }
+  
+  // Format 2: e.g. "30th March 2020" or "14th Feb 20"
+  const textDateRegex = /\b(\d{1,2})(st|nd|rd|th)?\s+([A-Za-z]+)\s*,?\s*(\d{2,4})\b/;
+  const textMatch = title.match(textDateRegex);
+  if (textMatch) {
+    let day = parseInt(textMatch[1], 10);
+    let monthStr = textMatch[3].substring(0, 3).toLowerCase();
+    let year = parseInt(textMatch[4], 10);
+    if (year < 100) {
+      year = 2000 + year;
+    }
+    const months = {
+      jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
+      jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12
+    };
+    let month = months[monthStr];
+    if (month && day >= 1 && day <= 31 && year >= 2000 && year <= 2030) {
+      const pad = (num) => String(num).padStart(2, '0');
+      return `${year}-${pad(month)}-${pad(day)}`;
+    }
+  }
+
+  // Format 2b: e.g. "September 2016" or "September, 2016" or "Sept 2016"
+  const monthYearRegex = /\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s*,?\s*(\d{4})\b/i;
+  const monthYearMatch = cleanTitle.match(monthYearRegex);
+  if (monthYearMatch) {
+    let monthStr = monthYearMatch[1].substring(0, 3).toLowerCase();
+    let year = parseInt(monthYearMatch[2], 10);
+    const months = {
+      jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
+      jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12
+    };
+    let month = months[monthStr];
+    if (month && year >= 2000 && year <= 2030) {
+      const pad = (num) => String(num).padStart(2, '0');
+      return `${year}-${pad(month)}-01`;
+    }
+  }
+
+  return parseRelativeDate(relativeDateText);
+}
+
 function removeWorshipSection(title) {
   const match = title.match(/\b(WORSHIP|WOR:|WOR\.|WORSIP)\b/i);
   if (!match) return title;
@@ -268,7 +404,12 @@ router.post('/sync', authenticateToken, async (req, res) => {
           const title = snippet.title || 'Untitled Sermon';
           const description = snippet.description || '';
           const publishedAt = item.contentDetails?.videoPublishedAt || snippet.publishedAt || '';
-          const upload_date = publishedAt ? publishedAt.split('T')[0] : new Date().toISOString().split('T')[0];
+          let upload_date = publishedAt ? publishedAt.split('T')[0] : new Date().toISOString().split('T')[0];
+          
+          const parsedTitleDate = parseDateFromTitle(title, upload_date);
+          if (parsedTitleDate) {
+            upload_date = parsedTitleDate;
+          }
 
           const { category, preacher } = classifySermon(title);
 
