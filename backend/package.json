@@ -7,15 +7,18 @@
     "start": "node server.js",
     "dev": "node server.js"
   },
+  "engines": {
+    "node": "20.x"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
-    "nodemailer": "^8.0.8",
-    "better-sqlite3": "^9.4.3"
+    "mysql2": "^3.22.3",
+    "nodemailer": "^6.9.16"
   },
-  "author": "Antigravity",
+  "author": "AGSTC",
   "license": "ISC"
 }

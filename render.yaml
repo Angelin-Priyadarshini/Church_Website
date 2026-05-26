@@ -10,13 +10,21 @@ services:
         value: production
       - key: PORT
         value: 10000
+      # Set these manually in the Render dashboard (sync: false = secret)
       - key: JWT_SECRET
         sync: false
-      - key: RESEND_API_KEY
+      - key: EMAIL_PASS
         sync: false
       - key: YOUTUBE_API_KEY
         sync: false
-    disk:
-      name: church-db
-      mountPath: /data
-      sizeGB: 1
+      # MySQL connection — use Render's managed MySQL or an external host
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: 3306
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        sync: false
