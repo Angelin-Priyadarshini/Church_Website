@@ -3,8 +3,10 @@ const getProductionApiBase = () => {
   return isHostinger ? '/new' : 'https://agsharjah.org/new';
 };
 
-export const API_BASE = import.meta.env.VITE_API_URL !== undefined
-  ? import.meta.env.VITE_API_URL
+// Use VITE_API_URL only if it's actually set to a non-empty value
+const envApiUrl = import.meta.env.VITE_API_URL;
+export const API_BASE = (envApiUrl && envApiUrl.trim() !== '')
+  ? envApiUrl
   : (import.meta.env.DEV ? 'http://localhost:5000' : getProductionApiBase());
 
 // Resolves an image/resource path to a full URL via the API base
