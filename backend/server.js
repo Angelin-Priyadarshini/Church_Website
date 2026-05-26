@@ -105,7 +105,7 @@ mountRoutes('/new');  // Subdirectory endpoints
 
 // Serve React Frontend Static Files in Production with robust fallback checks
 const fs = require('fs');
-const frontendPath = path.join(__dirname, '../frontend/dist');
+const frontendPath = path.join(__dirname, 'frontend/dist');
 
 if (fs.existsSync(frontendPath) && fs.existsSync(path.join(frontendPath, 'index.html'))) {
   // Serve static assets (JS, CSS, images) under both / and /new/
