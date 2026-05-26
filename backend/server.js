@@ -108,23 +108,31 @@ const fs = require('fs');
 const frontendPath = path.join(__dirname, '../frontend/dist');
 
 if (fs.existsSync(frontendPath) && fs.existsSync(path.join(frontendPath, 'index.html'))) {
+  // Serve static assets (JS, CSS, images) under both / and /new/
+  app.use('/new', express.static(frontendPath));
   app.use(express.static(frontendPath));
-  app.use('/new', express.static(frontendPath)); // Serve static files under /new prefix!
-  
-  // Route wildcard: Route all non-API and non-resource requests to the React SPA index.html
-  app.get('*', (req, res) => {
-    const isApi = req.path.startsWith('/api') || req.path.startsWith('/new/api');
-    const isResource = req.path.startsWith('/resources') || req.path.startsWith('/new/resources');
-    
+
+  // SPA fallback: any non-API, non-resource request under /new/* → index.html
+  app.get('/new', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'index.html'));
+  });
+  app.get('/new/*', (req, res) => {
+    const isApi = req.path.startsWith('/new/api');
+    const isResource = req.path.startsWith('/new/resources') || req.path.startsWith('/new/images');
     if (!isApi && !isResource) {
       res.sendFile(path.join(frontendPath, 'index.html'));
     } else {
       res.status(404).json({ error: 'Endpoint not found.' });
     }
   });
+
+  // Root redirect → /new
+  app.get('/', (req, res) => {
+    res.redirect(301, '/new');
+  });
 } else {
   console.warn('[Warning]: frontend/dist folder or index.html not found. React static client serving is disabled. Please compile the frontend using "npm run build" inside the frontend directory.');
-  
+
   // Root fallback endpoint
   app.get('/', (req, res) => {
     res.json({ message: 'AGSTC Church REST API online and running! (Note: React frontend dist not built yet)' });
