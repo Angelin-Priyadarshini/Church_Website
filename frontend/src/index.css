@@ -179,7 +179,7 @@ html[data-theme="light"] .glass-panel-dark {
   background: rgba(255, 255, 255, 0.92);
   border: 1px solid rgba(230, 175, 46, 0.3);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  color: var(--text-light);
+  color: var(--text-main);
 }
 
 /* Navigation */
@@ -298,6 +298,8 @@ a {
 /* ==========================================
    LIGHT MODE — TAILWIND CLASS OVERRIDES
    ========================================== */
+
+/* --- Text colors: dark-mode text classes → dark text on light bg --- */
 html[data-theme="light"] .text-white,
 html[data-theme="light"] .text-slate-100,
 html[data-theme="light"] .text-slate-200 {
@@ -311,12 +313,36 @@ html[data-theme="light"] .text-slate-500 {
   color: hsl(218, 15%, 48%) !important;
 }
 
-html[data-theme="light"] .bg-slate-900,
-html[data-theme="light"] .bg-slate-950 {
+/* --- Background colors: dark slates → light warm tones --- */
+/* Exclude footer: it should keep its dark background in light mode */
+html[data-theme="light"] :not(footer) > .bg-slate-950,
+html[data-theme="light"] main .bg-slate-950,
+html[data-theme="light"] section.bg-slate-950 {
+  background-color: hsl(40, 30%, 95%) !important;
+}
+html[data-theme="light"] :not(footer).bg-slate-900,
+html[data-theme="light"] main .bg-slate-900,
+html[data-theme="light"] section.bg-slate-900 {
+  background-color: hsl(40, 25%, 93%) !important;
+}
+html[data-theme="light"] .bg-slate-800 {
+  background-color: hsl(40, 20%, 91%) !important;
+}
+/* Keep footer dark */
+html[data-theme="light"] footer.bg-slate-900 {
   background-color: hsl(222, 40%, 14%) !important;
 }
+html[data-theme="light"] footer .text-white {
+  color: white !important;
+}
+html[data-theme="light"] footer .text-slate-200,
+html[data-theme="light"] footer .text-slate-300,
+html[data-theme="light"] footer .text-slate-400,
+html[data-theme="light"] footer .text-slate-500 {
+  color: inherit !important;
+}
 
-/* Section alternating backgrounds */
+/* Section alternating backgrounds (opacity variants) */
 html[data-theme="light"] .bg-slate-950\/45,
 html[data-theme="light"] .bg-slate-950\/60 {
   background-color: hsl(40, 25%, 93%) !important;
@@ -324,14 +350,30 @@ html[data-theme="light"] .bg-slate-950\/60 {
 html[data-theme="light"] .bg-slate-950\/20 {
   background-color: rgba(240, 237, 230, 0.5) !important;
 }
+html[data-theme="light"] .bg-slate-950\/70 {
+  background-color: hsl(40, 22%, 94%) !important;
+}
+html[data-theme="light"] .bg-slate-950\/95 {
+  background-color: rgba(255, 255, 255, 0.97) !important;
+}
+html[data-theme="light"] .bg-slate-900\/60,
+html[data-theme="light"] .bg-slate-900\/50,
+html[data-theme="light"] .bg-slate-900\/40 {
+  background-color: rgba(245, 241, 235, 0.7) !important;
+}
 
+/* --- Border colors --- */
 html[data-theme="light"] .border-slate-800,
 html[data-theme="light"] .border-slate-700,
 html[data-theme="light"] .border-slate-900 {
   border-color: rgba(230, 175, 46, 0.2) !important;
 }
+html[data-theme="light"] .border-slate-900\/60 {
+  border-color: rgba(230, 175, 46, 0.15) !important;
+}
 
-html[data-theme="light"] .divide-slate-800 > * + * {
+html[data-theme="light"] .divide-slate-800 > * + *,
+html[data-theme="light"] .divide-slate-700 > * + * {
   border-color: rgba(230, 175, 46, 0.15) !important;
 }
 
@@ -340,7 +382,7 @@ html[data-theme="light"] .glass-panel.bg-slate-950\/95 {
   background: rgba(255, 255, 255, 0.97) !important;
 }
 
-/* Input controls */
+/* --- Input controls --- */
 html[data-theme="light"] .input-control {
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(230, 175, 46, 0.3);
@@ -348,6 +390,33 @@ html[data-theme="light"] .input-control {
 }
 html[data-theme="light"] .input-control::placeholder {
   color: hsl(218, 15%, 50%);
+}
+
+/* --- Select dropdowns & form backgrounds --- */
+html[data-theme="light"] select,
+html[data-theme="light"] input[type="text"],
+html[data-theme="light"] input[type="email"],
+html[data-theme="light"] input[type="password"],
+html[data-theme="light"] input[type="tel"],
+html[data-theme="light"] textarea {
+  color: hsl(222, 47%, 12%);
+}
+
+/* --- Table header row --- */
+html[data-theme="light"] thead tr {
+  background-color: hsl(40, 22%, 92%) !important;
+}
+
+/* --- Ring / focus colors --- */
+html[data-theme="light"] .ring-slate-700,
+html[data-theme="light"] .ring-slate-800 {
+  --tw-ring-color: rgba(230, 175, 46, 0.25) !important;
+}
+
+/* --- Hover states --- */
+html[data-theme="light"] .hover\:bg-slate-800:hover,
+html[data-theme="light"] .hover\:bg-slate-900:hover {
+  background-color: hsl(40, 20%, 89%) !important;
 }
 
 /* Scrollbar */

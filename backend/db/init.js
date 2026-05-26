@@ -5,147 +5,117 @@ async function seedDatabase() {
   console.log('Starting database initialization...');
 
   try {
-    // 1. Create Tables
+    // 1. Create Tables (MySQL syntax)
     await db.runAsync(`CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      email TEXT UNIQUE NOT NULL,
-      password_hash TEXT NOT NULL,
-      role TEXT NOT NULL DEFAULT 'user',
-      is_verified INTEGER DEFAULT 0,
-      verification_code TEXT,
-      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      email VARCHAR(255) UNIQUE NOT NULL,
+      password_hash VARCHAR(255) NOT NULL,
+      role VARCHAR(50) NOT NULL DEFAULT 'user',
+      is_verified TINYINT(1) DEFAULT 0,
+      verification_code VARCHAR(255),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`);
 
     await db.runAsync(`CREATE TABLE IF NOT EXISTS services (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT NOT NULL,
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      title VARCHAR(500) NOT NULL,
       description TEXT,
-      youtube_video_id TEXT NOT NULL,
-      category TEXT DEFAULT 'Main Service',
-      duration TEXT DEFAULT '1:30:00',
-      upload_date TEXT,
-      preacher TEXT DEFAULT 'Pastor Immanuel',
-      view_count INTEGER DEFAULT 0
+      youtube_video_id VARCHAR(255) NOT NULL,
+      category VARCHAR(255) DEFAULT 'Main Service',
+      duration VARCHAR(50) DEFAULT '1:30:00',
+      upload_date VARCHAR(50),
+      preacher VARCHAR(255) DEFAULT 'Pastor Immanuel',
+      view_count INT DEFAULT 0
     )`);
 
     await db.runAsync(`CREATE TABLE IF NOT EXISTS schedule (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      time TEXT NOT NULL,
-      location TEXT NOT NULL,
-      category TEXT NOT NULL,
-      recurrence TEXT NOT NULL DEFAULT 'Weekly'
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      time VARCHAR(255) NOT NULL,
+      location VARCHAR(500) NOT NULL,
+      category VARCHAR(255) NOT NULL,
+      recurrence VARCHAR(255) NOT NULL DEFAULT 'Weekly'
     )`);
 
     await db.runAsync(`CREATE TABLE IF NOT EXISTS ministries (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
       description TEXT NOT NULL,
-      leader TEXT,
-      schedule TEXT,
-      category TEXT,
-      image_url TEXT,
+      leader VARCHAR(255),
+      schedule VARCHAR(255),
+      category VARCHAR(255),
+      image_url VARCHAR(500),
       gallery_urls TEXT
     )`);
 
-    try {
-      await db.runAsync(`ALTER TABLE ministries ADD COLUMN gallery_urls TEXT`);
-      console.log('Migrated ministries table: added gallery_urls column.');
-    } catch (e) {
-      // Column already exists, ignore
-    }
-
     await db.runAsync(`CREATE TABLE IF NOT EXISTS prayers (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      email TEXT NOT NULL,
-      phone TEXT,
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      email VARCHAR(255) NOT NULL,
+      phone VARCHAR(50),
       request_text TEXT NOT NULL,
-      category TEXT NOT NULL,
-      status TEXT DEFAULT 'Pending',
-      is_anonymous INTEGER DEFAULT 0,
-      user_id INTEGER DEFAULT NULL,
-      is_answered INTEGER DEFAULT 0,
-      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+      category VARCHAR(255) NOT NULL,
+      status VARCHAR(50) DEFAULT 'Pending',
+      is_anonymous TINYINT(1) DEFAULT 0,
+      user_id INT DEFAULT NULL,
+      is_answered TINYINT(1) DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`);
 
-    // Run Migrations for Users and Prayers columns
-    try {
-      await db.runAsync(`ALTER TABLE users ADD COLUMN is_verified INTEGER DEFAULT 0`);
-      console.log('Migrated users table: added is_verified column.');
-    } catch (e) {}
-    try {
-      await db.runAsync(`ALTER TABLE users ADD COLUMN verification_code TEXT`);
-      console.log('Migrated users table: added verification_code column.');
-    } catch (e) {}
-    try {
-      await db.runAsync(`ALTER TABLE prayers ADD COLUMN user_id INTEGER DEFAULT NULL`);
-      console.log('Migrated prayers table: added user_id column.');
-    } catch (e) {}
-    try {
-      await db.runAsync(`ALTER TABLE prayers ADD COLUMN is_answered INTEGER DEFAULT 0`);
-      console.log('Migrated prayers table: added is_answered column.');
-    } catch (e) {}
-
-    // Ensure all pre-existing admin/moderator users are marked as verified
-    try {
-      await db.runAsync(`UPDATE users SET is_verified = 1 WHERE role IN ('admin', 'moderator')`);
-    } catch (e) {}
-
     await db.runAsync(`CREATE TABLE IF NOT EXISTS events (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT NOT NULL,
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      title VARCHAR(500) NOT NULL,
       description TEXT,
-      date TEXT NOT NULL,
-      time TEXT NOT NULL,
-      location TEXT NOT NULL,
-      image_url TEXT,
-      capacity INTEGER DEFAULT 100
+      date VARCHAR(50) NOT NULL,
+      time VARCHAR(100) NOT NULL,
+      location VARCHAR(500) NOT NULL,
+      image_url VARCHAR(500),
+      capacity INT DEFAULT 100
     )`);
 
     await db.runAsync(`CREATE TABLE IF NOT EXISTS event_registrations (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      event_id INTEGER NOT NULL,
-      attendee_name TEXT NOT NULL,
-      attendee_email TEXT NOT NULL,
-      attendee_phone TEXT,
-      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY(event_id) REFERENCES events(id)
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      event_id INT NOT NULL,
+      attendee_name VARCHAR(255) NOT NULL,
+      attendee_email VARCHAR(255) NOT NULL,
+      attendee_phone VARCHAR(50),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (event_id) REFERENCES events(id)
     )`);
 
     await db.runAsync(`CREATE TABLE IF NOT EXISTS testimonies (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      author_name TEXT NOT NULL,
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      author_name VARCHAR(255) NOT NULL,
       story_text TEXT NOT NULL,
-      category TEXT DEFAULT 'General',
-      video_url TEXT,
-      status TEXT DEFAULT 'Pending',
-      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+      category VARCHAR(255) DEFAULT 'General',
+      video_url VARCHAR(500),
+      status VARCHAR(50) DEFAULT 'Pending',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`);
 
     await db.runAsync(`CREATE TABLE IF NOT EXISTS blog_devotionals (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT NOT NULL,
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      title VARCHAR(500) NOT NULL,
       content TEXT NOT NULL,
-      author TEXT DEFAULT 'Pastor Immanuel',
-      category TEXT DEFAULT 'Daily Promise',
-      publish_date TEXT DEFAULT CURRENT_TIMESTAMP,
-      read_time_minutes INTEGER DEFAULT 3
+      author VARCHAR(255) DEFAULT 'Pastor Immanuel',
+      category VARCHAR(255) DEFAULT 'Daily Promise',
+      publish_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      read_time_minutes INT DEFAULT 3
     )`);
 
     await db.runAsync(`CREATE TABLE IF NOT EXISTS resources (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT NOT NULL,
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      title VARCHAR(500) NOT NULL,
       description TEXT,
-      file_url TEXT NOT NULL,
-      file_type TEXT DEFAULT 'PDF',
-      download_count INTEGER DEFAULT 0,
-      category TEXT DEFAULT 'Bible Study'
+      file_url VARCHAR(500) NOT NULL,
+      file_type VARCHAR(50) DEFAULT 'PDF',
+      download_count INT DEFAULT 0,
+      category VARCHAR(255) DEFAULT 'Bible Study'
     )`);
 
     await db.runAsync(`CREATE TABLE IF NOT EXISTS about_content (
-      key TEXT PRIMARY KEY,
+      \`key\` VARCHAR(255) PRIMARY KEY,
       en_val TEXT NOT NULL,
       ta_val TEXT NOT NULL
     )`);
@@ -166,6 +136,11 @@ async function seedDatabase() {
       );
       console.log('Users seeded successfully: Admin (admin@agstc.org), Moderator (moderator@agstc.org)');
     }
+
+    // Ensure all pre-existing admin/moderator users are marked as verified
+    try {
+      await db.runAsync(`UPDATE users SET is_verified = 1 WHERE role IN ('admin', 'moderator')`);
+    } catch (e) {}
 
     // 3. Seed Schedule (Reset and seed to ensure updates apply instantly on redeployment)
     await db.runAsync(`DELETE FROM schedule`);
@@ -272,7 +247,7 @@ async function seedDatabase() {
           image_url: '/images/banner2.jpg'
         },
         {
-          name: 'Women’s Ministry',
+          name: 'Women\u2019s Ministry',
           description: 'Empowering sisters through intense prayer circles, home-to-home visitations, charitable outreach, and the weekly Tuesday Sisters Fellowship.',
           leader: 'Sis. Mary Immanuel',
           schedule: 'Tuesdays at 10:00 AM',
@@ -296,13 +271,13 @@ async function seedDatabase() {
         ['15/2/26 | SUNDAY SERVICE | Worship: Bro.Durai | PERFECT PEACE : Asst.Past.Paulsamy', 'Sunday Service live recording from Assemblies of God Sharjah Tamil Church. Special message on Perfect Peace by Asst. Past. Paulsamy, with worship led by Bro. Durai.', 'H4gf7y5mvlM', 'Sunday Service', '2:15:30', '2026-02-15', 'Asst. Past. Paulsamy', 450]
       );
       await db.runAsync(`INSERT INTO services (title, description, youtube_video_id, category, duration, upload_date, preacher, view_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        ['12/02/26 | THURSDAY SERVICE | Worship: Bro. Babu | “Strength For a New Season”: Bro. Raskin', 'Thursday Service recording from Assemblies of God Sharjah Tamil Church. Bro. Raskin shares a powerful message on "Strength for a New Season". Worship led by Bro. Babu.', 'fBUkKrNagaE', 'Midweek Prayer', '1:48:15', '2026-02-12', 'Bro. Ruskin', 320]
+        ['12/02/26 | THURSDAY SERVICE | Worship: Bro. Babu | "Strength For a New Season": Bro. Raskin', 'Thursday Service recording from Assemblies of God Sharjah Tamil Church. Bro. Raskin shares a powerful message on "Strength for a New Season". Worship led by Bro. Babu.', 'fBUkKrNagaE', 'Midweek Prayer', '1:48:15', '2026-02-12', 'Bro. Ruskin', 320]
       );
       await db.runAsync(`INSERT INTO services (title, description, youtube_video_id, category, duration, upload_date, preacher, view_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         ['08/2/26 | SUNDAY SERVICE | Worship: Bro.William | Seed and its Results : Rev.Andrew', 'Sunday Worship Service. Rev. Andrew preaches on "Seed and its Results". Worship led by Bro. William.', 'nNqM7otHQ1o', 'Sunday Service', '2:05:40', '2026-02-08', 'Rev. Andrew', 380]
       );
       await db.runAsync(`INSERT INTO services (title, description, youtube_video_id, category, duration, upload_date, preacher, view_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        ['05/02/26 | THURSDAY SERVICE | Worship: Br.Dinakar | “Doors only God can Open”: Br.Jeyaraj', 'Thursday Midweek Service at AGSTC. Br. Jeyaraj preaches on "Doors only God can Open". Worship led by Br. Dinakar.', 'YEgSpruVq2M', 'Midweek Prayer', '1:52:10', '2026-02-05', 'Br. Jeyaraj', 290]
+        ['05/02/26 | THURSDAY SERVICE | Worship: Br.Dinakar | "Doors only God can Open": Br.Jeyaraj', 'Thursday Midweek Service at AGSTC. Br. Jeyaraj preaches on "Doors only God can Open". Worship led by Br. Dinakar.', 'YEgSpruVq2M', 'Midweek Prayer', '1:52:10', '2026-02-05', 'Br. Jeyaraj', 290]
       );
       await db.runAsync(`INSERT INTO services (title, description, youtube_video_id, category, duration, upload_date, preacher, view_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         ['01/2/26 | SUNDAY SERVICE | Wor: Pas.Andrew | 5 Steps for a victorious life of faith: Pas.Immanuel', 'Sunday Service recording. Senior Pastor Immanuel preaches on "5 Steps for a Victorious Life of Faith". Worship led by Pastor Andrew.', 'spzGzjM48lc', 'Sunday Service', '2:22:15', '2026-02-01', 'Pastor Immanuel', 510]
@@ -371,7 +346,7 @@ async function seedDatabase() {
       await db.runAsync(`INSERT INTO blog_devotionals (title, content, author, category, read_time_minutes) VALUES (?, ?, ?, ?, ?)`,
         [
           'The Promise of Shaddai Security', 
-          '\"He who dwells in the secret place of the Most High shall abide under the shadow of the Almighty.\" (Psalm 91:1). In this transient world, especially as many of us live far from our native towns, the shadow of El Shaddai represents absolute protection. The shadow covers us from heat, protects us from spiritual attacks, and wraps us in comfort. Dwell in His presence today through heartfelt prayer, knowing your steps are secure.',
+          '"He who dwells in the secret place of the Most High shall abide under the shadow of the Almighty." (Psalm 91:1). In this transient world, especially as many of us live far from our native towns, the shadow of El Shaddai represents absolute protection. The shadow covers us from heat, protects us from spiritual attacks, and wraps us in comfort. Dwell in His presence today through heartfelt prayer, knowing your steps are secure.',
           'Pastor Immanuel', 
           'Daily Promise', 
           4
@@ -411,7 +386,7 @@ async function seedDatabase() {
     }
 
     // 9. Seed Dynamic About Us Content if empty
-    const aboutCount = await db.getAsync(`SELECT COUNT(*) as count FROM about_content`);
+    const aboutCount = await db.getAsync('SELECT COUNT(*) as count FROM about_content');
     if (aboutCount.count === 0) {
       const defaultAbout = [
         {
@@ -447,44 +422,43 @@ async function seedDatabase() {
         {
           key: 'milestones',
           en: JSON.stringify([
-            {"year": "1996", "titleEn": "Humble Beginnings", "titleTa": "எளிய ஆரம்பம்", "descEn": "Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.", "descTa": "ஷார்ஜாவில் ஒரு எளிய இல்ல ஜெபக் கூட்டமாகத் தொடங்கப்பட்டு, தூரதேசத்தில் வாழும் உழைப்பாளர்களை ஆவிக்குரிய ரீதியில் ஆதரிப்பதை நோக்கமாகக் கொண்டு ஆரம்பிக்கப்பட்டது."},
-            {"year": "2005", "titleEn": "Transport fleet launched", "titleTa": "போக்குவரத்து சேவை துவக்கம்", "descEn": "Purchased our first shuttle bus to fetch Tamil laborers completely free of charge from far-flung industrial camps.", "descTa": "தொழிலாளர்கள் எவ்வித சிரமமுமின்றி ஆராதனையில் கலந்து கொள்ள தூர முகாம்களில் இருந்து முற்றிலும் இலவசமாக அழைத்து வர முதல் பேருந்து வாங்கப்பட்டது."},
-            {"year": "2016", "titleEn": "Regional Branch Network", "titleTa": "கிளை சபைகள் விரிவாக்கம்", "descEn": "Formally established satellite cell fellowships in Ajman and Umm Al Quwain, expanding weekly ministries.", "descTa": "அண்டை எமிரேட்களான அஜ்மான் மற்றும் உம் அல் குவைனில் முறையான கிளை சபை ஐக்கியங்கள் ஏற்படுத்தப்பட்டு வாராந்திர ஊழியங்கள் விரிவுபடுத்தப்பட்டன."}
+            {"year": "1996", "titleEn": "Humble Beginnings", "titleTa": "\u0b8e\u0bb3\u0bbf\u0baf \u0b86\u0bb0\u0bae\u0bcd\u0baa\u0bae\u0bcd", "descEn": "Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.", "descTa": "\u0bb7\u0bbe\u0bb0\u0bcd\u0b9c\u0bbe\u0bb5\u0bbf\u0bb2\u0bcd \u0b92\u0bb0\u0bc1 \u0b8e\u0bb3\u0bbf\u0baf \u0b87\u0bb2\u0bcd\u0bb2 \u0b9c\u0bc6\u0baa\u0b95\u0bcd \u0b95\u0bc2\u0b9f\u0bcd\u0b9f\u0bae\u0bbe\u0b95\u0ba4\u0bcd \u0ba4\u0bca\u0b9f\u0b99\u0bcd\u0b95\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f\u0bc1, \u0ba4\u0bc2\u0bb0\u0ba4\u0bc7\u0b9a\u0ba4\u0bcd\u0ba4\u0bbf\u0bb2\u0bcd \u0bb5\u0bbe\u0bb4\u0bc1\u0bae\u0bcd \u0b89\u0bb4\u0bc8\u0baa\u0bcd\u0baa\u0bbe\u0bb3\u0bb0\u0bcd\u0b95\u0bb3\u0bc8 \u0b86\u0bb5\u0bbf\u0b95\u0bcd\u0b95\u0bc1\u0bb0\u0bbf\u0baf \u0bb0\u0bc0\u0ba4\u0bbf\u0baf\u0bbf\u0bb2\u0bcd \u0b86\u0ba4\u0bb0\u0bbf\u0baa\u0bcd\u0baa\u0ba4\u0bc8 \u0ba8\u0bcb\u0b95\u0bcd\u0b95\u0bae\u0bbe\u0b95\u0b95\u0bcd \u0b95\u0bca\u0ba3\u0bcd\u0b9f\u0bc1 \u0b86\u0bb0\u0bae\u0bcd\u0baa\u0bbf\u0b95\u0bcd\u0b95\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f\u0ba4\u0bc1."},
+            {"year": "2005", "titleEn": "Transport fleet launched", "titleTa": "\u0baa\u0bcb\u0b95\u0bcd\u0b95\u0bc1\u0bb5\u0bb0\u0ba4\u0bcd\u0ba4\u0bc1 \u0b9a\u0bc7\u0bb5\u0bc8 \u0ba4\u0bc1\u0bb5\u0b95\u0bcd\u0b95\u0bae\u0bcd", "descEn": "Purchased our first shuttle bus to fetch Tamil laborers completely free of charge from far-flung industrial camps.", "descTa": "\u0ba4\u0bca\u0bb4\u0bbf\u0bb2\u0bbe\u0bb3\u0bb0\u0bcd\u0b95\u0bb3\u0bcd \u0b8e\u0bb5\u0bcd\u0bb5\u0bbf\u0ba4 \u0b9a\u0bbf\u0bb0\u0bae\u0bae\u0bc1\u0bae\u0bbf\u0ba9\u0bcd\u0bb1\u0bbf \u0b86\u0bb0\u0bbe\u0ba4\u0ba9\u0bc8\u0baf\u0bbf\u0bb2\u0bcd \u0b95\u0bb2\u0ba8\u0bcd\u0ba4\u0bc1 \u0b95\u0bca\u0bb3\u0bcd\u0bb3 \u0ba4\u0bc2\u0bb0 \u0bae\u0bc1\u0b95\u0bbe\u0bae\u0bcd\u0b95\u0bb3\u0bbf\u0bb2\u0bcd \u0b87\u0bb0\u0bc1\u0ba8\u0bcd\u0ba4\u0bc1 \u0bae\u0bc1\u0bb1\u0bcd\u0bb1\u0bbf\u0bb2\u0bc1\u0bae\u0bcd \u0b87\u0bb2\u0bb5\u0b9a\u0bae\u0bbe\u0b95 \u0b85\u0bb4\u0bc8\u0ba4\u0bcd\u0ba4\u0bc1 \u0bb5\u0bb0 \u0bae\u0bc1\u0ba4\u0bb2\u0bcd \u0baa\u0bc7\u0bb0\u0bc1\u0ba8\u0bcd\u0ba4\u0bc1 \u0bb5\u0bbe\u0b99\u0bcd\u0b95\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f\u0ba4\u0bc1."},
+            {"year": "2016", "titleEn": "Regional Branch Network", "titleTa": "\u0b95\u0bbf\u0bb3\u0bc8 \u0b9a\u0baa\u0bc8\u0b95\u0bb3\u0bcd \u0bb5\u0bbf\u0bb0\u0bbf\u0bb5\u0bbe\u0b95\u0bcd\u0b95\u0bae\u0bcd", "descEn": "Formally established satellite cell fellowships in Ajman and Umm Al Quwain, expanding weekly ministries.", "descTa": "\u0b85\u0ba3\u0bcd\u0b9f\u0bc8 \u0b8e\u0bae\u0bbf\u0bb0\u0bc7\u0b9f\u0bcd\u0b95\u0bb3\u0bbe\u0ba9 \u0b85\u0b9c\u0bcd\u0bae\u0bbe\u0ba9\u0bcd \u0bae\u0bb1\u0bcd\u0bb1\u0bc1\u0bae\u0bcd \u0b89\u0bae\u0bcd \u0b85\u0bb2\u0bcd \u0b95\u0bc1\u0bb5\u0bc8\u0ba9\u0bbf\u0bb2\u0bcd \u0bae\u0bc1\u0bb1\u0bc8\u0baf\u0bbe\u0ba9 \u0b95\u0bbf\u0bb3\u0bc8 \u0b9a\u0baa\u0bc8 \u0b90\u0b95\u0bcd\u0b95\u0bbf\u0baf\u0b99\u0bcd\u0b95\u0bb3\u0bcd \u0b8f\u0bb1\u0bcd\u0baa\u0b9f\u0bc1\u0ba4\u0bcd\u0ba4\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f\u0bc1 \u0bb5\u0bbe\u0bb0\u0bbe\u0ba8\u0bcd\u0ba4\u0bbf\u0bb0 \u0b8a\u0bb4\u0bbf\u0baf\u0b99\u0bcd\u0b95\u0bb3\u0bcd \u0bb5\u0bbf\u0bb0\u0bbf\u0bb5\u0bc1\u0baa\u0b9f\u0bc1\u0ba4\u0bcd\u0ba4\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f\u0ba9."}
           ]),
           ta: JSON.stringify([
-            {"year": "1996", "titleEn": "Humble Beginnings", "titleTa": "எளிய ஆரம்பம்", "descEn": "Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.", "descTa": "ஷார்ஜாவில் ஒரு எளிய இல்ல ஜெபக் கூட்டமாகத் தொடங்கப்பட்டு, தூரதேசத்தில் வாழும் உழைப்பாளர்களை ஆவிக்குரிய ரீதியில் ஆதரிப்பதை நோக்கமாகக் கொண்டு ஆரம்பிக்கப்பட்டது."},
-            {"year": "2005", "titleEn": "Transport fleet launched", "titleTa": "போக்குவரத்து சேவை துவக்கம்", "descEn": "Purchased our first shuttle bus to fetch Tamil laborers completely free of charge from far-flung industrial camps.", "descTa": "தொழிலாளர்கள் எவ்வித சிரமமுமின்றி ஆராதனையில் கலந்து கொள்ள தூர முகாம்களில் இருந்து முற்றிலும் இலவசமாக அழைத்து வர முதல் பேருந்து வாங்கப்பட்டது."},
-            {"year": "2016", "titleEn": "Regional Branch Network", "titleTa": "கிளை சபைகள் விரிவாக்கம்", "descEn": "Formally established satellite cell fellowships in Ajman and Umm Al Quwain, expanding weekly ministries.", "descTa": "அண்டை எமிரேட்களான அஜ்மான் மற்றும் உம் அல் குவைனில் முறையான கிளை சபை ஐக்கியங்கள் ஏற்படுத்தப்பட்டு வாராந்திர ஊழியங்கள் விரிவுபடுத்தப்பட்டன."}
+            {"year": "1996", "titleEn": "Humble Beginnings", "titleTa": "\u0b8e\u0bb3\u0bbf\u0baf \u0b86\u0bb0\u0bae\u0bcd\u0baa\u0bae\u0bcd", "descEn": "Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.", "descTa": "\u0bb7\u0bbe\u0bb0\u0bcd\u0b9c\u0bbe\u0bb5\u0bbf\u0bb2\u0bcd \u0b92\u0bb0\u0bc1 \u0b8e\u0bb3\u0bbf\u0baf \u0b87\u0bb2\u0bcd\u0bb2 \u0b9c\u0bc6\u0baa\u0b95\u0bcd \u0b95\u0bc2\u0b9f\u0bcd\u0b9f\u0bae\u0bbe\u0b95\u0ba4\u0bcd \u0ba4\u0bca\u0b9f\u0b99\u0bcd\u0b95\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f\u0bc1, \u0ba4\u0bc2\u0bb0\u0ba4\u0bc7\u0b9a\u0ba4\u0bcd\u0ba4\u0bbf\u0bb2\u0bcd \u0bb5\u0bbe\u0bb4\u0bc1\u0bae\u0bcd \u0b89\u0bb4\u0bc8\u0baa\u0bcd\u0baa\u0bbe\u0bb3\u0bb0\u0bcd\u0b95\u0bb3\u0bc8 \u0b86\u0bb5\u0bbf\u0b95\u0bcd\u0b95\u0bc1\u0bb0\u0bbf\u0baf \u0bb0\u0bc0\u0ba4\u0bbf\u0baf\u0bbf\u0bb2\u0bcd \u0b86\u0ba4\u0bb0\u0bbf\u0baa\u0bcd\u0baa\u0ba4\u0bc8 \u0ba8\u0bcb\u0b95\u0bcd\u0b95\u0bae\u0bbe\u0b95\u0b95\u0bcd \u0b95\u0bca\u0ba3\u0bcd\u0b9f\u0bc1 \u0b86\u0bb0\u0bae\u0bcd\u0baa\u0bbf\u0b95\u0bcd\u0b95\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f\u0ba4\u0bc1."},
+            {"year": "2005", "titleEn": "Transport fleet launched", "titleTa": "\u0baa\u0bcb\u0b95\u0bcd\u0b95\u0bc1\u0bb5\u0bb0\u0ba4\u0bcd\u0ba4\u0bc1 \u0b9a\u0bc7\u0bb5\u0bc8 \u0ba4\u0bc1\u0bb5\u0b95\u0bcd\u0b95\u0bae\u0bcd", "descEn": "Purchased our first shuttle bus to fetch Tamil laborers completely free of charge from far-flung industrial camps.", "descTa": "\u0ba4\u0bca\u0bb4\u0bbf\u0bb2\u0bbe\u0bb3\u0bb0\u0bcd\u0b95\u0bb3\u0bcd \u0b8e\u0bb5\u0bcd\u0bb5\u0bbf\u0ba4 \u0b9a\u0bbf\u0bb0\u0bae\u0bae\u0bc1\u0bae\u0bbf\u0ba9\u0bcd\u0bb1\u0bbf \u0b86\u0bb0\u0bbe\u0ba4\u0ba9\u0bc8\u0baf\u0bbf\u0bb2\u0bcd \u0b95\u0bb2\u0ba8\u0bcd\u0ba4\u0bc1 \u0b95\u0bca\u0bb3\u0bcd\u0bb3 \u0ba4\u0bc2\u0bb0 \u0bae\u0bc1\u0b95\u0bbe\u0bae\u0bcd\u0b95\u0bb3\u0bbf\u0bb2\u0bcd \u0b87\u0bb0\u0bc1\u0ba8\u0bcd\u0ba4\u0bc1 \u0bae\u0bc1\u0bb1\u0bcd\u0bb1\u0bbf\u0bb2\u0bc1\u0bae\u0bcd \u0b87\u0bb2\u0bb5\u0b9a\u0bae\u0bbe\u0b95 \u0b85\u0bb4\u0bc8\u0ba4\u0bcd\u0ba4\u0bc1 \u0bb5\u0bb0 \u0bae\u0bc1\u0ba4\u0bb2\u0bcd \u0baa\u0bc7\u0bb0\u0bc1\u0ba8\u0bcd\u0ba4\u0bc1 \u0bb5\u0bbe\u0b99\u0bcd\u0b95\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f\u0ba4\u0bc1."},
+            {"year": "2016", "titleEn": "Regional Branch Network", "titleTa": "\u0b95\u0bbf\u0bb3\u0bc8 \u0b9a\u0baa\u0bc8\u0b95\u0bb3\u0bcd \u0bb5\u0bbf\u0bb0\u0bbf\u0bb5\u0bbe\u0b95\u0bcd\u0b95\u0bae\u0bcd", "descEn": "Formally established satellite cell fellowships in Ajman and Umm Al Quwain, expanding weekly ministries.", "descTa": "\u0b85\u0ba3\u0bcd\u0b9f\u0bc8 \u0b8e\u0bae\u0bbf\u0bb0\u0bc7\u0b9f\u0bcd\u0b95\u0bb3\u0bbe\u0ba9 \u0b85\u0b9c\u0bcd\u0bae\u0bbe\u0ba9\u0bcd \u0bae\u0bb1\u0bcd\u0bb1\u0bc1\u0bae\u0bcd \u0b89\u0bae\u0bcd \u0b85\u0bb2\u0bcd \u0b95\u0bc1\u0bb5\u0bc8\u0ba9\u0bbf\u0bb2\u0bcd \u0bae\u0bc1\u0bb1\u0bc8\u0baf\u0bbe\u0ba9 \u0b95\u0bbf\u0bb3\u0bc8 \u0b9a\u0baa\u0bc8 \u0b90\u0b95\u0bcd\u0b95\u0bbf\u0baf\u0b99\u0bcd\u0b95\u0bb3\u0bcd \u0b8f\u0bb1\u0bcd\u0baa\u0b9f\u0bc1\u0ba4\u0bcd\u0ba4\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f\u0bc1 \u0bb5\u0bbe\u0bb0\u0bbe\u0ba8\u0bcd\u0ba4\u0bbf\u0bb0 \u0b8a\u0bb4\u0bbf\u0baf\u0b99\u0bcd\u0b95\u0bb3\u0bcd \u0bb5\u0bbf\u0bb0\u0bbf\u0bb5\u0bc1\u0baa\u0b9f\u0bc1\u0ba4\u0bcd\u0ba4\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f\u0ba9."}
           ])
         },
         {
           key: 'faithStatements',
           en: JSON.stringify([
-            {"titleEn": "The Scriptures Inspired", "titleTa": "வேதவசனங்களின் தெய்வீக உத்வேகம்", "descEn": "The Bible is the inspired, infallible Word of God, a divine revelation and the authoritative rule of faith and conduct.", "descTa": "சத்திய வேதாகமம் தேவ ஆவியினால் அருளப்பட்டதும், தவறுகளற்றதும், விசுவாசத்திற்கும் ஜீவியத்திற்கும் அதிகாரம் கொண்ட தேவ வெளிப்பாடாகும்."},
-            {"titleEn": "The One True God", "titleTa": "ஒரே மெய்யான தேவன்", "descEn": "The one true God has revealed Himself as the eternally self-existent \"I AM,\" the Creator of heaven and earth, manifested as Father, Son, and Holy Spirit.", "descTa": "ஒரே மெய்யான தேவன் தம்மை நித்திய சுயம்புவாகிய \"நான் இருக்கிறவராக இருக்கிறேன்\" என்றும், வானத்தையும் பூமியையும் படைத்த சிருஷ்டிகராகவும், பிதா, குமாரன், பரிசுத்த ஆவியாக வெளிப்படுத்தியுள்ளார்."},
-            {"titleEn": "Salvation of Man", "titleTa": "மனிதனின் இரட்சிப்பு", "descEn": "Man's only hope of redemption is through the shed blood of Jesus Christ the Son of God, received by faith and repentance.", "descTa": "தேவ குமாரனாகிய இயேசு கிறிஸ்துவின் சிந்தப்பட்ட இரத்தத்தின் மூலமே மனிதனுக்கு மீட்பு உண்டு, இது விசுவாசத்தாலும் மனந்திரும்புதலாலும் பெறப்படுகிறது."},
-            {"titleEn": "Baptism in the Holy Spirit", "titleTa": "பரிசுத்த ஆவியின் அபிஷேகம்", "descEn": "All believers are entitled to and should ardently expect the promise of the Father, the baptism in the Holy Spirit, which gives power for life and service.", "descTa": "விசுவாசிகள் அனைவரும் பிதாவின் வாக்குத்தத்தமாகிய பரிசுத்த ஆவியின் அபிஷேகத்தை ஆவலோடு எதிர்பார்க்க வேண்டும், இது கிறிஸ்தவ ஜீவியத்திற்கும் ஊழியத்திற்கும் வல்லமையளிக்கிறது."}
+            {"titleEn": "The Scriptures Inspired", "titleTa": "\u0bb5\u0bc7\u0ba4\u0bb5\u0b9a\u0ba9\u0b99\u0bcd\u0b95\u0bb3\u0bbf\u0ba9\u0bcd \u0ba4\u0bc6\u0baf\u0bcd\u0bb5\u0bc0\u0b95 \u0b89\u0ba4\u0bcd\u0bb5\u0bc7\u0b95\u0bae\u0bcd", "descEn": "The Bible is the inspired, infallible Word of God, a divine revelation and the authoritative rule of faith and conduct.", "descTa": "\u0b9a\u0ba4\u0bcd\u0ba4\u0bbf\u0baf \u0bb5\u0bc7\u0ba4\u0bbe\u0b95\u0bae\u0bae\u0bcd \u0ba4\u0bc7\u0bb5 \u0b86\u0bb5\u0bbf\u0baf\u0bbf\u0ba9\u0bbe\u0bb2\u0bcd \u0b85\u0bb0\u0bc1\u0bb3\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f\u0ba4\u0bc1\u0bae\u0bcd, \u0ba4\u0bb5\u0bb1\u0bc1\u0b95\u0bb3\u0bb1\u0bcd\u0bb1\u0ba4\u0bc1\u0bae\u0bcd, \u0bb5\u0bbf\u0b9a\u0bc1\u0bb5\u0bbe\u0b9a\u0ba4\u0bcd\u0ba4\u0bbf\u0bb1\u0bcd\u0b95\u0bc1\u0bae\u0bcd \u0b9c\u0bc0\u0bb5\u0bbf\u0baf\u0ba4\u0bcd\u0ba4\u0bbf\u0bb1\u0bcd\u0b95\u0bc1\u0bae\u0bcd \u0b85\u0ba4\u0bbf\u0b95\u0bbe\u0bb0\u0bae\u0bcd \u0b95\u0bca\u0ba3\u0bcd\u0b9f \u0ba4\u0bc7\u0bb5 \u0bb5\u0bc6\u0bb3\u0bbf\u0baa\u0bcd\u0baa\u0bbe\u0b9f\u0bbe\u0b95\u0bc1\u0bae\u0bcd."},
+            {"titleEn": "The One True God", "titleTa": "\u0b92\u0bb0\u0bc7 \u0bae\u0bc6\u0baf\u0bcd\u0baf\u0bbe\u0ba9 \u0ba4\u0bc7\u0bb5\u0ba9\u0bcd", "descEn": "The one true God has revealed Himself as the eternally self-existent \"I AM,\" the Creator of heaven and earth, manifested as Father, Son, and Holy Spirit.", "descTa": "\u0b92\u0bb0\u0bc7 \u0bae\u0bc6\u0baf\u0bcd\u0baf\u0bbe\u0ba9 \u0ba4\u0bc7\u0bb5\u0ba9\u0bcd \u0ba4\u0bae\u0bcd\u0bae\u0bc8 \u0ba8\u0bbf\u0ba4\u0bcd\u0ba4\u0bbf\u0baf \u0b9a\u0bc1\u0baf\u0bae\u0bcd\u0baa\u0bc1\u0bb5\u0bbe\u0b95\u0bbf\u0baf \"\u0ba8\u0bbe\u0ba9\u0bcd \u0b87\u0bb0\u0bc1\u0b95\u0bcd\u0b95\u0bbf\u0bb1\u0bb5\u0bb0\u0bbe\u0b95 \u0b87\u0bb0\u0bc1\u0b95\u0bcd\u0b95\u0bbf\u0bb1\u0bc7\u0ba9\u0bcd\" \u0b8e\u0ba9\u0bcd\u0bb1\u0bc1\u0bae\u0bcd, \u0bb5\u0bbe\u0ba9\u0ba4\u0bcd\u0ba4\u0bc8\u0baf\u0bc1\u0bae\u0bcd \u0baa\u0bc2\u0bae\u0bbf\u0baf\u0bc8\u0baf\u0bc1\u0bae\u0bcd \u0baa\u0b9f\u0bc8\u0ba4\u0bcd\u0ba4 \u0b9a\u0bbf\u0bb0\u0bc1\u0bb7\u0bcd\u0b9f\u0bbf\u0b95\u0bb0\u0bbe\u0b95\u0bb5\u0bc1\u0bae\u0bcd, \u0baa\u0bbf\u0ba4\u0bbe, \u0b95\u0bc1\u0bae\u0bbe\u0bb0\u0ba9\u0bcd, \u0baa\u0bb0\u0bbf\u0b9a\u0bc1\u0ba4\u0bcd\u0ba4 \u0b86\u0bb5\u0bbf\u0baf\u0bbe\u0b95 \u0bb5\u0bc6\u0bb3\u0bbf\u0baa\u0bcd\u0baa\u0b9f\u0bc1\u0ba4\u0bcd\u0ba4\u0bbf\u0baf\u0bc1\u0bb3\u0bcd\u0bb3\u0bbe\u0bb0\u0bcd."},
+            {"titleEn": "Salvation of Man", "titleTa": "\u0bae\u0ba9\u0bbf\u0ba4\u0ba9\u0bbf\u0ba9\u0bcd \u0b87\u0bb0\u0b9f\u0bcd\u0b9a\u0bbf\u0baa\u0bcd\u0baa\u0bc1", "descEn": "Man's only hope of redemption is through the shed blood of Jesus Christ the Son of God, received by faith and repentance.", "descTa": "\u0ba4\u0bc7\u0bb5 \u0b95\u0bc1\u0bae\u0bbe\u0bb0\u0ba9\u0bbe\u0b95\u0bbf\u0baf \u0b87\u0baf\u0bc7\u0b9a\u0bc1 \u0b95\u0bbf\u0bb1\u0bbf\u0bb8\u0bcd\u0ba4\u0bc1\u0bb5\u0bbf\u0ba9\u0bcd \u0b9a\u0bbf\u0ba8\u0bcd\u0ba4\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f \u0b87\u0bb0\u0ba4\u0bcd\u0ba4\u0ba4\u0bcd\u0ba4\u0bbf\u0ba9\u0bcd \u0bae\u0bc2\u0bb2\u0bae\u0bc7 \u0bae\u0ba9\u0bbf\u0ba4\u0ba9\u0bc1\u0b95\u0bcd\u0b95\u0bc1 \u0bae\u0bc0\u0b9f\u0bcd\u0baa\u0bc1 \u0b89\u0ba3\u0bcd\u0b9f\u0bc1, \u0b87\u0ba4\u0bc1 \u0bb5\u0bbf\u0b9a\u0bc1\u0bb5\u0bbe\u0b9a\u0ba4\u0bcd\u0ba4\u0bbe\u0bb2\u0bc1\u0bae\u0bcd \u0bae\u0ba9\u0ba8\u0bcd\u0ba4\u0bbf\u0bb0\u0bc1\u0bae\u0bcd\u0baa\u0bc1\u0ba4\u0bb2\u0bbe\u0bb2\u0bc1\u0bae\u0bcd \u0baa\u0bc6\u0bb1\u0baa\u0bcd\u0baa\u0b9f\u0bc1\u0b95\u0bbf\u0bb1\u0ba4\u0bc1."},
+            {"titleEn": "Baptism in the Holy Spirit", "titleTa": "\u0baa\u0bb0\u0bbf\u0b9a\u0bc1\u0ba4\u0bcd\u0ba4 \u0b86\u0bb5\u0bbf\u0baf\u0bbf\u0ba9\u0bcd \u0b85\u0baa\u0bbf\u0bb7\u0bc7\u0b95\u0bae\u0bcd", "descEn": "All believers are entitled to and should ardently expect the promise of the Father, the baptism in the Holy Spirit, which gives power for life and service.", "descTa": "\u0bb5\u0bbf\u0b9a\u0bc1\u0bb5\u0bbe\u0b9a\u0bbf\u0b95\u0bb3\u0bcd \u0b85\u0ba9\u0bc8\u0bb5\u0bb0\u0bc1\u0bae\u0bcd \u0baa\u0bbf\u0ba4\u0bbe\u0bb5\u0bbf\u0ba9\u0bcd \u0bb5\u0bbe\u0b95\u0bcd\u0b95\u0bc1\u0ba4\u0bcd\u0ba4\u0ba4\u0bcd\u0ba4\u0bae\u0bbe\u0b95\u0bbf\u0baf \u0baa\u0bb0\u0bbf\u0b9a\u0bc1\u0ba4\u0bcd\u0ba4 \u0b86\u0bb5\u0bbf\u0baf\u0bbf\u0ba9\u0bcd \u0b85\u0baa\u0bbf\u0bb7\u0bc7\u0b95\u0ba4\u0bcd\u0ba4\u0bc8 \u0b86\u0bb5\u0bb2\u0bcb\u0b9f\u0bc1 \u0b8e\u0ba4\u0bbf\u0bb0\u0bcd\u0baa\u0bbe\u0bb0\u0bcd\u0b95\u0bcd\u0b95 \u0bb5\u0bc7\u0ba3\u0bcd\u0b9f\u0bc1\u0bae\u0bcd, \u0b87\u0ba4\u0bc1 \u0b95\u0bbf\u0bb1\u0bbf\u0bb8\u0bcd\u0ba4\u0bb5 \u0b9c\u0bc0\u0bb5\u0bbf\u0baf\u0ba4\u0bcd\u0ba4\u0bbf\u0bb1\u0bcd\u0b95\u0bc1\u0bae\u0bcd \u0b8a\u0bb4\u0bbf\u0baf\u0ba4\u0bcd\u0ba4\u0bbf\u0bb1\u0bcd\u0b95\u0bc1\u0bae\u0bcd \u0bb5\u0bb2\u0bcd\u0bb2\u0bae\u0bc8\u0baf\u0bb3\u0bbf\u0b95\u0bcd\u0b95\u0bbf\u0bb1\u0ba4\u0bc1."}
           ]),
           ta: JSON.stringify([
-            {"titleEn": "The Scriptures Inspired", "titleTa": "வேதவசனங்களின் தெய்வீக உத்வேகம்", "descEn": "The Bible is the inspired, infallible Word of God, a divine revelation and the authoritative rule of faith and conduct.", "descTa": "சத்திய வேதாகமம் தேவ ஆவியினால் அருளப்பட்டதும், தவறுகளற்றதும், விசுவாசத்திற்கும் ஜீவியத்திற்கும் அதிகாரம் கொண்ட தேவ வெளிப்பாடாகும்."},
-            {"titleEn": "The One True God", "titleTa": "ஒரே மெய்யான தேவன்", "descEn": "The one true God has revealed Himself as the eternally self-existent \"I AM,\" the Creator of heaven and earth, manifested as Father, Son, and Holy Spirit.", "descTa": "ஒரே மெய்யான தேவன் தம்மை நித்திய சுயம்புவாகிய \"நான் இருக்கிறவராக இருக்கிறேன்\" என்றும், வானத்தையும் பூமியையும் படைத்த சிருஷ்டிகராகவும், பிதா, குமாரன், பரிசுத்த ஆவியாக வெளிப்படுத்தியுள்ளார்."},
-            {"titleEn": "Salvation of Man", "titleTa": "மனிதனின் இரட்சிப்பு", "descEn": "Man's only hope of redemption is through the shed blood of Jesus Christ the Son of God, received by faith and repentance.", "descTa": "தேவ குமாரனாகிய இயேசு கிறிஸ்துவின் சிந்தப்பட்ட இரத்தத்தின் மூலமே மனிதனுக்கு மீட்பு உண்டு, இது விசுவாசத்தாலும் மனந்திரும்புதலாலும் பெறப்படுகிறது."},
-            {"titleEn": "Baptism in the Holy Spirit", "titleTa": "பரிசுத்த ஆவியின் அபிஷேகம்", "descEn": "All believers are entitled to and should ardently expect the promise of the Father, the baptism in the Holy Spirit, which gives power for life and service.", "descTa": "விசுவாசிகள் அனைவரும் பிதாவின் வாக்குத்தத்தமாகிய பரிசுத்த ஆவியின் அபிஷேகத்தை ஆவலோடு எதிர்பார்க்க வேண்டும், இது கிறிஸ்தவ ஜீவியத்திற்கும் ஊழியத்திற்கும் வல்லமையளிக்கிறது."}
+            {"titleEn": "The Scriptures Inspired", "titleTa": "\u0bb5\u0bc7\u0ba4\u0bb5\u0b9a\u0ba9\u0b99\u0bcd\u0b95\u0bb3\u0bbf\u0ba9\u0bcd \u0ba4\u0bc6\u0baf\u0bcd\u0bb5\u0bc0\u0b95 \u0b89\u0ba4\u0bcd\u0bb5\u0bc7\u0b95\u0bae\u0bcd", "descEn": "The Bible is the inspired, infallible Word of God, a divine revelation and the authoritative rule of faith and conduct.", "descTa": "\u0b9a\u0ba4\u0bcd\u0ba4\u0bbf\u0baf \u0bb5\u0bc7\u0ba4\u0bbe\u0b95\u0bae\u0bae\u0bcd \u0ba4\u0bc7\u0bb5 \u0b86\u0bb5\u0bbf\u0baf\u0bbf\u0ba9\u0bbe\u0bb2\u0bcd \u0b85\u0bb0\u0bc1\u0bb3\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f\u0ba4\u0bc1\u0bae\u0bcd, \u0ba4\u0bb5\u0bb1\u0bc1\u0b95\u0bb3\u0bb1\u0bcd\u0bb1\u0ba4\u0bc1\u0bae\u0bcd, \u0bb5\u0bbf\u0b9a\u0bc1\u0bb5\u0bbe\u0b9a\u0ba4\u0bcd\u0ba4\u0bbf\u0bb1\u0bcd\u0b95\u0bc1\u0bae\u0bcd \u0b9c\u0bc0\u0bb5\u0bbf\u0baf\u0ba4\u0bcd\u0ba4\u0bbf\u0bb1\u0bcd\u0b95\u0bc1\u0bae\u0bcd \u0b85\u0ba4\u0bbf\u0b95\u0bbe\u0bb0\u0bae\u0bcd \u0b95\u0bca\u0ba3\u0bcd\u0b9f \u0ba4\u0bc7\u0bb5 \u0bb5\u0bc6\u0bb3\u0bbf\u0baa\u0bcd\u0baa\u0bbe\u0b9f\u0bbe\u0b95\u0bc1\u0bae\u0bcd."},
+            {"titleEn": "The One True God", "titleTa": "\u0b92\u0bb0\u0bc7 \u0bae\u0bc6\u0baf\u0bcd\u0baf\u0bbe\u0ba9 \u0ba4\u0bc7\u0bb5\u0ba9\u0bcd", "descEn": "The one true God has revealed Himself as the eternally self-existent \"I AM,\" the Creator of heaven and earth, manifested as Father, Son, and Holy Spirit.", "descTa": "\u0b92\u0bb0\u0bc7 \u0bae\u0bc6\u0baf\u0bcd\u0baf\u0bbe\u0ba9 \u0ba4\u0bc7\u0bb5\u0ba9\u0bcd \u0ba4\u0bae\u0bcd\u0bae\u0bc8 \u0ba8\u0bbf\u0ba4\u0bcd\u0ba4\u0bbf\u0baf \u0b9a\u0bc1\u0baf\u0bae\u0bcd\u0baa\u0bc1\u0bb5\u0bbe\u0b95\u0bbf\u0baf \"\u0ba8\u0bbe\u0ba9\u0bcd \u0b87\u0bb0\u0bc1\u0b95\u0bcd\u0b95\u0bbf\u0bb1\u0bb5\u0bb0\u0bbe\u0b95 \u0b87\u0bb0\u0bc1\u0b95\u0bcd\u0b95\u0bbf\u0bb1\u0bc7\u0ba9\u0bcd\" \u0b8e\u0ba9\u0bcd\u0bb1\u0bc1\u0bae\u0bcd, \u0bb5\u0bbe\u0ba9\u0ba4\u0bcd\u0ba4\u0bc8\u0baf\u0bc1\u0bae\u0bcd \u0baa\u0bc2\u0bae\u0bbf\u0baf\u0bc8\u0baf\u0bc1\u0bae\u0bcd \u0baa\u0b9f\u0bc8\u0ba4\u0bcd\u0ba4 \u0b9a\u0bbf\u0bb0\u0bc1\u0bb7\u0bcd\u0b9f\u0bbf\u0b95\u0bb0\u0bbe\u0b95\u0bb5\u0bc1\u0bae\u0bcd, \u0baa\u0bbf\u0ba4\u0bbe, \u0b95\u0bc1\u0bae\u0bbe\u0bb0\u0ba9\u0bcd, \u0baa\u0bb0\u0bbf\u0b9a\u0bc1\u0ba4\u0bcd\u0ba4 \u0b86\u0bb5\u0bbf\u0baf\u0bbe\u0b95 \u0bb5\u0bc6\u0bb3\u0bbf\u0baa\u0bcd\u0baa\u0b9f\u0bc1\u0ba4\u0bcd\u0ba4\u0bbf\u0baf\u0bc1\u0bb3\u0bcd\u0bb3\u0bbe\u0bb0\u0bcd."},
+            {"titleEn": "Salvation of Man", "titleTa": "\u0bae\u0ba9\u0bbf\u0ba4\u0ba9\u0bbf\u0ba9\u0bcd \u0b87\u0bb0\u0b9f\u0bcd\u0b9a\u0bbf\u0baa\u0bcd\u0baa\u0bc1", "descEn": "Man's only hope of redemption is through the shed blood of Jesus Christ the Son of God, received by faith and repentance.", "descTa": "\u0ba4\u0bc7\u0bb5 \u0b95\u0bc1\u0bae\u0bbe\u0bb0\u0ba9\u0bbe\u0b95\u0bbf\u0baf \u0b87\u0baf\u0bc7\u0b9a\u0bc1 \u0b95\u0bbf\u0bb1\u0bbf\u0bb8\u0bcd\u0ba4\u0bc1\u0bb5\u0bbf\u0ba9\u0bcd \u0b9a\u0bbf\u0ba8\u0bcd\u0ba4\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f \u0b87\u0bb0\u0ba4\u0bcd\u0ba4\u0ba4\u0bcd\u0ba4\u0bbf\u0ba9\u0bcd \u0bae\u0bc2\u0bb2\u0bae\u0bc7 \u0bae\u0ba9\u0bbf\u0ba4\u0ba9\u0bc1\u0b95\u0bcd\u0b95\u0bc1 \u0bae\u0bc0\u0b9f\u0bcd\u0baa\u0bc1 \u0b89\u0ba3\u0bcd\u0b9f\u0bc1, \u0b87\u0ba4\u0bc1 \u0bb5\u0bbf\u0b9a\u0bc1\u0bb5\u0bbe\u0b9a\u0ba4\u0bcd\u0ba4\u0bbe\u0bb2\u0bc1\u0bae\u0bcd \u0bae\u0ba9\u0ba8\u0bcd\u0ba4\u0bbf\u0bb0\u0bc1\u0bae\u0bcd\u0baa\u0bc1\u0ba4\u0bb2\u0bbe\u0bb2\u0bc1\u0bae\u0bcd \u0baa\u0bc6\u0bb1\u0baa\u0bcd\u0baa\u0b9f\u0bc1\u0b95\u0bbf\u0bb1\u0ba4\u0bc1."},
+            {"titleEn": "Baptism in the Holy Spirit", "titleTa": "\u0baa\u0bb0\u0bbf\u0b9a\u0bc1\u0ba4\u0bcd\u0ba4 \u0b86\u0bb5\u0bbf\u0baf\u0bbf\u0ba9\u0bcd \u0b85\u0baa\u0bbf\u0bb7\u0bc7\u0b95\u0bae\u0bcd", "descEn": "All believers are entitled to and should ardently expect the promise of the Father, the baptism in the Holy Spirit, which gives power for life and service.", "descTa": "\u0bb5\u0bbf\u0b9a\u0bc1\u0bb5\u0bbe\u0b9a\u0bbf\u0b95\u0bb3\u0bcd \u0b85\u0ba9\u0bc8\u0bb5\u0bb0\u0bc1\u0bae\u0bcd \u0baa\u0bbf\u0ba4\u0bbe\u0bb5\u0bbf\u0ba9\u0bcd \u0bb5\u0bbe\u0b95\u0bcd\u0b95\u0bc1\u0ba4\u0bcd\u0ba4\u0ba4\u0bcd\u0ba4\u0bae\u0bbe\u0b95\u0bbf\u0baf \u0baa\u0bb0\u0bbf\u0b9a\u0bc1\u0ba4\u0bcd\u0ba4 \u0b86\u0bb5\u0bbf\u0baf\u0bbf\u0ba9\u0bcd \u0b85\u0baa\u0bbf\u0bb7\u0bc7\u0b95\u0ba4\u0bcd\u0ba4\u0bc8 \u0b86\u0bb5\u0bb2\u0bcb\u0b9f\u0bc1 \u0b8e\u0ba4\u0bbf\u0bb0\u0bcd\u0baa\u0bbe\u0bb0\u0bcd\u0b95\u0bcd\u0b95 \u0bb5\u0bc7\u0ba3\u0bcd\u0b9f\u0bc1\u0bae\u0bcd, \u0b87\u0ba4\u0bc1 \u0b95\u0bbf\u0bb1\u0bbf\u0bb8\u0bcd\u0ba4\u0bb5 \u0b9c\u0bc0\u0bb5\u0bbf\u0baf\u0ba4\u0bcd\u0ba4\u0bbf\u0bb1\u0bcd\u0b95\u0bc1\u0bae\u0bcd \u0b8a\u0bb4\u0bbf\u0baf\u0ba4\u0bcd\u0ba4\u0bbf\u0bb1\u0bcd\u0b95\u0bc1\u0bae\u0bcd \u0bb5\u0bb2\u0bcd\u0bb2\u0bae\u0bc8\u0baf\u0bb3\u0bbf\u0b95\u0bcd\u0b95\u0bbf\u0bb1\u0ba4\u0bc1."}
           ])
         }
       ];
 
       for (const item of defaultAbout) {
-        await db.runAsync(`INSERT INTO about_content (key, en_val, ta_val) VALUES (?, ?, ?)`,
+        await db.runAsync('INSERT INTO about_content (`key`, en_val, ta_val) VALUES (?, ?, ?)',
           [item.key, item.en, item.ta]
         );
       }
       console.log('About us content seeded successfully.');
     } else {
-      // Ensure milestones, faithStatements, and aboutImage exist for migrated existing databases
       const keysToCheck = ['aboutImage', 'milestones', 'faithStatements'];
       for (const key of keysToCheck) {
-        const exists = await db.getAsync(`SELECT key FROM about_content WHERE key = ?`, [key]);
+        const exists = await db.getAsync('SELECT `key` FROM about_content WHERE `key` = ?', [key]);
         if (!exists) {
           let enVal = '';
           let taVal = '';
@@ -493,21 +467,21 @@ async function seedDatabase() {
             taVal = '/images/home-banner1.JPG';
           } else if (key === 'milestones') {
             enVal = JSON.stringify([
-              {"year": "1996", "titleEn": "Humble Beginnings", "titleTa": "எளிய ஆரம்பம்", "descEn": "Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.", "descTa": "ஷார்ஜாவில் ஒரு எளிய இல்ல ஜபக் கூட்டமாகத் தொடங்கப்பட்டு, தூரதேசத்தில் வாழும் உழைப்பாளர்களை ஆவிக்குரிய ரீதியில் ஆதரிப்பதை நோக்கமாகக் கொண்டு ஆரம்பிக்கப்பட்டது."},
-              {"year": "2005", "titleEn": "Transport fleet launched", "titleTa": "போக்குவரத்து சேவை துவக்கம்", "descEn": "Purchased our first shuttle bus to fetch Tamil laborers completely free of charge from far-flung industrial camps.", "descTa": "தொழிலாளர்கள் எவ்வித சிரமமுமின்றி ஆராதனையில் கலந்து கொள்ள தூர முகாம்களில் இருந்து முற்றிலும் இலவசமாக அழைத்து வர முதல் பேருந்து வாங்கப்பட்டது."},
-              {"year": "2016", "titleEn": "Regional Branch Network", "titleTa": "கிளை சபைகள் விரிவாக்கம்", "descEn": "Formally established satellite cell fellowships in Ajman and Umm Al Quwain, expanding weekly ministries.", "descTa": "அண்டை எமிரேட்களான அஜ்மான் மற்றும் உம் அல் குவைனில் முறையான கிளை சபை ஐக்கியங்கள் ஏற்படுத்தப்பட்டு வாராந்திர ஊழியங்கள் விரிவுபடுத்தப்பட்டன."}
+              {"year": "1996", "titleEn": "Humble Beginnings", "titleTa": "\u0b8e\u0bb3\u0bbf\u0baf \u0b86\u0bb0\u0bae\u0bcd\u0baa\u0bae\u0bcd", "descEn": "Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.", "descTa": "\u0bb7\u0bbe\u0bb0\u0bcd\u0b9c\u0bbe\u0bb5\u0bbf\u0bb2\u0bcd \u0b92\u0bb0\u0bc1 \u0b8e\u0bb3\u0bbf\u0baf \u0b87\u0bb2\u0bcd\u0bb2 \u0b9c\u0baa\u0b95\u0bcd \u0b95\u0bc2\u0b9f\u0bcd\u0b9f\u0bae\u0bbe\u0b95\u0ba4\u0bcd \u0ba4\u0bca\u0b9f\u0b99\u0bcd\u0b95\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f\u0bc1, \u0ba4\u0bc2\u0bb0\u0ba4\u0bc7\u0b9a\u0ba4\u0bcd\u0ba4\u0bbf\u0bb2\u0bcd \u0bb5\u0bbe\u0bb4\u0bc1\u0bae\u0bcd \u0b89\u0bb4\u0bc8\u0baa\u0bcd\u0baa\u0bbe\u0bb3\u0bb0\u0bcd\u0b95\u0bb3\u0bc8 \u0b86\u0bb5\u0bbf\u0b95\u0bcd\u0b95\u0bc1\u0bb0\u0bbf\u0baf \u0bb0\u0bc0\u0ba4\u0bbf\u0baf\u0bbf\u0bb2\u0bcd \u0b86\u0ba4\u0bb0\u0bbf\u0baa\u0bcd\u0baa\u0ba4\u0bc8 \u0ba8\u0bcb\u0b95\u0bcd\u0b95\u0bae\u0bbe\u0b95\u0b95\u0bcd \u0b95\u0bca\u0ba3\u0bcd\u0b9f\u0bc1 \u0b86\u0bb0\u0bae\u0bcd\u0baa\u0bbf\u0b95\u0bcd\u0b95\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f\u0ba4\u0bc1."},
+              {"year": "2005", "titleEn": "Transport fleet launched", "titleTa": "\u0baa\u0bcb\u0b95\u0bcd\u0b95\u0bc1\u0bb5\u0bb0\u0ba4\u0bcd\u0ba4\u0bc1 \u0b9a\u0bc7\u0bb5\u0bc8 \u0ba4\u0bc1\u0bb5\u0b95\u0bcd\u0b95\u0bae\u0bcd", "descEn": "Purchased our first shuttle bus to fetch Tamil laborers completely free of charge from far-flung industrial camps.", "descTa": "\u0ba4\u0bca\u0bb4\u0bbf\u0bb2\u0bbe\u0bb3\u0bb0\u0bcd\u0b95\u0bb3\u0bcd \u0b8e\u0bb5\u0bcd\u0bb5\u0bbf\u0ba4 \u0b9a\u0bbf\u0bb0\u0bae\u0bae\u0bc1\u0bae\u0bbf\u0ba9\u0bcd\u0bb1\u0bbf \u0b86\u0bb0\u0bbe\u0ba4\u0ba9\u0bc8\u0baf\u0bbf\u0bb2\u0bcd \u0b95\u0bb2\u0ba8\u0bcd\u0ba4\u0bc1 \u0b95\u0bca\u0bb3\u0bcd\u0bb3 \u0ba4\u0bc2\u0bb0 \u0bae\u0bc1\u0b95\u0bbe\u0bae\u0bcd\u0b95\u0bb3\u0bbf\u0bb2\u0bcd \u0b87\u0bb0\u0bc1\u0ba8\u0bcd\u0ba4\u0bc1 \u0bae\u0bc1\u0bb1\u0bcd\u0bb1\u0bbf\u0bb2\u0bc1\u0bae\u0bcd \u0b87\u0bb2\u0bb5\u0b9a\u0bae\u0bbe\u0b95 \u0b85\u0bb4\u0bc8\u0ba4\u0bcd\u0ba4\u0bc1 \u0bb5\u0bb0 \u0bae\u0bc1\u0ba4\u0bb2\u0bcd \u0baa\u0bc7\u0bb0\u0bc1\u0ba8\u0bcd\u0ba4\u0bc1 \u0bb5\u0bbe\u0b99\u0bcd\u0b95\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f\u0ba4\u0bc1."},
+              {"year": "2016", "titleEn": "Regional Branch Network", "titleTa": "\u0b95\u0bbf\u0bb3\u0bc8 \u0b9a\u0baa\u0bc8\u0b95\u0bb3\u0bcd \u0bb5\u0bbf\u0bb0\u0bbf\u0bb5\u0bbe\u0b95\u0bcd\u0b95\u0bae\u0bcd", "descEn": "Formally established satellite cell fellowships in Ajman and Umm Al Quwain, expanding weekly ministries.", "descTa": "\u0b85\u0ba3\u0bcd\u0b9f\u0bc8 \u0b8e\u0bae\u0bbf\u0bb0\u0bc7\u0b9f\u0bcd\u0b95\u0bb3\u0bbe\u0ba9 \u0b85\u0b9c\u0bcd\u0bae\u0bbe\u0ba9\u0bcd \u0bae\u0bb1\u0bcd\u0bb1\u0bc1\u0bae\u0bcd \u0b89\u0bae\u0bcd \u0b85\u0bb2\u0bcd \u0b95\u0bc1\u0bb5\u0bc8\u0ba9\u0bbf\u0bb2\u0bcd \u0bae\u0bc1\u0bb1\u0bc8\u0baf\u0bbe\u0ba9 \u0b95\u0bbf\u0bb3\u0bc8 \u0b9a\u0baa\u0bc8 \u0b90\u0b95\u0bcd\u0b95\u0bbf\u0baf\u0b99\u0bcd\u0b95\u0bb3\u0bcd \u0b8f\u0bb1\u0bcd\u0baa\u0b9f\u0bc1\u0ba4\u0bcd\u0ba4\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f\u0bc1 \u0bb5\u0bbe\u0bb0\u0bbe\u0ba8\u0bcd\u0ba4\u0bbf\u0bb0 \u0b8a\u0bb4\u0bbf\u0baf\u0b99\u0bcd\u0b95\u0bb3\u0bcd \u0bb5\u0bbf\u0bb0\u0bbf\u0bb5\u0bc1\u0baa\u0b9f\u0bc1\u0ba4\u0bcd\u0ba4\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f\u0ba9."}
             ]);
             taVal = enVal;
           } else if (key === 'faithStatements') {
             enVal = JSON.stringify([
-              {"titleEn": "The Scriptures Inspired", "titleTa": "வேதவசனங்களின் தெய்வீக உத்வேகம்", "descEn": "The Bible is the inspired, infallible Word of God, a divine revelation and the authoritative rule of faith and conduct.", "descTa": "சத்திய வேதாகமம் தேவ ஆவியினால் அருளப்பட்டதும், தவறுகளற்றதும், விசுவாசத்திற்கும் ஜீவியத்திற்கும் அதிகாரம் கொண்ட தேவ வெளிப்பாடாகும்."},
-              {"titleEn": "The One True God", "titleTa": "ஒரே மெய்யான தேவன்", "descEn": "The one true God has revealed Himself as the eternally self-existent \"I AM,\" the Creator of heaven and earth, manifested as Father, Son, and Holy Spirit.", "descTa": "ஒரே மெய்யான தேவன் தம்மை நித்திய சுயம்புவாகிய \"நான் இருக்கிறவராக இருக்கிறேன்\" என்றும், வானத்தையும் பூமியையும் படைத்த சிருஷ்டிகராகவும், பிதா, குமாரன், பரிசுத்த ஆவியாக வெளிப்படுத்தியுள்ளார்."},
-              {"titleEn": "Salvation of Man", "titleTa": "மனிதனின் இரட்சிப்பு", "descEn": "Man's only hope of redemption is through the shed blood of Jesus Christ the Son of God, received by faith and repentance.", "descTa": "தேவ குமாரனாகிய இயேசு கிறிஸ்துவின் சிந்தப்பட்ட இரத்தத்தின் மூலமே மனிதனுக்கு மீட்பு உண்டு, இது விசுவாசத்தாலும் மனந்திரும்புதலாலும் பெறப்படுகிறது."},
-              {"titleEn": "Baptism in the Holy Spirit", "titleTa": "பரிசுத்த ஆவியின் அபிஷேகம்", "descEn": "All believers are entitled to and should ardently expect the promise of the Father, the baptism in the Holy Spirit, which gives power for life and service.", "descTa": "விசுவாசிகள் அனைவரும் பிதாவின் வாக்குத்தத்தமாகிய பரிசுத்த ஆவியின் அபிஷேகத்தை ஆவலோடு எதிர்பார்க்க வேண்டும், இது கிறிஸ்தவ ஜீவியத்திற்கும் ஊழியத்திற்கும் வல்லமையளிக்கிறது."}
+              {"titleEn": "The Scriptures Inspired", "titleTa": "\u0bb5\u0bc7\u0ba4\u0bb5\u0b9a\u0ba9\u0b99\u0bcd\u0b95\u0bb3\u0bbf\u0ba9\u0bcd \u0ba4\u0bc6\u0baf\u0bcd\u0bb5\u0bc0\u0b95 \u0b89\u0ba4\u0bcd\u0bb5\u0bc7\u0b95\u0bae\u0bcd", "descEn": "The Bible is the inspired, infallible Word of God, a divine revelation and the authoritative rule of faith and conduct.", "descTa": "\u0b9a\u0ba4\u0bcd\u0ba4\u0bbf\u0baf \u0bb5\u0bc7\u0ba4\u0bbe\u0b95\u0bae\u0bae\u0bcd \u0ba4\u0bc7\u0bb5 \u0b86\u0bb5\u0bbf\u0baf\u0bbf\u0ba9\u0bbe\u0bb2\u0bcd \u0b85\u0bb0\u0bc1\u0bb3\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f\u0ba4\u0bc1\u0bae\u0bcd, \u0ba4\u0bb5\u0bb1\u0bc1\u0b95\u0bb3\u0bb1\u0bcd\u0bb1\u0ba4\u0bc1\u0bae\u0bcd, \u0bb5\u0bbf\u0b9a\u0bc1\u0bb5\u0bbe\u0b9a\u0ba4\u0bcd\u0ba4\u0bbf\u0bb1\u0bcd\u0b95\u0bc1\u0bae\u0bcd \u0b9c\u0bc0\u0bb5\u0bbf\u0baf\u0ba4\u0bcd\u0ba4\u0bbf\u0bb1\u0bcd\u0b95\u0bc1\u0bae\u0bcd \u0b85\u0ba4\u0bbf\u0b95\u0bbe\u0bb0\u0bae\u0bcd \u0b95\u0bca\u0ba3\u0bcd\u0b9f \u0ba4\u0bc7\u0bb5 \u0bb5\u0bc6\u0bb3\u0bbf\u0baa\u0bcd\u0baa\u0bbe\u0b9f\u0bbe\u0b95\u0bc1\u0bae\u0bcd."},
+              {"titleEn": "The One True God", "titleTa": "\u0b92\u0bb0\u0bc7 \u0bae\u0bc6\u0baf\u0bcd\u0baf\u0bbe\u0ba9 \u0ba4\u0bc7\u0bb5\u0ba9\u0bcd", "descEn": "The one true God has revealed Himself as the eternally self-existent \"I AM,\" the Creator of heaven and earth, manifested as Father, Son, and Holy Spirit.", "descTa": "\u0b92\u0bb0\u0bc7 \u0bae\u0bc6\u0baf\u0bcd\u0baf\u0bbe\u0ba9 \u0ba4\u0bc7\u0bb5\u0ba9\u0bcd \u0ba4\u0bae\u0bcd\u0bae\u0bc8 \u0ba8\u0bbf\u0ba4\u0bcd\u0ba4\u0bbf\u0baf \u0b9a\u0bc1\u0baf\u0bae\u0bcd\u0baa\u0bc1\u0bb5\u0bbe\u0b95\u0bbf\u0baf \"\u0ba8\u0bbe\u0ba9\u0bcd \u0b87\u0bb0\u0bc1\u0b95\u0bcd\u0b95\u0bbf\u0bb1\u0bb5\u0bb0\u0bbe\u0b95 \u0b87\u0bb0\u0bc1\u0b95\u0bcd\u0b95\u0bbf\u0bb1\u0bc7\u0ba9\u0bcd\" \u0b8e\u0ba9\u0bcd\u0bb1\u0bc1\u0bae\u0bcd, \u0bb5\u0bbe\u0ba9\u0ba4\u0bcd\u0ba4\u0bc8\u0baf\u0bc1\u0bae\u0bcd \u0baa\u0bc2\u0bae\u0bbf\u0baf\u0bc8\u0baf\u0bc1\u0bae\u0bcd \u0baa\u0b9f\u0bc8\u0ba4\u0bcd\u0ba4 \u0b9a\u0bbf\u0bb0\u0bc1\u0bb7\u0bcd\u0b9f\u0bbf\u0b95\u0bb0\u0bbe\u0b95\u0bb5\u0bc1\u0bae\u0bcd, \u0baa\u0bbf\u0ba4\u0bbe, \u0b95\u0bc1\u0bae\u0bbe\u0bb0\u0ba9\u0bcd, \u0baa\u0bb0\u0bbf\u0b9a\u0bc1\u0ba4\u0bcd\u0ba4 \u0b86\u0bb5\u0bbf\u0baf\u0bbe\u0b95 \u0bb5\u0bc6\u0bb3\u0bbf\u0baa\u0bcd\u0baa\u0b9f\u0bc1\u0ba4\u0bcd\u0ba4\u0bbf\u0baf\u0bc1\u0bb3\u0bcd\u0bb3\u0bbe\u0bb0\u0bcd."},
+              {"titleEn": "Salvation of Man", "titleTa": "\u0bae\u0ba9\u0bbf\u0ba4\u0ba9\u0bbf\u0ba9\u0bcd \u0b87\u0bb0\u0b9f\u0bcd\u0b9a\u0bbf\u0baa\u0bcd\u0baa\u0bc1", "descEn": "Man's only hope of redemption is through the shed blood of Jesus Christ the Son of God, received by faith and repentance.", "descTa": "\u0ba4\u0bc7\u0bb5 \u0b95\u0bc1\u0bae\u0bbe\u0bb0\u0ba9\u0bbe\u0b95\u0bbf\u0baf \u0b87\u0baf\u0bc7\u0b9a\u0bc1 \u0b95\u0bbf\u0bb1\u0bbf\u0bb8\u0bcd\u0ba4\u0bc1\u0bb5\u0bbf\u0ba9\u0bcd \u0b9a\u0bbf\u0ba8\u0bcd\u0ba4\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f \u0b87\u0bb0\u0ba4\u0bcd\u0ba4\u0ba4\u0bcd\u0ba4\u0bbf\u0ba9\u0bcd \u0bae\u0bc2\u0bb2\u0bae\u0bc7 \u0bae\u0ba9\u0bbf\u0ba4\u0ba9\u0bc1\u0b95\u0bcd\u0b95\u0bc1 \u0bae\u0bc0\u0b9f\u0bcd\u0baa\u0bc1 \u0b89\u0ba3\u0bcd\u0b9f\u0bc1, \u0b87\u0ba4\u0bc1 \u0bb5\u0bbf\u0b9a\u0bc1\u0bb5\u0bbe\u0b9a\u0ba4\u0bcd\u0ba4\u0bbe\u0bb2\u0bc1\u0bae\u0bcd \u0bae\u0ba9\u0ba8\u0bcd\u0ba4\u0bbf\u0bb0\u0bc1\u0bae\u0bcd\u0baa\u0bc1\u0ba4\u0bb2\u0bbe\u0bb2\u0bc1\u0bae\u0bcd \u0baa\u0bc6\u0bb1\u0baa\u0bcd\u0baa\u0b9f\u0bc1\u0b95\u0bbf\u0bb1\u0ba4\u0bc1."},
+              {"titleEn": "Baptism in the Holy Spirit", "titleTa": "\u0baa\u0bb0\u0bbf\u0b9a\u0bc1\u0ba4\u0bcd\u0ba4 \u0b86\u0bb5\u0bbf\u0baf\u0bbf\u0ba9\u0bcd \u0b85\u0baa\u0bbf\u0bb7\u0bc7\u0b95\u0bae\u0bcd", "descEn": "All believers are entitled to and should ardently expect the promise of the Father, the baptism in the Holy Spirit, which gives power for life and service.", "descTa": "\u0bb5\u0bbf\u0b9a\u0bc1\u0bb5\u0bbe\u0b9a\u0bbf\u0b95\u0bb3\u0bcd \u0b85\u0ba9\u0bc8\u0bb5\u0bb0\u0bc1\u0bae\u0bcd \u0baa\u0bbf\u0ba4\u0bbe\u0bb5\u0bbf\u0ba9\u0bcd \u0bb5\u0bbe\u0b95\u0bcd\u0b95\u0bc1\u0ba4\u0bcd\u0ba4\u0ba4\u0bcd\u0ba4\u0bae\u0bbe\u0b95\u0bbf\u0baf \u0baa\u0bb0\u0bbf\u0b9a\u0bc1\u0ba4\u0bcd\u0ba4 \u0b86\u0bb5\u0bbf\u0baf\u0bbf\u0ba9\u0bcd \u0b85\u0baa\u0bbf\u0bb7\u0bc7\u0b95\u0ba4\u0bcd\u0ba4\u0bc8 \u0b86\u0bb5\u0bb2\u0bcb\u0b9f\u0bc1 \u0b8e\u0ba4\u0bbf\u0bb0\u0bcd\u0baa\u0bbe\u0bb0\u0bcd\u0b95\u0bcd\u0b95 \u0bb5\u0bc7\u0ba3\u0bcd\u0b9f\u0bc1\u0bae\u0bcd, \u0b87\u0ba4\u0bc1 \u0b95\u0bbf\u0bb1\u0bbf\u0bb8\u0bcd\u0ba4\u0bb5 \u0b9c\u0bc0\u0bb5\u0bbf\u0baf\u0ba4\u0bcd\u0ba4\u0bbf\u0bb1\u0bcd\u0b95\u0bc1\u0bae\u0bcd \u0b8a\u0bb4\u0bbf\u0baf\u0ba4\u0bcd\u0ba4\u0bbf\u0bb1\u0bcd\u0b95\u0bc1\u0bae\u0bcd \u0bb5\u0bb2\u0bcd\u0bb2\u0bae\u0bc8\u0baf\u0bb3\u0bbf\u0b95\u0bcd\u0b95\u0bbf\u0bb1\u0ba4\u0bc1."}
             ]);
             taVal = enVal;
           }
-          await db.runAsync(`INSERT INTO about_content (key, en_val, ta_val) VALUES (?, ?, ?)`, [key, enVal, taVal]);
+          await db.runAsync('INSERT INTO about_content (`key`, en_val, ta_val) VALUES (?, ?, ?)', [key, enVal, taVal]);
         }
       }
     }
