@@ -112,7 +112,7 @@ const HeroBanner = () => {
               <span className="text-xs uppercase tracking-widest font-extrabold text-amber-400 block">
                 {t('headerBrandSub')}
               </span>
-              <h1 className="heading-primary font-serif font-bold text-white leading-tight max-w-3xl">
+              <h1 className="font-serif font-bold text-white leading-tight max-w-3xl" style={{ fontSize: 'clamp(2rem, 6vw, 3.8rem)' }}>
                 {slide.title}
               </h1>
               <p className="text-lg md:text-xl text-slate-200 font-light max-w-2xl">

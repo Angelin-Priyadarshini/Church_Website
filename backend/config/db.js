@@ -1,35 +1,54 @@
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '3306', 10),
-  user: process.env.DB_USER || 'root',
+const dbConfig = {
+  host:     process.env.DB_HOST     || 'localhost',
+  port:     parseInt(process.env.DB_PORT || '3306'),
+  user:     process.env.DB_USER     || 'root',
   password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'agstc_church',
+  database: process.env.DB_NAME     || 'agstc',
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
-});
+  queueLimit: 0,
+  charset: 'utf8mb4',
+  timezone: '+00:00',
+  connectTimeout: 10000
+};
 
-const promisePool = pool.promise();
+console.log(`[DB] Connecting to MySQL: host=${dbConfig.host} port=${dbConfig.port} user=${dbConfig.user} db=${dbConfig.database}`);
 
-console.log(`Connected to MySQL database: ${process.env.DB_NAME || 'agstc_church'} @ ${process.env.DB_HOST || 'localhost'}`);
+const pool = mysql.createPool(dbConfig);
 
-const db = {};
+pool.getConnection()
+  .then(conn => {
+    console.log('[DB] Connected to MySQL successfully.');
+    conn.release();
+  })
+  .catch(err => {
+    console.error(`[DB] MySQL connection FAILED: ${err.message}`);
+    console.error(`[DB] Config used: host=${dbConfig.host} port=${dbConfig.port} user=${dbConfig.user} db=${dbConfig.database}`);
+    console.error('[DB] If on Hostinger, make sure DB_HOST=localhost and the DB user has been granted access in hPanel > Databases > MySQL Databases.');
+  });
 
-db.allAsync = async (sql, params = []) => {
-  const [rows] = await promisePool.execute(sql, params);
+// Returns array of rows
+const allAsync = async (sql, params = []) => {
+  const [rows] = await pool.execute(sql, params);
   return rows;
 };
 
-db.getAsync = async (sql, params = []) => {
-  const [rows] = await promisePool.execute(sql, params);
-  return rows[0] || null;
+// Returns single row or undefined
+const getAsync = async (sql, params = []) => {
+  const [rows] = await pool.execute(sql, params);
+  return rows[0] || undefined;
 };
 
-db.runAsync = async (sql, params = []) => {
-  const [result] = await promisePool.execute(sql, params);
-  return { lastID: result.insertId, changes: result.affectedRows };
+// Returns { lastID, changes }
+const runAsync = async (sql, params = []) => {
+  const [result] = await pool.execute(sql, params);
+  return {
+    lastID: result.insertId || 0,
+    changes: result.affectedRows || 0
+  };
 };
 
+const db = { allAsync, getAsync, runAsync, pool };
 module.exports = db;
