@@ -4,62 +4,127 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ==========================================
+   DARK MODE (default :root variables)
+   ========================================== */
 :root {
-  /* Sleek Dark Navy & Spiritual Gold Luxury Theme */
   --primary-gold: hsl(42, 90%, 52%);
   --primary-gold-glow: hsl(42, 100%, 60%);
   --accent-gold-dark: hsl(38, 75%, 42%);
   --accent-navy: hsl(222, 47%, 12%);
   --accent-navy-dark: hsl(224, 60%, 8%);
   --accent-navy-light: hsl(220, 40%, 18%);
-  
+
+  --bg-main: hsl(222, 47%, 7%);
+  --bg-elevated: hsl(223, 45%, 11%);
   --bg-navy: hsl(222, 47%, 7%);
   --bg-navy-elevated: hsl(223, 45%, 11%);
-  
-  /* High-end Dark Glassmorphism */
+
   --card-glass: rgba(15, 23, 42, 0.72);
   --card-glass-light: rgba(30, 41, 59, 0.45);
   --border-glass: rgba(230, 175, 46, 0.28);
   --border-glass-subtle: rgba(255, 255, 255, 0.08);
-  
+
   --text-main: hsl(215, 25%, 88%);
   --text-muted: hsl(218, 15%, 65%);
   --text-light: hsl(35, 100%, 99%);
-  
+  --text-heading: hsl(35, 100%, 99%);
+
+  --nav-bg: rgba(10, 15, 30, 0.82);
+  --nav-border: rgba(230, 175, 46, 0.25);
+
+  --footer-bg: hsl(222, 47%, 6%);
+  --footer-text: hsl(218, 15%, 65%);
+
+  --scrollbar-track: hsl(222, 47%, 7%);
+
   --font-body: 'Inter', sans-serif;
   --font-serif: 'Playfair Display', serif;
-  
+
   --shadow-premium: 0 16px 40px rgba(0, 0, 0, 0.4);
   --shadow-glow: 0 0 25px rgba(230, 175, 46, 0.22);
-  
+
   --border-radius-lg: 24px;
   --border-radius-md: 16px;
   --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* ==========================================
+   LIGHT MODE OVERRIDES
+   ========================================== */
+html[data-theme="light"] {
+  --bg-main: hsl(40, 30%, 97%);
+  --bg-elevated: hsl(0, 0%, 100%);
+  --bg-navy: hsl(40, 30%, 97%);
+  --bg-navy-elevated: hsl(0, 0%, 100%);
+
+  --card-glass: rgba(255, 255, 255, 0.88);
+  --card-glass-light: rgba(255, 255, 255, 0.6);
+  --border-glass: rgba(230, 175, 46, 0.3);
+  --border-glass-subtle: rgba(0, 0, 0, 0.07);
+
+  --text-main: hsl(222, 30%, 22%);
+  --text-muted: hsl(218, 15%, 42%);
+  --text-light: hsl(222, 47%, 10%);
+  --text-heading: hsl(222, 47%, 10%);
+
+  --nav-bg: rgba(255, 255, 255, 0.95);
+  --nav-border: rgba(230, 175, 46, 0.3);
+
+  --footer-bg: hsl(222, 40%, 14%);
+  --footer-text: hsl(218, 15%, 65%);
+
+  --scrollbar-track: hsl(40, 30%, 93%);
+
+  --shadow-premium: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --shadow-glow: 0 0 20px rgba(230, 175, 46, 0.18);
+}
+
+/* ==========================================
+   RESET & BASE
+   ========================================== */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
   font-family: var(--font-body);
-  background-color: var(--bg-navy);
+  background-color: var(--bg-main);
   color: var(--text-main);
   line-height: 1.6;
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   overflow-x: hidden;
-  /* Fluid high-fidelity dual-glowing radial backdrops */
-  background-image: 
+  max-width: 100vw;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* Dark mode body gradient */
+html[data-theme="dark"] body {
+  background-image:
     radial-gradient(circle at 90% 10%, hsla(42, 90%, 52%, 0.07) 0%, transparent 45%),
     radial-gradient(circle at 10% 90%, hsla(222, 60%, 20%, 0.45) 0%, transparent 50%),
     radial-gradient(circle at 50% 50%, hsla(222, 50%, 10%, 1) 0%, transparent 100%);
   background-attachment: fixed;
 }
 
-/* Luxury Glassmorphism Classes */
+/* Light mode body gradient */
+html[data-theme="light"] body {
+  background-image:
+    radial-gradient(circle at 90% 10%, hsla(42, 90%, 52%, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 10% 90%, hsla(222, 50%, 85%, 0.3) 0%, transparent 50%);
+  background-attachment: fixed;
+}
+
+/* ==========================================
+   GLASSMORPHISM PANELS
+   ========================================== */
 .glass-panel {
   background: var(--card-glass);
   backdrop-filter: blur(20px);
@@ -71,10 +136,32 @@ body {
   transition: var(--transition-smooth);
 }
 
-.glass-panel:hover {
+/* Clickable interactive variant — has hover lift */
+.glass-panel-interactive {
+  background: var(--card-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-premium);
+  color: var(--text-main);
+  transition: var(--transition-smooth);
+}
+.glass-panel-interactive:hover {
   border-color: rgba(230, 175, 46, 0.5);
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5), var(--shadow-glow);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.18), var(--shadow-glow);
   transform: translateY(-4px);
+}
+
+/* Static non-clickable variant — NO hover effect */
+.glass-panel-static {
+  background: var(--card-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-premium);
+  color: var(--text-main);
 }
 
 .glass-panel-dark {
@@ -88,44 +175,50 @@ body {
   transition: var(--transition-smooth);
 }
 
-.glass-panel-dark:hover {
-  border-color: var(--primary-gold-glow);
-  box-shadow: 0 30px 64px rgba(0, 0, 0, 0.65), 0 0 30px rgba(230, 175, 46, 0.3);
-  transform: translateY(-4px);
+html[data-theme="light"] .glass-panel-dark {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(230, 175, 46, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  color: var(--text-light);
 }
 
+/* Navigation */
 .glass-nav {
-  background: rgba(10, 15, 30, 0.82); /* Rich Dark Navy Glass */
+  background: var(--nav-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(230, 175, 46, 0.25); /* Elegant gold line */
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid var(--nav-border);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
   transition: var(--transition-smooth);
 }
 
-/* Typography Defaults */
+/* ==========================================
+   TYPOGRAPHY
+   ========================================== */
 h1, h2, h3, h4 {
   font-family: var(--font-serif);
   font-weight: 700;
-  color: var(--text-light);
+  color: var(--text-heading);
   line-height: 1.3;
+  transition: color 0.4s ease;
 }
 
 .heading-primary {
-  font-size: clamp(2.2rem, 6vw, 3.8rem);
+  font-size: clamp(2rem, 6vw, 3.8rem);
   letter-spacing: -0.5px;
-  background: linear-gradient(135deg, #fff 30%, var(--primary-gold) 100%);
+  background: linear-gradient(135deg, var(--text-heading) 30%, var(--primary-gold) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
   line-height: 1.25;
 }
 
 .heading-secondary {
-  font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
   position: relative;
   display: inline-block;
   margin-bottom: 2.2rem;
-  color: var(--text-light);
+  color: var(--text-heading);
   line-height: 1.35;
 }
 
@@ -140,7 +233,6 @@ h1, h2, h3, h4 {
   border-radius: 2px;
 }
 
-/* Center underline when section heading is in a text-center parent */
 .text-center .heading-secondary {
   text-align: center;
 }
@@ -149,7 +241,9 @@ h1, h2, h3, h4 {
   transform: translateX(-50%);
 }
 
-/* Interactive Elements styling */
+/* ==========================================
+   INTERACTIVE ELEMENTS
+   ========================================== */
 a {
   color: inherit;
   text-decoration: none;
@@ -172,7 +266,6 @@ a {
   box-shadow: 0 4px 15px rgba(230, 175, 46, 0.25);
   transition: var(--transition-smooth);
 }
-
 .btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(230, 175, 46, 0.45), var(--shadow-glow);
@@ -180,9 +273,9 @@ a {
 }
 
 .btn-secondary {
-  background-color: rgba(15, 23, 42, 0.45);
+  background-color: rgba(15, 23, 42, 0.1);
   backdrop-filter: blur(8px);
-  color: var(--text-light);
+  color: var(--text-main);
   font-weight: 600;
   font-size: 0.95rem;
   letter-spacing: 0.3px;
@@ -195,29 +288,87 @@ a {
   gap: 8px;
   transition: var(--transition-smooth);
 }
-
 .btn-secondary:hover {
   background-color: rgba(230, 175, 46, 0.12);
   border-color: var(--primary-gold-glow);
-  color: var(--text-light);
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(230, 175, 46, 0.2);
 }
 
-/* Custom Styled Scrollbars */
-::-webkit-scrollbar {
-  width: 10px;
+/* ==========================================
+   LIGHT MODE — TAILWIND CLASS OVERRIDES
+   ========================================== */
+html[data-theme="light"] .text-white,
+html[data-theme="light"] .text-slate-100,
+html[data-theme="light"] .text-slate-200 {
+  color: hsl(222, 47%, 12%) !important;
 }
-::-webkit-scrollbar-track {
-  background: var(--bg-navy);
+html[data-theme="light"] .text-slate-300,
+html[data-theme="light"] .text-slate-400 {
+  color: hsl(218, 20%, 35%) !important;
 }
+html[data-theme="light"] .text-slate-500 {
+  color: hsl(218, 15%, 48%) !important;
+}
+
+html[data-theme="light"] .bg-slate-900,
+html[data-theme="light"] .bg-slate-950 {
+  background-color: hsl(222, 40%, 14%) !important;
+}
+
+/* Section alternating backgrounds */
+html[data-theme="light"] .bg-slate-950\/45,
+html[data-theme="light"] .bg-slate-950\/60 {
+  background-color: hsl(40, 25%, 93%) !important;
+}
+html[data-theme="light"] .bg-slate-950\/20 {
+  background-color: rgba(240, 237, 230, 0.5) !important;
+}
+
+html[data-theme="light"] .border-slate-800,
+html[data-theme="light"] .border-slate-700,
+html[data-theme="light"] .border-slate-900 {
+  border-color: rgba(230, 175, 46, 0.2) !important;
+}
+
+html[data-theme="light"] .divide-slate-800 > * + * {
+  border-color: rgba(230, 175, 46, 0.15) !important;
+}
+
+/* Mobile menu in light mode */
+html[data-theme="light"] .glass-panel.bg-slate-950\/95 {
+  background: rgba(255, 255, 255, 0.97) !important;
+}
+
+/* Input controls */
+html[data-theme="light"] .input-control {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(230, 175, 46, 0.3);
+  color: hsl(222, 47%, 12%);
+}
+html[data-theme="light"] .input-control::placeholder {
+  color: hsl(218, 15%, 50%);
+}
+
+/* Scrollbar */
+html[data-theme="light"] ::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+/* ==========================================
+   SCROLLBAR
+   ========================================== */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); }
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, var(--primary-gold) 0%, var(--accent-gold-dark) 100%);
   border-radius: 10px;
-  border: 2px solid var(--bg-navy);
+  border: 2px solid var(--scrollbar-track);
 }
 
-/* Input Form Controls */
+/* ==========================================
+   INPUT FORM CONTROLS
+   ========================================== */
 .input-control {
   width: 100%;
   padding: 1rem 1.4rem;
@@ -229,99 +380,114 @@ a {
   color: var(--text-light);
   transition: var(--transition-smooth);
 }
-
 .input-control:focus {
   outline: none;
   border-color: var(--primary-gold);
   background: rgba(15, 23, 42, 0.85);
   box-shadow: 0 0 0 3px rgba(230, 175, 46, 0.35);
 }
-
 .input-control option {
   background: var(--bg-navy-elevated);
   color: var(--text-light);
 }
 
-/* Animations declarations */
+/* ==========================================
+   ANIMATIONS
+   ========================================== */
 @keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-
 .animate-slideup {
   animation: slideUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.glow-hover {
-  transition: var(--transition-smooth);
-}
+.glow-hover { transition: var(--transition-smooth); }
 .glow-hover:hover {
   box-shadow: var(--shadow-glow);
   transform: translateY(-4px);
 }
 
-/* Grid & Layout Utilities */
+/* ==========================================
+   LAYOUT UTILITIES
+   ========================================== */
 .container-box {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 1.25rem;
 }
 
 .section-padding {
-  padding: 6rem 0;
+  padding: 5rem 0;
 }
 
+/* Responsive grids — minmax values safe for mobile */
 .grid-three {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 2.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.75rem;
 }
 
 .grid-two {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
-  gap: 4.5rem;
-}
-
-@media (max-width: 768px) {
-  .heading-primary {
-    font-size: 2.5rem;
-  }
-  .heading-secondary {
-    font-size: 2rem;
-  }
-  .grid-two {
-    grid-template-columns: 1fr;
-    gap: 2.5rem;
-  }
-  .section-padding {
-    padding: 4.5rem 0;
-  }
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 480px), 1fr));
+  gap: 3rem;
 }
 
 /* ==========================================
-   Tamil Connected Script & Typography Fixes
+   MOBILE RESPONSIVE FIXES
+   ========================================== */
+@media (max-width: 768px) {
+  .heading-primary  { font-size: clamp(1.75rem, 8vw, 2.5rem); }
+  .heading-secondary { font-size: clamp(1.4rem, 6vw, 2rem); }
+
+  .grid-two {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .grid-three {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .section-padding { padding: 3.5rem 0; }
+
+  .container-box { padding: 0 1rem; }
+
+  /* Prevent any element from overflowing horizontally */
+  img, video, iframe, table {
+    max-width: 100%;
+  }
+
+  /* More breathing room on mobile */
+  .glass-panel,
+  .glass-panel-static,
+  .glass-panel-interactive,
+  .glass-panel-dark {
+    border-radius: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  body { font-size: 0.97rem; }
+  .container-box { padding: 0 0.875rem; }
+  .section-padding { padding: 2.75rem 0; }
+  .glass-panel,
+  .glass-panel-static,
+  .glass-panel-interactive { padding: 1.25rem !important; }
+}
+
+/* ==========================================
+   TAMIL TYPOGRAPHY FIXES
    ========================================== */
 .lang-ta * {
   letter-spacing: normal !important;
   text-transform: none !important;
 }
-
-/* Apply sleek Inter sans-serif to all headings in Tamil for perfect readability and alignment */
 .lang-ta .heading-secondary,
 .lang-ta .heading-primary,
 .lang-ta .font-serif,
-.lang-ta h1,
-.lang-ta h2,
-.lang-ta h3,
-.lang-ta h4 {
+.lang-ta h1, .lang-ta h2, .lang-ta h3, .lang-ta h4 {
   font-family: var(--font-body) !important;
 }
-

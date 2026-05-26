@@ -48,7 +48,7 @@ const Home = () => {
 
       {/* 2. Pastoral Welcome Card */}
       <section className="section-padding container-box">
-        <div className="glass-panel-dark p-8 md:p-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center glow-hover">
+        <div className="glass-panel-static p-8 md:p-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-4 text-center">
             <div className="relative inline-block">
               <div className="absolute -inset-1 rounded-full bg-amber-500/25 blur opacity-45 animate-pulse" />
@@ -129,7 +129,7 @@ const Home = () => {
                 </thead>
                 <tbody className="divide-y divide-slate-800">
                   {schedules.map((sched) => (
-                    <tr key={sched.id} className="hover:bg-white/5 transition-colors">
+                    <tr key={sched.id} className="transition-colors">
                       <td className="p-4 md:p-6 font-semibold text-slate-200">{t(sched.name)}</td>
                       <td className="p-4 md:p-6 text-amber-400 font-bold">{t(sched.time)}</td>
                       <td className="p-4 md:p-6 text-slate-300 font-medium">{t(sched.location)}</td>
@@ -142,7 +142,7 @@ const Home = () => {
             {/* Mobile Cards List View */}
             <div className="block sm:hidden divide-y divide-slate-800">
               {schedules.map((sched) => (
-                <div key={sched.id} className="p-5 flex flex-col gap-2 bg-slate-950/20 hover:bg-white/5 transition-colors">
+                <div key={sched.id} className="p-5 flex flex-col gap-2 bg-slate-950/20 transition-colors">
                   <div className="flex justify-between items-start gap-2">
                     <span className="font-serif font-bold text-sm text-white">{t(sched.name)}</span>
                     <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 text-xs font-bold shrink-0">{t(sched.time)}</span>
@@ -160,32 +160,32 @@ const Home = () => {
       {/* 5. Core Values */}
       <section className="bg-slate-950/60 border-t border-b border-slate-900 py-16">
         <div className="container-box grid-three">
-          <div className="glass-panel p-6 text-center flex flex-col items-center gap-3">
+          <div className="glass-panel-static p-6 text-center flex flex-col items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400">
               <Heart className="w-6 h-6" />
             </div>
-            <h3 className="font-serif font-bold text-xl text-white">{t('valGospelTitle')}</h3>
-            <p className="text-slate-300 text-sm">
+            <h3 className="font-serif font-bold text-xl">{t('valGospelTitle')}</h3>
+            <p className="text-sm" style={{color: 'var(--text-muted)'}}>
               {t('valGospelDesc')}
             </p>
           </div>
 
-          <div className="glass-panel p-6 text-center flex flex-col items-center gap-3">
+          <div className="glass-panel-static p-6 text-center flex flex-col items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400">
               <Shield className="w-6 h-6" />
             </div>
-            <h3 className="font-serif font-bold text-xl text-white">{t('valSanctuaryTitle')}</h3>
-            <p className="text-slate-300 text-sm">
+            <h3 className="font-serif font-bold text-xl">{t('valSanctuaryTitle')}</h3>
+            <p className="text-sm" style={{color: 'var(--text-muted)'}}>
               {t('valSanctuaryDesc')}
             </p>
           </div>
 
-          <div className="glass-panel p-6 text-center flex flex-col items-center gap-3">
+          <div className="glass-panel-static p-6 text-center flex flex-col items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400">
               <HelpCircle className="w-6 h-6" />
             </div>
-            <h3 className="font-serif font-bold text-xl text-white">{t('valOutreachTitle')}</h3>
-            <p className="text-slate-300 text-sm">
+            <h3 className="font-serif font-bold text-xl">{t('valOutreachTitle')}</h3>
+            <p className="text-sm" style={{color: 'var(--text-muted)'}}>
               {t('valOutreachDesc')}
             </p>
           </div>
@@ -206,9 +206,9 @@ const Home = () => {
 
           <div className="grid-three">
             {testimonies.map((test) => (
-              <div 
-                key={test.id} 
-                className="glass-panel p-6 relative flex flex-col justify-between"
+              <div
+                key={test.id}
+                className="glass-panel-static p-6 relative flex flex-col justify-between"
               >
                 <div className="absolute top-4 right-4 text-amber-400">
                   <Star className="w-5 h-5 fill-amber-400" />
@@ -217,13 +217,12 @@ const Home = () => {
                   <span className="text-[10px] uppercase font-bold text-amber-400 block mb-2">
                     {t(test.category) || 'Miracle'}
                   </span>
-                  <p className="text-slate-200 text-sm leading-relaxed italic">
+                  <p className="text-sm leading-relaxed italic" style={{color: 'var(--text-muted)'}}>
                     "{t(test.story_text)}"
                   </p>
                 </div>
-                <div className="border-t border-slate-800 pt-4 flex items-center justify-between">
-                  <span className="font-bold text-sm text-slate-100">{test.author_name}</span>
-                  <span className="text-slate-400 text-[10px]">{t('verifiedMember')}</span>
+                <div className="border-t pt-4" style={{borderColor: 'var(--border-glass)'}}>
+                  <span className="font-bold text-sm" style={{color: 'var(--text-main)'}}>{test.author_name}</span>
                 </div>
               </div>
             ))}

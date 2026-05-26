@@ -136,7 +136,7 @@ const Footer = () => {
               YouTube Channel
             </a>
             <Link to="/admin" className="hover:text-slate-300">
-              Admin Portal
+              Login
             </Link>
           </div>
         </div>

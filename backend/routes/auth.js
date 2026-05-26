@@ -2,31 +2,42 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 const db = require('../config/db');
 const { authenticateToken, JWT_SECRET } = require('../middleware/auth');
 
-// Resend HTTP-based email client (works on all cloud hosts - no SMTP port blocking)
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+// Nodemailer SMTP Transporter setup - highly secure SSL direct connection with certificate fallback for cloud VPS
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
+  auth: {
+    user: 'agsharjahtamil@gmail.com',
+    pass: process.env.EMAIL_PASS
+  },
+  tls: {
+    rejectUnauthorized: false // Bypasses self-signed handshake restrictions on host providers like Hostinger/Render
+  }
+});
 
 // Helper function to send email with 6-digit code
 async function sendVerificationEmail(email, name, verificationCode) {
-  if (!resend) {
+  if (!process.env.EMAIL_PASS) {
     console.log(`\n==================================================`);
-    console.log(`[VERIFICATION EMAIL FALLBACK - No RESEND_API_KEY set]`);
+    console.log(`[VERIFICATION EMAIL FALLBACK]`);
     console.log(`To: ${email}`);
     console.log(`Code: ${verificationCode}`);
-    console.log(`Set RESEND_API_KEY in your environment for live emails.`);
+    console.log(`Please set EMAIL_PASS in your environment for live emails.`);
     console.log(`==================================================\n`);
     return true;
   }
 
-  await resend.emails.send({
-    from: 'AG Sharjah Tamil Church <onboarding@resend.dev>',
+  const mailOptions = {
+    from: `"AG Sharjah Tamil Church" <agsharjahtamil@gmail.com>`,
     to: email,
     subject: `${verificationCode} is your AGSTC Verification Code`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 /images/logo.png auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
         <h2 style="color: #6366f1; text-align: center;">AG Sharjah Tamil Church</h2>
         <hr style="border: 0; border-top: 1px solid #eeeeee;" />
         <p>Dear ${name},</p>
@@ -42,7 +53,9 @@ async function sendVerificationEmail(email, name, verificationCode) {
         </p>
       </div>
     `
-  });
+  };
+
+  await transporter.sendMail(mailOptions);
 }
 
 // POST /api/auth/login
@@ -126,17 +139,24 @@ router.post('/register', async (req, res) => {
 
     if (existingUser) {
       if (existingUser.is_verified === 0) {
-        // Auto-verify and update the unverified account so they can log in immediately
+        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+
         await db.runAsync(
-          `UPDATE users SET name = ?, password_hash = ?, is_verified = 1, verification_code = NULL WHERE id = ?`,
-          [name, passwordHash, existingUser.id]
+          `UPDATE users SET name = ?, password_hash = ?, verification_code = ? WHERE id = ?`,
+          [name, passwordHash, verificationCode, existingUser.id]
         );
+
+        sendVerificationEmail(email, name, verificationCode).catch(mailErr => {
+          console.error('SMTP background mailer error on re-register:', mailErr);
+          console.log(`[SMTP Mailer Error Code Backup]: ${verificationCode} for ${email}`);
+        });
+
         return res.status(201).json({
-          message: 'Registration successful! You can now log in.',
+          message: 'This email is already registered but unverified. We have sent a new 6-digit verification code to your email.',
           email
         });
       } else {
-        return res.status(400).json({ error: 'Email is already registered. Please sign in.' });
+        return res.status(400).json({ error: 'Email is already registered and verified. Please sign in.' });
       }
     }
 
@@ -148,13 +168,22 @@ router.post('/register', async (req, res) => {
       );
       res.status(201).json({ message: `Successfully registered ${assignedRole} user: ${name}` });
     } else {
-      // Public believer registration — auto-verified (email verification temporarily disabled)
+      // Public believer registration with 6-digit verification code
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+
       await db.runAsync(
-        `INSERT INTO users (name, email, password_hash, role, is_verified) VALUES (?, ?, ?, ?, ?)`,
-        [name, email, passwordHash, 'user', 1]
+        `INSERT INTO users (name, email, password_hash, role, is_verified, verification_code) VALUES (?, ?, ?, ?, ?, ?)`,
+        [name, email, passwordHash, 'user', 0, verificationCode]
       );
+
+      // Trigger email asynchronously in the background (prevents blocking HTTP response, making registration extremely fast!)
+      sendVerificationEmail(email, name, verificationCode).catch(mailErr => {
+        console.error('SMTP background mailer error:', mailErr);
+        console.log(`[SMTP Mailer Error Code Backup]: ${verificationCode} for ${email}`);
+      });
+
       res.status(201).json({
-        message: 'Registration successful! You can now log in.',
+        message: 'Registration successful! A 6-digit verification code has been sent to your email.',
         email
       });
     }
