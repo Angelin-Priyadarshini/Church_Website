@@ -126,10 +126,7 @@ if (fs.existsSync(frontendPath) && fs.existsSync(path.join(frontendPath, 'index.
     }
   });
 
-  // Root redirect → /new
-  app.get('/', (req, res) => {
-    res.redirect(301, '/new');
-  });
+  // Root intentionally serves nothing — agsharjah.org shows no content
 } else {
   console.warn('[Warning]: frontend/dist folder or index.html not found. React static client serving is disabled. Please compile the frontend using "npm run build" inside the frontend directory.');
 
