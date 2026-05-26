@@ -53,31 +53,31 @@
    LIGHT MODE OVERRIDES
    ========================================== */
 html[data-theme="light"] {
-  --bg-main: hsl(40, 30%, 97%);
+  --bg-main: hsl(0, 0%, 100%);
   --bg-elevated: hsl(0, 0%, 100%);
-  --bg-navy: hsl(40, 30%, 97%);
-  --bg-navy-elevated: hsl(0, 0%, 100%);
+  --bg-navy: hsl(0, 0%, 100%);
+  --bg-navy-elevated: hsl(0, 0%, 98%);
 
-  --card-glass: rgba(255, 255, 255, 0.88);
-  --card-glass-light: rgba(255, 255, 255, 0.6);
-  --border-glass: rgba(230, 175, 46, 0.3);
-  --border-glass-subtle: rgba(0, 0, 0, 0.07);
+  --card-glass: rgba(255, 255, 255, 0.95);
+  --card-glass-light: rgba(255, 255, 255, 0.8);
+  --border-glass: rgba(180, 150, 60, 0.2);
+  --border-glass-subtle: rgba(0, 0, 0, 0.06);
 
-  --text-main: hsl(222, 30%, 22%);
-  --text-muted: hsl(218, 15%, 42%);
-  --text-light: hsl(222, 47%, 10%);
-  --text-heading: hsl(222, 47%, 10%);
+  --text-main: hsl(222, 47%, 18%);
+  --text-muted: hsl(222, 30%, 38%);
+  --text-light: hsl(222, 47%, 12%);
+  --text-heading: hsl(222, 47%, 12%);
 
-  --nav-bg: rgba(255, 255, 255, 0.95);
-  --nav-border: rgba(230, 175, 46, 0.3);
+  --nav-bg: rgba(255, 255, 255, 0.97);
+  --nav-border: rgba(180, 150, 60, 0.25);
 
-  --footer-bg: hsl(222, 40%, 14%);
+  --footer-bg: hsl(222, 47%, 14%);
   --footer-text: hsl(218, 15%, 65%);
 
-  --scrollbar-track: hsl(40, 30%, 93%);
+  --scrollbar-track: hsl(0, 0%, 95%);
 
-  --shadow-premium: 0 8px 32px rgba(0, 0, 0, 0.1);
-  --shadow-glow: 0 0 20px rgba(230, 175, 46, 0.18);
+  --shadow-premium: 0 4px 24px rgba(0, 0, 0, 0.07);
+  --shadow-glow: 0 0 20px rgba(180, 140, 40, 0.15);
 }
 
 /* ==========================================
@@ -297,191 +297,236 @@ a {
 
 /* ==========================================
    LIGHT MODE — TAILWIND CLASS OVERRIDES
+   White background · Navy blue text · Gold highlights
+   Light text preserved on dark image overlays
    ========================================== */
+
+/* ── Base text colours ── */
 html[data-theme="light"] .text-white,
 html[data-theme="light"] .text-slate-100,
 html[data-theme="light"] .text-slate-200 {
-  color: hsl(222, 47%, 12%) !important;
+  color: hsl(222, 47%, 14%) !important;
 }
 html[data-theme="light"] .text-slate-300,
 html[data-theme="light"] .text-slate-400 {
-  color: hsl(218, 20%, 35%) !important;
+  color: hsl(222, 35%, 32%) !important;
 }
 html[data-theme="light"] .text-slate-500 {
-  color: hsl(218, 15%, 48%) !important;
+  color: hsl(222, 25%, 45%) !important;
 }
 
-/* Keep amber text gold in light mode */
-html[data-theme="light"] .text-amber-400,
+/* Keep amber/gold as-is but slightly deeper */
+html[data-theme="light"] .text-amber-400 {
+  color: hsl(38, 80%, 36%) !important;
+}
 html[data-theme="light"] .text-amber-500 {
-  color: hsl(38, 85%, 38%) !important;
+  color: hsl(38, 85%, 32%) !important;
 }
 
-/* Dark section backgrounds → light equivalents */
-html[data-theme="light"] .bg-slate-900,
-html[data-theme="light"] .bg-slate-950 {
-  background-color: hsl(222, 30%, 18%) !important;
-}
-html[data-theme="light"] .bg-slate-950\/45,
-html[data-theme="light"] .bg-slate-950\/60,
+/* ── Page section backgrounds ── */
+/* Dark overlay header sections (hero banners, page titles) — keep dark with light text */
 html[data-theme="light"] .bg-slate-950\/65,
 html[data-theme="light"] .bg-slate-950\/70 {
-  background-color: hsl(40, 20%, 91%) !important;
+  background-color: hsl(222, 47%, 16%) !important;
 }
-html[data-theme="light"] .bg-slate-950\/20 {
-  background-color: rgba(240, 237, 230, 0.5) !important;
+/* Text INSIDE dark header sections stays light */
+html[data-theme="light"] .bg-slate-950\/65 *,
+html[data-theme="light"] .bg-slate-950\/70 * {
+  color: inherit;
 }
-
-/* Page header sections — dark overlay → warm light */
-html[data-theme="light"] section.bg-slate-950\/65,
-html[data-theme="light"] section.bg-slate-950\/70 {
-  background-color: hsl(222, 40%, 18%) !important;
-}
-/* Text inside dark header sections stays white */
 html[data-theme="light"] section.bg-slate-950\/65 .text-white,
 html[data-theme="light"] section.bg-slate-950\/65 .text-slate-300,
+html[data-theme="light"] section.bg-slate-950\/65 .heading-primary,
 html[data-theme="light"] section.bg-slate-950\/70 .text-white,
-html[data-theme="light"] section.bg-slate-950\/70 .text-slate-300 {
+html[data-theme="light"] section.bg-slate-950\/70 .text-slate-300,
+html[data-theme="light"] section.bg-slate-950\/70 .heading-primary {
   color: hsl(0, 0%, 95%) !important;
+  -webkit-text-fill-color: hsl(0, 0%, 95%) !important;
+}
+html[data-theme="light"] section.bg-slate-950\/65 .text-amber-400,
+html[data-theme="light"] section.bg-slate-950\/70 .text-amber-400 {
+  color: hsl(42, 90%, 62%) !important;
 }
 
 /* Alternating section backgrounds */
 html[data-theme="light"] .bg-slate-950\/45,
 html[data-theme="light"] .bg-slate-950\/60 {
-  background-color: hsl(40, 25%, 93%) !important;
+  background-color: hsl(220, 30%, 96%) !important;
+}
+html[data-theme="light"] .bg-slate-950\/20 {
+  background-color: hsl(220, 20%, 98%) !important;
 }
 
-/* Borders */
-html[data-theme="light"] .border-slate-800,
-html[data-theme="light"] .border-slate-700,
-html[data-theme="light"] .border-slate-900 {
-  border-color: rgba(180, 150, 80, 0.25) !important;
+/* Hard dark backgrounds → navy */
+html[data-theme="light"] .bg-slate-900 {
+  background-color: hsl(222, 47%, 14%) !important;
 }
-html[data-theme="light"] .border-slate-900\/60 {
-  border-color: rgba(180, 150, 80, 0.2) !important;
-}
-html[data-theme="light"] .divide-slate-800 > * + * {
-  border-color: rgba(180, 150, 80, 0.15) !important;
+html[data-theme="light"] .bg-slate-950 {
+  background-color: hsl(222, 47%, 10%) !important;
 }
 
-/* Glass panels in light mode */
+/* ── Glass panels → white cards with navy text ── */
 html[data-theme="light"] .glass-panel,
 html[data-theme="light"] .glass-panel-static,
 html[data-theme="light"] .glass-panel-interactive {
-  background: rgba(255, 255, 255, 0.92) !important;
-  border-color: rgba(200, 165, 60, 0.25) !important;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08) !important;
-  color: hsl(222, 30%, 18%) !important;
+  background: rgba(255, 255, 255, 0.97) !important;
+  border-color: rgba(180, 150, 60, 0.18) !important;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06) !important;
+  color: hsl(222, 47%, 14%) !important;
 }
-
-/* Text inside glass panels */
 html[data-theme="light"] .glass-panel .text-white,
 html[data-theme="light"] .glass-panel-static .text-white,
-html[data-theme="light"] .glass-panel-interactive .text-white {
+html[data-theme="light"] .glass-panel-interactive .text-white,
+html[data-theme="light"] .glass-panel h1,
+html[data-theme="light"] .glass-panel h2,
+html[data-theme="light"] .glass-panel h3,
+html[data-theme="light"] .glass-panel-static h1,
+html[data-theme="light"] .glass-panel-static h2,
+html[data-theme="light"] .glass-panel-static h3 {
   color: hsl(222, 47%, 12%) !important;
 }
 html[data-theme="light"] .glass-panel .text-slate-300,
-html[data-theme="light"] .glass-panel-static .text-slate-300,
-html[data-theme="light"] .glass-panel-interactive .text-slate-300,
 html[data-theme="light"] .glass-panel .text-slate-400,
+html[data-theme="light"] .glass-panel-static .text-slate-300,
 html[data-theme="light"] .glass-panel-static .text-slate-400 {
-  color: hsl(218, 20%, 38%) !important;
+  color: hsl(222, 30%, 38%) !important;
+}
+html[data-theme="light"] .glass-panel .italic,
+html[data-theme="light"] .glass-panel-static .italic {
+  color: hsl(222, 30%, 30%) !important;
 }
 
-/* Sermon cards */
+/* ── Sermon cards ── */
 html[data-theme="light"] .bg-white\/5 {
-  background-color: rgba(255, 255, 255, 0.85) !important;
+  background-color: rgba(255, 255, 255, 0.97) !important;
 }
 html[data-theme="light"] .bg-white\/10 {
-  background-color: rgba(255, 255, 255, 0.95) !important;
+  background-color: rgba(255, 255, 255, 1) !important;
 }
 html[data-theme="light"] .border-white\/10 {
-  border-color: rgba(180, 150, 60, 0.2) !important;
+  border-color: rgba(180, 150, 60, 0.15) !important;
+}
+/* Sermon card thumbnail overlay — keep dark so play button is visible */
+html[data-theme="light"] .bg-slate-950\/50 {
+  background-color: rgba(10, 15, 40, 0.45) !important;
+}
+/* Duration badge on thumbnail */
+html[data-theme="light"] .bg-black\/80 {
+  background-color: rgba(0, 0, 0, 0.75) !important;
 }
 
-/* Table rows */
+/* ── Table (schedule) ── */
 html[data-theme="light"] .bg-slate-950\/70 {
-  background-color: hsl(222, 35%, 20%) !important;
+  background-color: hsl(222, 47%, 16%) !important;
 }
 html[data-theme="light"] .bg-slate-950\/70 th {
   color: hsl(42, 90%, 65%) !important;
 }
-html[data-theme="light"] tr.transition-colors:hover {
-  background-color: rgba(230, 175, 46, 0.06) !important;
+html[data-theme="light"] tbody tr:hover {
+  background-color: hsl(220, 40%, 97%) !important;
+}
+html[data-theme="light"] .divide-slate-800 > * + * {
+  border-color: hsl(220, 30%, 90%) !important;
 }
 
-/* Mobile menu in light mode */
-html[data-theme="light"] .glass-panel.bg-slate-950\/95 {
-  background: rgba(255, 255, 255, 0.97) !important;
+/* ── Borders ── */
+html[data-theme="light"] .border-slate-800,
+html[data-theme="light"] .border-slate-700,
+html[data-theme="light"] .border-slate-900,
+html[data-theme="light"] .border-slate-900\/60 {
+  border-color: hsl(220, 25%, 88%) !important;
+}
+html[data-theme="light"] .border-white\/10 {
+  border-color: hsl(220, 25%, 88%) !important;
 }
 
-/* Input controls */
+/* ── Inputs ── */
 html[data-theme="light"] .input-control {
-  background: rgba(255, 255, 255, 0.95) !important;
-  border: 1px solid rgba(180, 150, 60, 0.35) !important;
+  background: hsl(0, 0%, 100%) !important;
+  border: 1px solid hsl(220, 25%, 82%) !important;
   color: hsl(222, 47%, 12%) !important;
 }
 html[data-theme="light"] .input-control::placeholder {
-  color: hsl(218, 15%, 52%) !important;
+  color: hsl(222, 20%, 55%) !important;
 }
 html[data-theme="light"] .input-control:focus {
-  background: rgba(255, 255, 255, 1) !important;
-  box-shadow: 0 0 0 3px rgba(230, 175, 46, 0.25) !important;
+  background: hsl(0, 0%, 100%) !important;
+  border-color: hsl(38, 80%, 42%) !important;
+  box-shadow: 0 0 0 3px rgba(180, 140, 40, 0.18) !important;
+}
+html[data-theme="light"] select.input-control,
+html[data-theme="light"] select.bg-slate-900 {
+  background: hsl(0, 0%, 100%) !important;
+  color: hsl(222, 47%, 12%) !important;
 }
 html[data-theme="light"] .input-control option {
   background: white !important;
   color: hsl(222, 47%, 12%) !important;
 }
 
-/* Select dropdowns */
-html[data-theme="light"] select.input-control,
-html[data-theme="light"] select.bg-slate-900 {
-  background: white !important;
-  color: hsl(222, 47%, 12%) !important;
-}
-
-/* Sermon card thumbnails */
-html[data-theme="light"] .bg-slate-950 {
-  background-color: hsl(222, 40%, 14%) !important;
-}
-
-/* Heading gradient in light mode */
+/* ── Headings ── */
 html[data-theme="light"] .heading-primary {
-  background: linear-gradient(135deg, hsl(222, 47%, 15%) 30%, hsl(38, 85%, 38%) 100%);
+  background: linear-gradient(135deg, hsl(222, 47%, 14%) 30%, hsl(38, 80%, 36%) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
-
-/* Scrollbar */
-html[data-theme="light"] ::-webkit-scrollbar-track {
-  background: var(--scrollbar-track);
+html[data-theme="light"] .heading-secondary {
+  color: hsl(222, 47%, 14%) !important;
 }
 
-/* btn-secondary in light mode */
+/* ── Buttons ── */
 html[data-theme="light"] .btn-secondary {
-  background-color: rgba(255, 255, 255, 0.8) !important;
-  color: hsl(222, 47%, 15%) !important;
-  border-color: rgba(180, 140, 40, 0.5) !important;
+  background-color: hsl(0, 0%, 100%) !important;
+  color: hsl(222, 47%, 14%) !important;
+  border-color: hsl(38, 70%, 45%) !important;
 }
 html[data-theme="light"] .btn-secondary:hover {
-  background-color: rgba(230, 175, 46, 0.1) !important;
+  background-color: hsl(42, 80%, 96%) !important;
 }
 
-/* Italic/quote text */
-html[data-theme="light"] .italic {
-  color: hsl(222, 30%, 28%) !important;
+/* ── Filter bar ── */
+html[data-theme="light"] .backdrop-blur-md {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: hsl(220, 25%, 88%) !important;
 }
 
-/* Loading spinner text */
+/* ── Loading spinner text ── */
 html[data-theme="light"] .text-amber-400\/90 {
-  color: hsl(38, 85%, 38%) !important;
+  color: hsl(38, 80%, 36%) !important;
+}
+html[data-theme="light"] .text-slate-300.text-sm {
+  color: hsl(222, 30%, 38%) !important;
 }
 
-/* Filter bar background */
-html[data-theme="light"] .backdrop-blur-md.bg-white\/5 {
-  background-color: rgba(255, 255, 255, 0.9) !important;
-  border-color: rgba(180, 150, 60, 0.2) !important;
+/* ── Scrollbar ── */
+html[data-theme="light"] ::-webkit-scrollbar-track {
+  background: hsl(0, 0%, 95%);
+}
+
+/* ── Light body background ── */
+html[data-theme="light"] body {
+  background-color: hsl(0, 0%, 100%);
+  background-image: none;
+}
+
+/* ── Text on dark image overlays — always stays light ── */
+/* Hero banner, page header sections with dark bg */
+html[data-theme="light"] [style*="background-image"] .text-white,
+html[data-theme="light"] [style*="background-image"] .text-slate-300,
+html[data-theme="light"] .relative.overflow-hidden .text-white,
+html[data-theme="light"] .relative.overflow-hidden .text-slate-300 {
+  color: hsl(0, 0%, 95%) !important;
+}
+
+/* ── Mobile menu ── */
+html[data-theme="light"] .xl\:hidden .glass-panel {
+  background: rgba(255, 255, 255, 0.99) !important;
+}
+
+/* ── Amber ring/glow effects ── */
+html[data-theme="light"] .ring-amber-950\/50 {
+  --tw-ring-color: rgba(180, 140, 40, 0.2) !important;
 }
 
 /* ==========================================
