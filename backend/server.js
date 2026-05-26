@@ -20,7 +20,29 @@ const uploadRoutes = require('./routes/upload');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Automatically seed database on boot (essential for empty server instances in cloud hostings like Render)
+// DB diagnostic endpoint — visit /api/dbcheck to see connection status
+app.get('/api/dbcheck', async (req, res) => {
+  try {
+    const row = await db.getAsync('SELECT 1+1 AS result');
+    res.json({
+      status: 'connected',
+      result: row,
+      host: process.env.DB_HOST,
+      database: process.env.DB_NAME,
+      user: process.env.DB_USER
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      message: err.message,
+      host: process.env.DB_HOST,
+      database: process.env.DB_NAME,
+      user: process.env.DB_USER
+    });
+  }
+});
+
+// Automatically seed database on boot
 const seedDatabase = require('./db/init');
 seedDatabase().then(() => {
   console.log('[Database Bootstrapper]: System checks passed. Tables synchronized successfully.');
