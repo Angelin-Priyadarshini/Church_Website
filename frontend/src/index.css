@@ -365,6 +365,19 @@ html[data-theme="light"] .bg-slate-950 {
   background-color: hsl(222, 47%, 10%) !important;
 }
 
+/* Additional dark bg variants */
+html[data-theme="light"] .bg-slate-800 {
+  background-color: hsl(222, 40%, 16%) !important;
+}
+html[data-theme="light"] .bg-slate-950\/95 {
+  background-color: rgba(255, 255, 255, 0.97) !important;
+}
+html[data-theme="light"] .bg-slate-900\/60,
+html[data-theme="light"] .bg-slate-900\/50,
+html[data-theme="light"] .bg-slate-900\/40 {
+  background-color: rgba(20, 25, 50, 0.5) !important;
+}
+
 /* ── Glass panels → white cards with navy text ── */
 html[data-theme="light"] .glass-panel,
 html[data-theme="light"] .glass-panel-static,

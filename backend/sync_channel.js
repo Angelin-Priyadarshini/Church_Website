@@ -600,7 +600,7 @@ async function run() {
       console.log(`Total unique sermons fetched via YouTube Data API: ${allVideos.length}`);
 
       // Upsert into database
-      console.log('Writing sermon records to SQLite database...');
+      console.log('Writing sermon records to database...');
       let inserted = 0;
       let updated = 0;
 
@@ -716,7 +716,7 @@ async function run() {
     }
     
     // 3. Upsert into database
-    console.log('Writing sermon records to SQLite database...');
+    console.log('Writing sermon records to database...');
     let inserted = 0;
     let updated = 0;
     

@@ -25,11 +25,11 @@ router.get('/', async (req, res) => {
   }
 
   if (sort === 'oldest') {
-    sql += ` ORDER BY upload_date ASC NULLS LAST, id ASC`;
+    sql += ` ORDER BY ISNULL(upload_date), upload_date ASC, id ASC`;
   } else if (sort === 'popular') {
-    sql += ` ORDER BY view_count DESC, upload_date DESC NULLS LAST`;
+    sql += ` ORDER BY view_count DESC, upload_date DESC, id DESC`;
   } else {
-    sql += ` ORDER BY upload_date DESC NULLS LAST, id DESC`;
+    sql += ` ORDER BY upload_date DESC, id DESC`;
   }
 
   if (limit) {

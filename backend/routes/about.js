@@ -6,7 +6,7 @@ const { authenticateToken } = require('../middleware/auth');
 // GET /api/about
 router.get('/', async (req, res) => {
   try {
-    const rows = await db.allAsync(`SELECT * FROM about_content`);
+    const rows = await db.allAsync('SELECT `key`, en_val, ta_val FROM about_content');
     const formatted = {
       en: {},
       ta: {}
@@ -41,8 +41,7 @@ router.put('/', authenticateToken, async (req, res) => {
       const ta_val = ta[key] || '';
 
       await db.runAsync(
-        `INSERT INTO about_content (key, en_val, ta_val) VALUES (?, ?, ?)
-         ON DUPLICATE KEY UPDATE en_val = VALUES(en_val), ta_val = VALUES(ta_val)`,
+        'INSERT INTO about_content (`key`, en_val, ta_val) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE en_val = VALUES(en_val), ta_val = VALUES(ta_val)',
         [key, en_val, ta_val]
       );
     }
