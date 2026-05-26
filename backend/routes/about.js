@@ -42,8 +42,8 @@ router.put('/', authenticateToken, async (req, res) => {
 
       await db.runAsync(
         `INSERT INTO about_content (key, en_val, ta_val) VALUES (?, ?, ?)
-         ON CONFLICT(key) DO UPDATE SET en_val = ?, ta_val = ?`,
-        [key, en_val, ta_val, en_val, ta_val]
+         ON DUPLICATE KEY UPDATE en_val = VALUES(en_val), ta_val = VALUES(ta_val)`,
+        [key, en_val, ta_val]
       );
     }
 

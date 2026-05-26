@@ -36,6 +36,11 @@ out/
 *.sln
 *.sw?
 
+# Deployment zip archives
+*.zip
+agstc_deploy.zip
+agstc_hostinger_deploy.zip
+
 # OS temp files
 Thumbs.db
 ehthumbs.db
