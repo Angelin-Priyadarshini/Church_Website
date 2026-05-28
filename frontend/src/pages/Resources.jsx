@@ -4,7 +4,7 @@ import { BookOpen, FileText, Download, Clock, User, Bookmark } from 'lucide-reac
 import { API_BASE } from '../config';
 
 const Resources = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [activeTab, setActiveTab] = useState('devotionals'); // devotionals or files
   const [devotionals, setDevotionals] = useState([]);
   const [resources, setResources] = useState([]);
@@ -53,7 +53,14 @@ const Resources = () => {
   return (
     <div className="animate-slideup">
       {/* Header */}
-      <section className="bg-slate-950/65 text-white py-16 relative overflow-hidden border-b border-amber-500/20">
+      <section 
+        className="bg-slate-950/65 text-white py-16 relative overflow-hidden border-b border-amber-500/20"
+        style={{
+          backgroundImage: t('bg_resources') && t('bg_resources') !== 'bg_resources' ? `linear-gradient(rgba(10, 15, 30, 0.75), rgba(10, 15, 30, 0.75)), url(${t('bg_resources')})` : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      >
         <div className="absolute inset-0 opacity-15 bg-[radial-gradient(circle_at_center,_var(--primary-gold))]" style={{ filter: 'blur(80px)' }} />
         <div className="container-box text-center relative z-10">
           <span className="text-xs uppercase font-extrabold text-amber-400 tracking-widest block">
@@ -65,21 +72,37 @@ const Resources = () => {
           <p className="text-slate-300 text-sm max-w-xl mx-auto mt-4">
             {t('equipFamilyAltar')}
           </p>
+
+          {(() => {
+            const rawParas = t('paras_resources');
+            let additionalParas = [];
+            try {
+              additionalParas = typeof rawParas === 'string' ? JSON.parse(rawParas) : rawParas;
+            } catch (e) {
+              additionalParas = [];
+            }
+            if (!Array.isArray(additionalParas)) additionalParas = [];
+            return additionalParas.map((p, idx) => (
+              <p key={idx} className="text-slate-300 text-xs md:text-sm max-w-xl mx-auto mt-3 leading-relaxed">
+                {language === 'ta' ? p.ta : p.en}
+              </p>
+            ));
+          })()}
         </div>
       </section>
 
       {/* Tabs Selector Bar */}
-      <section className="container-box pt-10">
-        <div className="flex justify-center border-b border-amber-500/20 gap-6">
+      <section className="container-box pt-12">
+        <div className="mx-auto flex w-full max-w-2xl rounded-lg border border-amber-500/20 bg-white/5 p-1.5 shadow-sm">
           <button 
             onClick={() => setActiveTab('devotionals')}
-            className={`pb-4 text-base font-bold transition-all relative ${
+            className={`flex-1 rounded-md px-4 py-3 text-sm font-bold transition-all ${
               activeTab === 'devotionals' 
-                ? 'text-amber-400 font-extrabold border-b-2 border-amber-500'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-amber-500 text-slate-950 shadow'
+                : 'text-slate-400 hover:bg-white/10 hover:text-amber-400'
             }`}
           >
-            <span className="flex items-center gap-2">
+            <span className="flex items-center justify-center gap-2">
               <BookOpen className="w-5 h-5" />
               {t('devotionalsTitle')}
             </span>
@@ -87,13 +110,13 @@ const Resources = () => {
 
           <button 
             onClick={() => setActiveTab('files')}
-            className={`pb-4 text-base font-bold transition-all relative ${
+            className={`flex-1 rounded-md px-4 py-3 text-sm font-bold transition-all ${
               activeTab === 'files' 
-                ? 'text-amber-400 font-extrabold border-b-2 border-amber-500'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-amber-500 text-slate-950 shadow'
+                : 'text-slate-400 hover:bg-white/10 hover:text-amber-400'
             }`}
           >
-            <span className="flex items-center gap-2">
+            <span className="flex items-center justify-center gap-2">
               <FileText className="w-5 h-5" />
               {t('downloadGuides')}
             </span>
@@ -102,22 +125,22 @@ const Resources = () => {
       </section>
 
       {/* Dynamic Tab Panels */}
-      <section className="container-box py-10">
+      <section className="container-box py-12 md:py-16">
         {loading ? (
           <div className="text-center py-16 text-slate-300 font-semibold">
             {t('fetchingResources')}
           </div>
         ) : activeTab === 'devotionals' ? (
           /* DEVOTIONALS PANEL */
-          <div className="flex flex-col gap-8 max-w-3xl mx-auto">
+          <div className="flex flex-col gap-8 max-w-5xl mx-auto">
             {devotionals.map((post) => (
               <article 
                 key={post.id}
-                className="glass-panel p-6 hover:shadow-md transition-all glow-hover flex flex-col gap-4"
+                className="glass-panel p-7 md:p-9 hover:shadow-md transition-all glow-hover flex flex-col gap-6"
               >
                 <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] uppercase font-bold text-amber-400 tracking-wider">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+                    <span className="text-[11px] uppercase font-extrabold text-amber-400 tracking-wider">
                       {t(post.category)}
                     </span>
                     <span className="flex items-center gap-1 text-xs text-slate-400 font-semibold">
@@ -126,16 +149,16 @@ const Resources = () => {
                     </span>
                   </div>
                   
-                  <h3 className="font-serif font-bold text-xl text-white leading-snug">
+                  <h3 className="font-serif font-bold text-2xl md:text-3xl text-white leading-snug">
                     {t(post.title)}
                   </h3>
                 </div>
 
-                <p className="text-slate-300 text-sm leading-relaxed" style={{ whiteSpace: 'pre-line' }}>
+                <p className="text-slate-300 text-base leading-8" style={{ whiteSpace: 'pre-line' }}>
                   {t(post.content)}
                 </p>
 
-                <div className="border-t border-amber-500/10 pt-3 flex items-center justify-between text-xs text-slate-400 font-semibold">
+                <div className="border-t border-amber-500/10 pt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between text-xs text-slate-400 font-semibold">
                   <span className="flex items-center gap-1">
                     <User className="w-3.5 h-3.5 text-amber-400" />
                     {t('writtenBy')}: <strong className="text-white">{t(post.author)}</strong>
@@ -150,28 +173,28 @@ const Resources = () => {
           </div>
         ) : (
           /* FILES CATALOG PANEL */
-          <div className="grid-three">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
             {resources.map((file) => (
               <div 
                 key={file.id}
-                className="glass-panel p-6 flex flex-col justify-between"
+                className="glass-panel p-7 flex flex-col justify-between min-h-[260px]"
               >
                 <div>
-                  <div className="w-10 h-10 rounded-lg bg-red-950/40 text-red-400 flex items-center justify-center mb-4 border border-red-900/30 font-bold text-xs shrink-0">
+                  <div className="w-12 h-12 rounded-lg bg-red-950/40 text-red-400 flex items-center justify-center mb-5 border border-red-900/30 font-bold text-xs shrink-0">
                     PDF
                   </div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1">
+                  <span className="text-[11px] uppercase font-extrabold text-amber-400 tracking-wider block mb-2">
                     {t(file.category)}
                   </span>
-                  <h3 className="font-serif font-bold text-base text-white mb-2 leading-snug">
+                  <h3 className="font-serif font-bold text-xl text-white mb-3 leading-snug">
                     {t(file.title)}
                   </h3>
-                  <p className="text-slate-300 text-xs leading-relaxed mb-6">
+                  <p className="text-slate-300 text-sm leading-6 mb-8">
                     {t(file.description)}
                   </p>
                 </div>
 
-                <div className="border-t border-amber-500/10 pt-4 flex items-center justify-between">
+                <div className="border-t border-amber-500/10 pt-5 flex items-center justify-between gap-4">
                   <span className="text-xs text-slate-400 font-semibold">
                     {file.download_count || 0} {t('downloadsCount')}
                   </span>

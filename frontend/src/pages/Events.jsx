@@ -4,7 +4,7 @@ import { Calendar, Clock, MapPin, Users, Ticket, CheckCircle, X } from 'lucide-r
 import { API_BASE, resolveImageUrl } from '../config';
 
 const Events = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   
@@ -83,7 +83,14 @@ const Events = () => {
   return (
     <div className="animate-slideup">
       {/* Header */}
-      <section className="bg-slate-950/65 text-white py-16 relative overflow-hidden border-b border-amber-500/20">
+      <section 
+        className="bg-slate-950/65 text-white py-16 relative overflow-hidden border-b border-amber-500/20"
+        style={{
+          backgroundImage: t('bg_events') && t('bg_events') !== 'bg_events' ? `linear-gradient(rgba(10, 15, 30, 0.75), rgba(10, 15, 30, 0.75)), url(${t('bg_events')})` : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      >
         <div className="absolute inset-0 opacity-15 bg-[radial-gradient(circle_at_center,_var(--primary-gold))]" style={{ filter: 'blur(80px)' }} />
         <div className="container-box text-center relative z-10">
           <span className="text-xs uppercase font-extrabold text-amber-400 tracking-widest block">
@@ -95,6 +102,21 @@ const Events = () => {
           <p className="text-slate-300 text-sm max-w-xl mx-auto mt-4">
             {t('eventsSub')}
           </p>
+          {(() => {
+            const rawParas = t('paras_events');
+            let additionalParas = [];
+            try {
+              additionalParas = typeof rawParas === 'string' ? JSON.parse(rawParas) : rawParas;
+            } catch (e) {
+              additionalParas = [];
+            }
+            if (!Array.isArray(additionalParas)) additionalParas = [];
+            return additionalParas.map((p, idx) => (
+              <p key={idx} className="text-slate-300 text-xs max-w-xl mx-auto mt-2 leading-relaxed">
+                {language === 'ta' ? p.ta : p.en}
+              </p>
+            ));
+          })()}
         </div>
       </section>
 
@@ -257,7 +279,8 @@ const Events = () => {
                     <select
                       value={countryCode}
                       onChange={(e) => setCountryCode(e.target.value)}
-                      className="input-control w-28 shrink-0 bg-slate-900 border border-white/10 text-white text-xs font-bold focus:border-amber-500 cursor-pointer"
+                      className="input-control bg-slate-900 border border-white/10 text-white text-xs font-bold focus:border-amber-500 cursor-pointer"
+                      style={{ width: '110px', minWidth: '110px', flexShrink: 0 }}
                     >
                       <option value="+971">🇦🇪 +971</option>
                       <option value="+91">🇮🇳 +91</option>

@@ -42,33 +42,33 @@ const Header = () => {
 
   return (
     <nav className="glass-nav sticky top-0 z-50 w-full" style={{ position: 'sticky' }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between py-2 sm:py-3">
+      <div className="container-box">
+        <div className="flex items-center justify-between py-3 sm:py-4">
 
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 shrink-0">
+          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 shrink-0 -ml-3 sm:-ml-6 lg:-ml-9 xl:-ml-12">
             <img
               src="/images/logo.png"
               alt="AGSTC Logo"
-              className="w-12 h-12 sm:w-14 sm:h-14 object-contain transition-transform duration-300 hover:scale-105"
+              className="w-12 h-12 sm:w-15 sm:h-15 object-contain transition-transform duration-300 hover:scale-105 shrink-0"
             />
             <div className="flex flex-col justify-center">
-              <span className={`font-serif font-bold text-lg sm:text-xl tracking-tight block leading-none mb-1 ${isDark ? 'text-white' : 'text-slate-800'}`}>
+              <span className={`font-serif font-bold text-lg sm:text-[22px] tracking-tight block leading-tight ${isDark ? 'text-white' : 'text-slate-800'}`}>
                 AGSTC
               </span>
-              <span className="text-[10px] uppercase font-bold text-amber-500 tracking-widest block">
+              <span className="text-[9px] sm:text-[10px] uppercase font-bold text-amber-500 tracking-wider block leading-tight mt-0.5">
                 {t('headerBrandSub')}
               </span>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden xl:flex items-center gap-3 xl:gap-4 2xl:gap-6 shrink-0">
+          <div className={`hidden xl:flex items-center ${language === 'ta' ? 'gap-2 xl:gap-2.5 2xl:gap-6' : 'gap-4 xl:gap-5 2xl:gap-8'} shrink-0`}>
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
-                className={`text-xs xl:text-sm font-semibold transition-colors ${navTextColor} ${navHoverColor}`}
+                className={`${language === 'ta' ? 'text-[12.5px] 2xl:text-[14px] tracking-tighter' : 'text-[16px] 2xl:text-[17px]'} font-semibold transition-colors ${navTextColor} ${navHoverColor} whitespace-nowrap`}
               >
                 {link.label}
               </Link>
@@ -77,7 +77,7 @@ const Header = () => {
             {/* Language Toggle */}
             <button
               onClick={toggleLanguage}
-              className={`flex items-center gap-1.5 p-1.5 rounded-full hover:bg-amber-500/10 transition-colors ${iconColor}`}
+              className={`flex items-center gap-1.5 p-1.5 rounded-full hover:bg-amber-500/10 transition-colors ${iconColor} shrink-0`}
               title="Toggle Language / மொழி மாற்று"
             >
               <Globe className="w-4 h-4 xl:w-5 xl:h-5" />
@@ -89,7 +89,7 @@ const Header = () => {
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className={`p-2 rounded-full hover:bg-amber-500/10 transition-colors ${iconColor}`}
+              className={`p-2 rounded-full hover:bg-amber-500/10 transition-colors ${iconColor} shrink-0`}
               title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
               id="theme-toggle-btn"
             >
@@ -101,7 +101,7 @@ const Header = () => {
 
             {/* Auth */}
             {user ? (
-              <div className={`flex items-center gap-2 xl:gap-4 pl-3 xl:pl-4 border-l ${isDark ? 'border-slate-700' : 'border-slate-300'}`}>
+              <div className={`flex items-center gap-2 xl:gap-3 pl-3 xl:pl-4 border-l ${isDark ? 'border-slate-700' : 'border-slate-300'} shrink-0`}>
                 <Link
                   to="/admin"
                   className={`flex items-center gap-1.5 text-xs xl:text-sm font-semibold ${navTextColor} ${navHoverColor}`}
@@ -120,7 +120,7 @@ const Header = () => {
             ) : (
               <Link
                 to="/admin"
-                className={`text-[11px] xl:text-xs font-semibold transition-colors pl-3 xl:pl-4 border-l ${isDark ? 'border-slate-700 text-slate-400 hover:text-slate-200' : 'border-slate-300 text-slate-500 hover:text-slate-800'}`}
+                className={`text-[12px] xl:text-xs font-semibold transition-colors pl-3 xl:pl-4 border-l ${isDark ? 'border-slate-700 text-slate-400 hover:text-slate-200' : 'border-slate-300 text-slate-500 hover:text-slate-800'} shrink-0`}
               >
                 {language === 'ta' ? 'உள்நுழை' : 'Login'}
               </Link>
@@ -128,7 +128,7 @@ const Header = () => {
           </div>
 
           {/* Mobile Controls */}
-          <div className="xl:hidden flex items-center gap-2">
+          <div className="xl:hidden flex items-center gap-1 shrink-0">
             {/* Theme toggle mobile */}
             <button
               onClick={toggleTheme}
@@ -162,34 +162,34 @@ const Header = () => {
       {/* Mobile Menu */}
       {isOpen && (
         <div
-          className="xl:hidden glass-panel mx-3 my-2 p-5 animate-slideup"
-          style={{ borderRadius: '16px', background: isDark ? 'rgba(8,12,24,0.97)' : 'rgba(255,255,255,0.98)' }}
+          className="xl:hidden absolute left-3 right-3 top-full mt-2 glass-panel p-4 animate-slideup max-h-[calc(100vh-92px)] overflow-y-auto"
+          style={{ borderRadius: '14px', background: isDark ? 'rgba(8,12,24,0.98)' : 'rgba(255,255,255,0.99)' }}
         >
-          <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 gap-2">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 onClick={() => setIsOpen(false)}
-                className={`text-base font-semibold py-1.5 border-b ${isDark ? 'text-slate-200 border-slate-800 hover:text-amber-400' : 'text-slate-700 border-slate-100 hover:text-amber-500'}`}
+                className={`rounded-lg px-4 py-3 text-base font-semibold transition-colors ${isDark ? 'text-slate-200 hover:bg-white/10 hover:text-amber-400' : 'text-slate-700 hover:bg-amber-50 hover:text-amber-700'}`}
               >
                 {link.label}
               </Link>
             ))}
 
             {user ? (
-              <div className="flex flex-col gap-3 pt-2">
+              <div className={`flex flex-col gap-2 pt-3 mt-2 border-t ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
                 <Link
                   to="/admin"
                   onClick={() => setIsOpen(false)}
-                  className={`flex items-center gap-2 text-base font-semibold ${isDark ? 'text-slate-200 hover:text-amber-400' : 'text-slate-700 hover:text-amber-500'}`}
+                  className={`flex items-center gap-2 rounded-lg px-4 py-3 text-base font-semibold ${isDark ? 'text-slate-200 hover:bg-white/10 hover:text-amber-400' : 'text-slate-700 hover:bg-amber-50 hover:text-amber-700'}`}
                 >
                   <User className="w-5 h-5" />
                   {dashboardTitleLabel}
                 </Link>
                 <button
                   onClick={() => { setIsOpen(false); handleLogout(); }}
-                  className="flex items-center gap-2 text-base font-semibold text-red-400 text-left"
+                  className="flex items-center gap-2 rounded-lg px-4 py-3 text-base font-semibold text-red-400 text-left hover:bg-red-500/10"
                 >
                   <LogOut className="w-5 h-5" />
                   {language === 'ta' ? 'வெளியேறு' : 'Logout'}
@@ -199,7 +199,7 @@ const Header = () => {
               <Link
                 to="/admin"
                 onClick={() => setIsOpen(false)}
-                className={`text-sm font-semibold pt-2 ${isDark ? 'text-slate-400 hover:text-slate-200' : 'text-slate-500 hover:text-slate-800'}`}
+                className={`block rounded-lg px-4 py-3 mt-2 border-t text-base font-semibold ${isDark ? 'border-slate-800 text-slate-300 hover:bg-white/10 hover:text-slate-100' : 'border-slate-100 text-slate-600 hover:bg-amber-50 hover:text-slate-900'}`}
               >
                 {language === 'ta' ? 'உள்நுழை' : 'Login'}
               </Link>

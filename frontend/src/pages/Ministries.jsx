@@ -25,7 +25,14 @@ const Ministries = () => {
   return (
     <div className="animate-slideup">
       {/* Header */}
-      <section className="bg-slate-950/65 text-white py-16 relative overflow-hidden border-b border-amber-500/20">
+      <section 
+        className="bg-slate-950/65 text-white py-16 relative overflow-hidden border-b border-amber-500/20"
+        style={{
+          backgroundImage: t('bg_ministries') && t('bg_ministries') !== 'bg_ministries' ? `linear-gradient(rgba(10, 15, 30, 0.75), rgba(10, 15, 30, 0.75)), url(${t('bg_ministries')})` : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      >
         <div className="absolute inset-0 opacity-15 bg-[radial-gradient(circle_at_center,_var(--primary-gold))]" style={{ filter: 'blur(80px)' }} />
         <div className="container-box text-center relative z-10">
           <span className="text-xs uppercase font-extrabold text-amber-400 tracking-widest block">
@@ -37,6 +44,22 @@ const Ministries = () => {
           <p className="text-slate-300 text-sm max-w-xl mx-auto mt-4">
             {t('ministriesSub')}
           </p>
+
+          {(() => {
+            const rawParas = t('paras_ministries');
+            let additionalParas = [];
+            try {
+              additionalParas = typeof rawParas === 'string' ? JSON.parse(rawParas) : rawParas;
+            } catch (e) {
+              additionalParas = [];
+            }
+            if (!Array.isArray(additionalParas)) additionalParas = [];
+            return additionalParas.map((p, idx) => (
+              <p key={idx} className="text-slate-300 text-xs md:text-sm max-w-xl mx-auto mt-3 leading-relaxed">
+                {language === 'ta' ? p.ta : p.en}
+              </p>
+            ));
+          })()}
         </div>
       </section>
 

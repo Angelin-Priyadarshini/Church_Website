@@ -19,51 +19,37 @@ const HeroBanner = () => {
     }
   }
 
-  if (!Array.isArray(bannerImages) || bannerImages.length === 0) {
-    const singleImage = t('aboutImage');
-    if (singleImage && singleImage !== 'aboutImage' && singleImage !== '/images/home-banner1.JPG') {
-      bannerImages = [singleImage];
-    } else {
-      bannerImages = [
-        '/images/home-banner1.JPG',
-        '/images/prayer.jpg',
-        '/images/banner1.jpg'
-      ];
-    }
+  // Ensure bannerImages is an array
+  if (!Array.isArray(bannerImages)) {
+    bannerImages = [];
   }
 
-  const baseSlides = [
+  const slides = [
     {
       title: t('heroTitle1'),
       subtitle: t('heroSub1'),
       ctaText: t('watchSermons'),
       ctaLink: '/services',
-      icon: <Play className="w-5 h-5" />
+      icon: <Play className="w-5 h-5" />,
+      image: bannerImages[0] || (t('aboutImage') !== 'aboutImage' ? t('aboutImage') : null) || '/images/home-banner1.JPG'
     },
     {
       title: t('heroTitle2'),
       subtitle: t('heroSub2'),
       ctaText: t('requestPrayer'),
       ctaLink: '/contact',
-      icon: <HeartHandshake className="w-5 h-5" />
+      icon: <HeartHandshake className="w-5 h-5" />,
+      image: bannerImages[1] || '/images/prayer.jpg'
     },
     {
       title: t('heroTitle3'),
       subtitle: t('heroSub3'),
       ctaText: t('navMinistries'),
       ctaLink: '/ministries',
-      icon: <HelpCircle className="w-5 h-5" />
+      icon: <HelpCircle className="w-5 h-5" />,
+      image: bannerImages[2] || '/images/banner1.jpg'
     }
   ];
-
-  const slides = bannerImages.map((imgUrl, idx) => {
-    const base = baseSlides[idx % baseSlides.length];
-    return {
-      ...base,
-      image: imgUrl
-    };
-  });
-
 
   // Auto-play slides every 6 seconds
   useEffect(() => {
@@ -85,23 +71,23 @@ const HeroBanner = () => {
     <div className="relative w-full h-[550px] overflow-hidden bg-slate-950">
       {/* Slides mapping */}
       {slides.map((slide, idx) => (
-        <div 
+        <div
           key={idx}
           className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${
             idx === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
           }`}
         >
           {/* Cover image overlay */}
-          <div 
+          <div
             className="absolute inset-0 bg-cover bg-center"
-            style={{ 
+            style={{
               backgroundImage: `url(${slide.image})`,
               filter: 'brightness(0.4) contrast(1.1)'
             }}
           />
 
           {/* Golden animated glow blurs */}
-          <div 
+          <div
             className="absolute top-1/4 left-1/4 w-[350px] h-[350px] rounded-full bg-amber-500/10 blur-[120px] pointer-events-none"
             style={{ transform: 'translate(-50%, -50%)' }}
           />
@@ -112,23 +98,26 @@ const HeroBanner = () => {
               <span className="text-xs uppercase tracking-widest font-extrabold text-amber-400 block">
                 {t('headerBrandSub')}
               </span>
-              <h1 className="font-serif font-bold text-white leading-tight max-w-3xl" style={{ fontSize: 'clamp(2rem, 6vw, 3.8rem)' }}>
+              <h1
+                className="font-serif font-bold text-amber-400 leading-tight max-w-3xl drop-shadow-[0_2px_12px_rgba(0,0,0,0.65)]"
+                style={{ fontSize: 'clamp(2rem, 6vw, 3.8rem)' }}
+              >
                 {slide.title}
               </h1>
-              <p className="text-lg md:text-xl text-slate-200 font-light max-w-2xl">
+              <p className="text-lg md:text-xl text-amber-300 font-semibold max-w-2xl drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)]">
                 {slide.subtitle}
               </p>
               <div className="flex flex-wrap gap-4 mt-2 justify-center md:justify-start">
-                <button 
+                <button
                   onClick={() => navigate(slide.ctaLink)}
                   className="btn-primary"
                 >
                   {slide.icon}
                   {slide.ctaText}
                 </button>
-                <button 
+                <button
                   onClick={() => navigate('/about')}
-                  className="btn-secondary text-white border-white hover:bg-white hover:text-slate-900"
+                  className="btn-secondary text-amber-300 border-amber-300 hover:bg-amber-300 hover:text-slate-950"
                 >
                   {t('learnHistory')}
                 </button>
@@ -138,24 +127,38 @@ const HeroBanner = () => {
         </div>
       ))}
 
-      {/* Navigation arrows */}
-      <button 
+      {/* Navigation arrows — always white/gold regardless of theme */}
+      <button
         onClick={prevSlide}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/30 hover:bg-black/50 text-white border border-white/10 transition-colors"
+        className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-300"
+        style={{
+          background: 'rgba(0,0,0,0.50)',
+          border: '1px solid rgba(251,191,36,0.5)',
+          color: '#FFFFFF'
+        }}
+        onMouseEnter={e => e.currentTarget.style.background = 'rgba(251,191,36,0.75)'}
+        onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.50)'}
       >
-        <ChevronLeft className="w-6 h-6" />
+        <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: '#FFFFFF', stroke: '#FFFFFF' }} />
       </button>
-      <button 
+      <button
         onClick={nextSlide}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/30 hover:bg-black/50 text-white border border-white/10 transition-colors"
+        className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-300"
+        style={{
+          background: 'rgba(0,0,0,0.50)',
+          border: '1px solid rgba(251,191,36,0.5)',
+          color: '#FFFFFF'
+        }}
+        onMouseEnter={e => e.currentTarget.style.background = 'rgba(251,191,36,0.75)'}
+        onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.50)'}
       >
-        <ChevronRight className="w-6 h-6" />
+        <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: '#FFFFFF', stroke: '#FFFFFF' }} />
       </button>
 
       {/* Slide Index Indicators */}
       <div className="absolute bottom-6 left-0 right-0 z-20 flex justify-center gap-3">
         {slides.map((_, idx) => (
-          <button 
+          <button
             key={idx}
             onClick={() => setCurrentSlide(idx)}
             className={`w-3 h-3 rounded-full transition-all duration-300 ${

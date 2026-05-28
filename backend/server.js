@@ -1,7 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-require('dotenv').config();
+const dotenv = require('dotenv');
+dotenv.config();
+dotenv.config({ path: path.join(__dirname, '.env'), override: false });
 
 const db = require('./config/db');
 const authRoutes = require('./routes/auth');
@@ -16,6 +18,9 @@ const contactRoutes = require('./routes/contact');
 const aboutRoutes = require('./routes/about');
 const ministriesRoutes = require('./routes/ministries');
 const uploadRoutes = require('./routes/upload');
+const quizzesRoutes = require('./routes/quizzes');
+const newcomersRoutes = require('./routes/newcomers');
+const believersRoutes = require('./routes/believers');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -27,17 +32,17 @@ app.get('/api/dbcheck', async (req, res) => {
     res.json({
       status: 'connected',
       result: row,
-      host: process.env.DB_HOST,
-      database: process.env.DB_NAME,
-      user: process.env.DB_USER
+      host: db.config.host,
+      database: db.config.database,
+      user: db.config.user
     });
   } catch (err) {
     res.status(500).json({
       status: 'error',
       message: err.message,
-      host: process.env.DB_HOST,
-      database: process.env.DB_NAME,
-      user: process.env.DB_USER
+      host: db.config.host,
+      database: db.config.database,
+      user: db.config.user
     });
   }
 });
@@ -83,6 +88,8 @@ app.use(express.json());
 // Serving static files for resources uploads
 app.use('/resources', express.static(path.join(__dirname, 'public/resources')));
 app.use('/images', express.static(path.join(__dirname, 'public/images')));
+app.use('/new/resources', express.static(path.join(__dirname, 'public/resources')));
+app.use('/new/images', express.static(path.join(__dirname, 'public/images')));
 
 // Mount routers supporting both standard relative roots and proxy /new roots
 const mountRoutes = (basePath = '') => {
@@ -98,6 +105,9 @@ const mountRoutes = (basePath = '') => {
   app.use(`${basePath}/api/about`, aboutRoutes);
   app.use(`${basePath}/api/ministries`, ministriesRoutes);
   app.use(`${basePath}/api/upload`, uploadRoutes);
+  app.use(`${basePath}/api/quizzes`, quizzesRoutes);
+  app.use(`${basePath}/api/newcomers`, newcomersRoutes);
+  app.use(`${basePath}/api/believers`, believersRoutes);
 
   // Admin dashboard KPI summary endpoint
   app.get(`${basePath}/api/dashboard/summary`, async (req, res) => {
@@ -107,17 +117,76 @@ const mountRoutes = (basePath = '') => {
       const totalRegistrations = await db.getAsync(`SELECT COUNT(*) as count FROM event_registrations`);
       const totalEvents = await db.getAsync(`SELECT COUNT(*) as count FROM events`);
       const testimoniesCount = await db.getAsync(`SELECT COUNT(*) as count FROM testimonies`);
+      const totalUsers = await db.getAsync(`SELECT COUNT(*) as count FROM users`);
+      const visitsRow = await db.getAsync(`SELECT en_val FROM about_content WHERE \`key\` = 'website_visits'`);
+      const visits = visitsRow ? parseInt(visitsRow.en_val, 10) || 0 : 0;
       
       res.json({
         sermonViews: totalViews.total || 0,
         testimoniesCount: testimoniesCount.count || 0,
         pendingPrayers: pendingPrayers.count || 0,
         totalEvents: totalEvents.count || 0,
-        totalBookings: totalRegistrations.count || 0
+        totalBookings: totalRegistrations.count || 0,
+        totalUsers: totalUsers ? totalUsers.count : 0,
+        websiteVisits: visits
       });
     } catch (err) {
       console.error('Error compiling dashboard summary:', err);
       res.status(500).json({ error: 'Server error generating dashboard analytics.' });
+    }
+  });
+
+  // Database diagnostic endpoint
+  app.get(`${basePath}/api/db-status`, async (req, res) => {
+    try {
+      const testResult = await db.getAsync('SELECT 1 + 1 as sum');
+      const tableCounts = {};
+      const tables = ['users', 'services', 'schedule', 'ministries', 'prayers', 'events', 'testimonies', 'blog_devotionals', 'resources', 'about_content'];
+      for (const t of tables) {
+        try {
+          const row = await db.getAsync(`SELECT COUNT(*) as count FROM ${t}`);
+          tableCounts[t] = row ? row.count : 0;
+        } catch (e) {
+          tableCounts[t] = `ERROR: ${e.message}`;
+        }
+      }
+      
+      const fs = require('fs');
+      const path = require('path');
+      const fPath = path.join(__dirname, '../frontend/dist');
+      const frontendExists = fs.existsSync(fPath);
+      const indexHtmlExists = frontendExists && fs.existsSync(path.join(fPath, 'index.html'));
+      
+      res.json({
+        status: 'success',
+        message: 'Database connection is active.',
+        testQuery: testResult,
+        frontend: {
+          path: fPath,
+          exists: frontendExists,
+          indexHtmlExists: indexHtmlExists
+        },
+        config: {
+          host: db.config.host,
+          database: db.config.database,
+          user: db.config.user
+        },
+        tableCounts
+      });
+    } catch (err) {
+      res.status(500).json({
+        status: 'error',
+        message: 'Database connection failed.',
+        errorMessage: err.message,
+        errorCode: err.code,
+        errorNumber: err.errno,
+        sqlState: err.sqlState,
+        config: {
+          host: db.config.host,
+          database: db.config.database,
+          user: db.config.user
+        }
+      });
     }
   });
 };
@@ -127,28 +196,34 @@ mountRoutes('/new');  // Subdirectory endpoints
 
 // Serve React Frontend Static Files in Production with robust fallback checks
 const fs = require('fs');
-const frontendPath = path.join(__dirname, 'frontend/dist');
+const frontendCandidates = [
+  path.join(__dirname, '../frontend/dist'),
+  path.join(__dirname, 'frontend/dist')
+];
+const frontendPath = frontendCandidates.find((candidate) => (
+  fs.existsSync(candidate) && fs.existsSync(path.join(candidate, 'index.html'))
+)) || frontendCandidates[0];
 
 if (fs.existsSync(frontendPath) && fs.existsSync(path.join(frontendPath, 'index.html'))) {
-  // Serve static assets (JS, CSS, images) under both / and /new/
-  app.use('/new', express.static(frontendPath));
-  app.use(express.static(frontendPath));
+  // Explicit route handlers for index.html to ensure reliability under subdirectory reverse proxies
+  app.get('/', (req, res) => res.sendFile(path.join(frontendPath, 'index.html')));
+  app.get('/new', (req, res) => res.sendFile(path.join(frontendPath, 'index.html')));
+  app.get('/new/', (req, res) => res.sendFile(path.join(frontendPath, 'index.html')));
 
-  // SPA fallback: any non-API, non-resource request under /new/* → index.html
-  app.get('/new', (req, res) => {
-    res.sendFile(path.join(frontendPath, 'index.html'));
-  });
-  app.get('/new/*', (req, res) => {
-    const isApi = req.path.startsWith('/new/api');
-    const isResource = req.path.startsWith('/new/resources') || req.path.startsWith('/new/images');
+  app.use(express.static(frontendPath));
+  app.use('/new', express.static(frontendPath)); // Serve static files under /new prefix!
+  
+  // Route wildcard: Route all non-API and non-resource requests to the React SPA index.html
+  app.get('*', (req, res) => {
+    const isApi = req.path.startsWith('/api') || req.path.startsWith('/new/api');
+    const isResource = req.path.startsWith('/resources') || req.path.startsWith('/new/resources') || req.path.startsWith('/images') || req.path.startsWith('/new/images');
+    
     if (!isApi && !isResource) {
       res.sendFile(path.join(frontendPath, 'index.html'));
     } else {
       res.status(404).json({ error: 'Endpoint not found.' });
     }
   });
-
-  // Root intentionally serves nothing — agsharjah.org shows no content
 } else {
   console.warn('[Warning]: frontend/dist folder or index.html not found. React static client serving is disabled. Please compile the frontend using "npm run build" inside the frontend directory.');
 

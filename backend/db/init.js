@@ -7,39 +7,39 @@ async function seedDatabase() {
   try {
     // 1. Create Tables
     await db.runAsync(`CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
       name TEXT NOT NULL,
-      email TEXT UNIQUE NOT NULL,
+      email VARCHAR(255) UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
-      role TEXT NOT NULL DEFAULT 'user',
+      role VARCHAR(50) NOT NULL DEFAULT 'user',
       is_verified INTEGER DEFAULT 0,
       verification_code TEXT,
-      created_at TEXT DEFAULT CURRENT_TIMESTAMP
-    )`);
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
 
     await db.runAsync(`CREATE TABLE IF NOT EXISTS services (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
       title TEXT NOT NULL,
       description TEXT,
       youtube_video_id TEXT NOT NULL,
-      category TEXT DEFAULT 'Main Service',
-      duration TEXT DEFAULT '1:30:00',
+      category VARCHAR(255) DEFAULT 'Main Service',
+      duration VARCHAR(50) DEFAULT '1:30:00',
       upload_date TEXT,
-      preacher TEXT DEFAULT 'Pastor Immanuel',
+      preacher VARCHAR(255) DEFAULT 'Pastor Immanuel',
       view_count INTEGER DEFAULT 0
-    )`);
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
 
     await db.runAsync(`CREATE TABLE IF NOT EXISTS schedule (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
       name TEXT NOT NULL,
       time TEXT NOT NULL,
       location TEXT NOT NULL,
       category TEXT NOT NULL,
-      recurrence TEXT NOT NULL DEFAULT 'Weekly'
-    )`);
+      recurrence VARCHAR(50) NOT NULL DEFAULT 'Weekly'
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
 
     await db.runAsync(`CREATE TABLE IF NOT EXISTS ministries (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
       name TEXT NOT NULL,
       description TEXT NOT NULL,
       leader TEXT,
@@ -47,7 +47,7 @@ async function seedDatabase() {
       category TEXT,
       image_url TEXT,
       gallery_urls TEXT
-    )`);
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
 
     try {
       await db.runAsync(`ALTER TABLE ministries ADD COLUMN gallery_urls TEXT`);
@@ -57,18 +57,18 @@ async function seedDatabase() {
     }
 
     await db.runAsync(`CREATE TABLE IF NOT EXISTS prayers (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
       name TEXT NOT NULL,
       email TEXT NOT NULL,
       phone TEXT,
       request_text TEXT NOT NULL,
       category TEXT NOT NULL,
-      status TEXT DEFAULT 'Pending',
+      status VARCHAR(50) DEFAULT 'Pending',
       is_anonymous INTEGER DEFAULT 0,
       user_id INTEGER DEFAULT NULL,
       is_answered INTEGER DEFAULT 0,
-      created_at TEXT DEFAULT CURRENT_TIMESTAMP
-    )`);
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
 
     // Run Migrations for Users and Prayers columns
     try {
@@ -94,7 +94,7 @@ async function seedDatabase() {
     } catch (e) {}
 
     await db.runAsync(`CREATE TABLE IF NOT EXISTS events (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
       title TEXT NOT NULL,
       description TEXT,
       date TEXT NOT NULL,
@@ -102,53 +102,126 @@ async function seedDatabase() {
       location TEXT NOT NULL,
       image_url TEXT,
       capacity INTEGER DEFAULT 100
-    )`);
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
 
     await db.runAsync(`CREATE TABLE IF NOT EXISTS event_registrations (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
       event_id INTEGER NOT NULL,
       attendee_name TEXT NOT NULL,
       attendee_email TEXT NOT NULL,
       attendee_phone TEXT,
-      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY(event_id) REFERENCES events(id)
-    )`);
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
 
     await db.runAsync(`CREATE TABLE IF NOT EXISTS testimonies (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
       author_name TEXT NOT NULL,
       story_text TEXT NOT NULL,
-      category TEXT DEFAULT 'General',
+      category VARCHAR(100) DEFAULT 'General',
       video_url TEXT,
-      status TEXT DEFAULT 'Pending',
-      created_at TEXT DEFAULT CURRENT_TIMESTAMP
-    )`);
+      status VARCHAR(50) DEFAULT 'Pending',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
 
     await db.runAsync(`CREATE TABLE IF NOT EXISTS blog_devotionals (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
       title TEXT NOT NULL,
       content TEXT NOT NULL,
-      author TEXT DEFAULT 'Pastor Immanuel',
-      category TEXT DEFAULT 'Daily Promise',
-      publish_date TEXT DEFAULT CURRENT_TIMESTAMP,
+      author VARCHAR(255) DEFAULT 'Pastor Immanuel',
+      category VARCHAR(255) DEFAULT 'Daily Promise',
+      publish_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       read_time_minutes INTEGER DEFAULT 3
-    )`);
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
 
     await db.runAsync(`CREATE TABLE IF NOT EXISTS resources (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
       title TEXT NOT NULL,
       description TEXT,
       file_url TEXT NOT NULL,
-      file_type TEXT DEFAULT 'PDF',
+      file_type VARCHAR(50) DEFAULT 'PDF',
       download_count INTEGER DEFAULT 0,
-      category TEXT DEFAULT 'Bible Study'
-    )`);
+      category VARCHAR(255) DEFAULT 'Bible Study'
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
 
     await db.runAsync(`CREATE TABLE IF NOT EXISTS about_content (
-      key TEXT PRIMARY KEY,
+      \`key\` VARCHAR(100) PRIMARY KEY,
       en_val TEXT NOT NULL,
       ta_val TEXT NOT NULL
-    )`);
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
+
+    await db.runAsync(`CREATE TABLE IF NOT EXISTS inquiries (
+      id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      phone TEXT,
+      subject TEXT,
+      message TEXT NOT NULL,
+      response_text TEXT,
+      is_answered INTEGER DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
+
+    // 1.1 New Tables for Advanced Church Portal Features
+    await db.runAsync(`CREATE TABLE IF NOT EXISTS quizzes (
+      id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+      title TEXT NOT NULL,
+      duration_seconds INT NOT NULL,
+      created_by INT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
+
+    await db.runAsync(`CREATE TABLE IF NOT EXISTS questions (
+      id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+      quiz_id INT NOT NULL,
+      question_text TEXT NOT NULL,
+      option_a TEXT NOT NULL,
+      option_b TEXT NOT NULL,
+      option_c TEXT NOT NULL,
+      option_d TEXT NOT NULL,
+      correct_option VARCHAR(10) NOT NULL,
+      FOREIGN KEY(quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
+
+    await db.runAsync(`CREATE TABLE IF NOT EXISTS quiz_scores (
+      id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      quiz_id INT NOT NULL,
+      score INT NOT NULL,
+      total INT NOT NULL,
+      completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY(quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
+
+    await db.runAsync(`CREATE TABLE IF NOT EXISTS newcomers (
+      id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+      full_name TEXT NOT NULL,
+      birthdate TEXT NOT NULL,
+      relationship_status VARCHAR(50) NOT NULL,
+      wedding_date TEXT,
+      mobile TEXT NOT NULL,
+      country_code VARCHAR(20) NOT NULL,
+      gender VARCHAR(50) NOT NULL,
+      location TEXT NOT NULL,
+      preferred_language VARCHAR(50) NOT NULL,
+      prayer_needs TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
+
+    await db.runAsync(`CREATE TABLE IF NOT EXISTS believers (
+      id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+      full_name TEXT NOT NULL,
+      birthdate TEXT NOT NULL,
+      relationship_status VARCHAR(50) NOT NULL,
+      wedding_date TEXT,
+      mobile TEXT NOT NULL,
+      gender VARCHAR(50) NOT NULL,
+      location TEXT NOT NULL,
+      preferred_language VARCHAR(50) NOT NULL,
+      age INT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
 
     console.log('Tables created successfully. Seeding initial data...');
 
@@ -159,13 +232,50 @@ async function seedDatabase() {
       const modHash = bcrypt.hashSync('password123', 10);
       
       await db.runAsync(`INSERT INTO users (name, email, password_hash, role, is_verified) VALUES (?, ?, ?, ?, ?)`, 
-        ['Senior Pastor Immanuel', 'admin@agstc.org', adminHash, 'admin', 1]
+        ['Senior Pastor Tamilselvi', 'tamilselvimariappan@gmail.com', adminHash, 'admin', 1]
       );
       await db.runAsync(`INSERT INTO users (name, email, password_hash, role, is_verified) VALUES (?, ?, ?, ?, ?)`, 
         ['Prayer Coordinator Barathi', 'moderator@agstc.org', modHash, 'moderator', 1]
       );
-      console.log('Users seeded successfully: Admin (admin@agstc.org), Moderator (moderator@agstc.org)');
+      console.log('Users seeded successfully: Admin (tamilselvimariappan@gmail.com), Moderator (moderator@agstc.org)');
+    } else {
+      // Ensure tamilselvimariappan@gmail.com is present and promoted to admin
+      const hasTamilAdmin = await db.getAsync(`SELECT * FROM users WHERE email = ?`, ['tamilselvimariappan@gmail.com']);
+      if (!hasTamilAdmin) {
+        const adminHash = bcrypt.hashSync('password123', 10);
+        await db.runAsync(`INSERT INTO users (name, email, password_hash, role, is_verified) VALUES (?, ?, ?, ?, ?)`, 
+          ['Senior Pastor Tamilselvi', 'tamilselvimariappan@gmail.com', adminHash, 'admin', 1]
+        );
+        console.log('Admin tamilselvimariappan@gmail.com seeded successfully.');
+      } else {
+        await db.runAsync(`UPDATE users SET role = 'admin', is_verified = 1 WHERE email = ?`, ['tamilselvimariappan@gmail.com']);
+        console.log('Admin role ensured for tamilselvimariappan@gmail.com.');
+      }
+      
+      // Enforce demotion of the old administrative seed email
+      try {
+        await db.runAsync(`UPDATE users SET role = 'user' WHERE email = ?`, ['admin@agstc.org']);
+      } catch (e) {}
     }
+
+    // Seed default testing accounts for Usher, Data Admin, and Believer if not already present
+    const rolesToSeed = [
+      { name: 'Default Usher', email: 'usher@agstc.org', role: 'usher' },
+      { name: 'Default Data Admin', email: 'dataadmin@agstc.org', role: 'data_admin' },
+      { name: 'Default Believer', email: 'believer@agstc.org', role: 'user' }
+    ];
+
+    for (const r of rolesToSeed) {
+      const userExists = await db.getAsync(`SELECT * FROM users WHERE email = ?`, [r.email]);
+      if (!userExists) {
+        const passHash = bcrypt.hashSync('password123', 10);
+        await db.runAsync(`INSERT INTO users (name, email, password_hash, role, is_verified) VALUES (?, ?, ?, ?, ?)`,
+          [r.name, r.email, passHash, r.role, 1]
+        );
+        console.log(`Seeded testing user: ${r.name} (${r.email}) with role ${r.role}`);
+      }
+    }
+
 
     // 3. Seed Schedule (Reset and seed to ensure updates apply instantly on redeployment)
     await db.runAsync(`DELETE FROM schedule`);
@@ -445,6 +555,11 @@ async function seedDatabase() {
           ta: '/images/home-banner1.JPG'
         },
         {
+          key: 'pastorImage',
+          en: '/images/pastor-immanuel.png',
+          ta: '/images/pastor-immanuel.png'
+        },
+        {
           key: 'milestones',
           en: JSON.stringify([
             {"year": "1996", "titleEn": "Humble Beginnings", "titleTa": "எளிய ஆரம்பம்", "descEn": "Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.", "descTa": "ஷார்ஜாவில் ஒரு எளிய இல்ல ஜெபக் கூட்டமாகத் தொடங்கப்பட்டு, தூரதேசத்தில் வாழும் உழைப்பாளர்களை ஆவிக்குரிய ரீதியில் ஆதரிப்பதை நோக்கமாகக் கொண்டு ஆரம்பிக்கப்பட்டது."},
@@ -471,26 +586,94 @@ async function seedDatabase() {
             {"titleEn": "Salvation of Man", "titleTa": "மனிதனின் இரட்சிப்பு", "descEn": "Man's only hope of redemption is through the shed blood of Jesus Christ the Son of God, received by faith and repentance.", "descTa": "தேவ குமாரனாகிய இயேசு கிறிஸ்துவின் சிந்தப்பட்ட இரத்தத்தின் மூலமே மனிதனுக்கு மீட்பு உண்டு, இது விசுவாசத்தாலும் மனந்திரும்புதலாலும் பெறப்படுகிறது."},
             {"titleEn": "Baptism in the Holy Spirit", "titleTa": "பரிசுத்த ஆவியின் அபிஷேகம்", "descEn": "All believers are entitled to and should ardently expect the promise of the Father, the baptism in the Holy Spirit, which gives power for life and service.", "descTa": "விசுவாசிகள் அனைவரும் பிதாவின் வாக்குத்தத்தமாகிய பரிசுத்த ஆவியின் அபிஷேகத்தை ஆவலோடு எதிர்பார்க்க வேண்டும், இது கிறிஸ்தவ ஜீவியத்திற்கும் ஊழியத்திற்கும் வல்லமையளிக்கிறது."}
           ])
+        },
+        {
+          key: 'welcomeTitle',
+          en: 'Welcome to AG Sharjah Tamil Church',
+          ta: 'ஆலயத்திற்கு அன்புடன் வரவேற்கிறோம் - ஏஜி ஷார்ஜா தமிழ் சபை'
+        },
+        {
+          key: 'welcomeSubtitle',
+          en: 'A place of peace, comfort, and spiritual harmony. We invite you to experience the grace of God Shaddai in our bilingually fellowship.',
+          ta: 'A place of peace, comfort, and spiritual harmony. We invite you to experience the grace of God Shaddai in our bilingually fellowship.'
+        },
+        {
+          key: 'pastorName',
+          en: 'Senior Pastor Immanuel',
+          ta: 'தலைமை போதகர் இம்மானுவேல்'
+        },
+        {
+          key: 'pastorMessageTitle',
+          en: 'Pastoral Message',
+          ta: 'போதகரின் செய்தி'
+        },
+        {
+          key: 'pastorMessageText',
+          en: 'We welcome you to this website in the most precious name of our Lord and savior Jesus Christ. Our Lord by His amazing grace has established AG Sharjah Tamil Church as a place of peace, comfort and harmony for His children who are residing away from their family and friends. Lord has blessed this Church as an instrument to spread the love of Christ amongst the people here, especially who belong to the Tamil community. AGSTC acts as a ladder through which we could reach greater heights in our spiritual life by growing in the knowledge of Christ, fellowshipping with Him and worshiping Him with an upright heart.',
+          ta: 'நம்முடைய கர்த்தரும் இரட்சகருமாகிய இயேசு கிறிஸ்துவின் மகா பிரசன்னமுள்ள நாமத்தில் உங்களை இந்த இணையதளத்திற்கு அன்போடு வரவேற்கிறோம். நமது கர்த்தர் தமது ஆச்சரியமான கிருபையினால் ஏஜி ஷார்ஜா தமிழ் சபையை குடும்பங்களையும் நண்பர்களையும் பிரிந்து வாழும் தேவ பிள்ளைகளுக்கு ஒரு புகலிடமாகவும் சமாதானத்தின் இடமாகவும் ஏற்படுத்தியுள்ளார். கர்த்தர் இந்த சபையை குறிப்பாக தமிழ் மக்கள் மத்தியில் கிறிஸ்துவின் அன்பை பரப்புவதற்கான ஒரு கருவியாக ஆசீர்வதித்துள்ளார். கிறிஸ்துவின் அறிவிலும், அவரோடு ஐக்கியப்படுவதிலும், உத்தம இருதயத்தோடு அவரை ஆராதிப்பதிலும் நமது ஆவிக்குரிய வாழ்க்கையில் நாம் முன்னேற ஏஜிஎஸ்டிசி ஒரு ஏணியாக செயல்படுகிறது.'
+        },
+        {
+          key: 'heroTitle1',
+          en: 'Experience Spiritual Sanctuary',
+          ta: 'தேவனுடைய மகிமையான பிரசன்னத்தை அநுபவியுங்கள்'
+        },
+        {
+          key: 'heroSub1',
+          en: 'A Tamil Assembly dedicated to deep spiritual grounding, active local cell fellowship, and sincere praise in Sharjah.',
+          ta: 'இந்த ஞாயிற்றுக்கிழமை எங்களோடு கூடி ஆராதித்து, எல்லாக் புத்திக்கும் மேலான சமாதானத்தைப் பெற்றுக் கொள்ளுங்கள்.'
+        },
+        {
+          key: 'heroTitle2',
+          en: 'We Stand in Prayer With You',
+          ta: 'ஒருமனப்பட்ட ஜெபத்தின் வல்லமை'
+        },
+        {
+          key: 'heroSub2',
+          en: 'The Jeremiah Ministry and Sister circles are interceding daily. Submit your prayer requests anonymously or publicly.',
+          ta: 'உங்கள் ஜெப விண்ணப்பங்களை எங்களுக்கு அனுப்பி, எங்கள் ஜெபவீரர்களோடு இணைந்து ஜெபியுங்கள்.'
+        },
+        {
+          key: 'heroTitle3',
+          en: 'Weekly Fellowship Assemblies',
+          ta: 'செழித்தோங்க நாட்டப்பட்டவர்கள்'
+        },
+        {
+          key: 'heroSub3',
+          en: 'Join our regional prayer groups and weekly services in Sharjah, Ajman, and Umm Al Quwain. Safe transport shuttles are provided.',
+          ta: 'ஒவ்வொரு வயதினரையும் ஆவிக்குரிய ரீதியில் வளர்க்கும் எங்களின் துடிப்பான ஊழியங்களை கண்டறியுங்கள்.'
+        },
+        {
+          key: 'aboutImages',
+          en: JSON.stringify(['/images/home-banner1.JPG', '/images/prayer.jpg', '/images/banner1.jpg']),
+          ta: JSON.stringify(['/images/home-banner1.JPG', '/images/prayer.jpg', '/images/banner1.jpg'])
         }
       ];
 
       for (const item of defaultAbout) {
-        await db.runAsync(`INSERT INTO about_content (key, en_val, ta_val) VALUES (?, ?, ?)`,
+        await db.runAsync(`INSERT INTO about_content (\`key\`, en_val, ta_val) VALUES (?, ?, ?)`,
           [item.key, item.en, item.ta]
         );
       }
       console.log('About us content seeded successfully.');
     } else {
       // Ensure milestones, faithStatements, and aboutImage exist for migrated existing databases
-      const keysToCheck = ['aboutImage', 'milestones', 'faithStatements'];
+      const keysToCheck = [
+        'aboutImage', 'pastorImage', 'milestones', 'faithStatements',
+        'welcomeTitle', 'welcomeSubtitle', 'pastorName', 'pastorMessageTitle',
+        'pastorMessageText', 'heroTitle1', 'heroSub1', 'heroTitle2', 'heroSub2',
+        'heroTitle3', 'heroSub3', 'aboutImages'
+      ];
       for (const key of keysToCheck) {
-        const exists = await db.getAsync(`SELECT key FROM about_content WHERE key = ?`, [key]);
+        const exists = await db.getAsync(`SELECT \`key\` FROM about_content WHERE \`key\` = ?`, [key]);
         if (!exists) {
           let enVal = '';
           let taVal = '';
           if (key === 'aboutImage') {
             enVal = '/images/home-banner1.JPG';
             taVal = '/images/home-banner1.JPG';
+          } else if (key === 'pastorImage') {
+            enVal = '/images/pastor-immanuel.png';
+            taVal = '/images/pastor-immanuel.png';
           } else if (key === 'milestones') {
             enVal = JSON.stringify([
               {"year": "1996", "titleEn": "Humble Beginnings", "titleTa": "எளிய ஆரம்பம்", "descEn": "Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.", "descTa": "ஷார்ஜாவில் ஒரு எளிய இல்ல ஜபக் கூட்டமாகத் தொடங்கப்பட்டு, தூரதேசத்தில் வாழும் உழைப்பாளர்களை ஆவிக்குரிய ரீதியில் ஆதரிப்பதை நோக்கமாகக் கொண்டு ஆரம்பிக்கப்பட்டது."},
@@ -506,8 +689,44 @@ async function seedDatabase() {
               {"titleEn": "Baptism in the Holy Spirit", "titleTa": "பரிசுத்த ஆவியின் அபிஷேகம்", "descEn": "All believers are entitled to and should ardently expect the promise of the Father, the baptism in the Holy Spirit, which gives power for life and service.", "descTa": "விசுவாசிகள் அனைவரும் பிதாவின் வாக்குத்தத்தமாகிய பரிசுத்த ஆவியின் அபிஷேகத்தை ஆவலோடு எதிர்பார்க்க வேண்டும், இது கிறிஸ்தவ ஜீவியத்திற்கும் ஊழியத்திற்கும் வல்லமையளிக்கிறது."}
             ]);
             taVal = enVal;
+          } else if (key === 'welcomeTitle') {
+            enVal = 'Welcome to AG Sharjah Tamil Church';
+            taVal = 'ஆலயத்திற்கு அன்புடன் வரவேற்கிறோம் - ஏஜி ஷார்ஜா தமிழ் சபை';
+          } else if (key === 'welcomeSubtitle') {
+            enVal = 'A place of peace, comfort, and spiritual harmony. We invite you to experience the grace of God Shaddai in our bilingually fellowship.';
+            taVal = 'A place of peace, comfort, and spiritual harmony. We invite you to experience the grace of God Shaddai in our bilingually fellowship.';
+          } else if (key === 'pastorName') {
+            enVal = 'Senior Pastor Immanuel';
+            taVal = 'தலைமை போதகர் இம்மானுவேல்';
+          } else if (key === 'pastorMessageTitle') {
+            enVal = 'Pastoral Message';
+            taVal = 'போதகரின் செய்தி';
+          } else if (key === 'pastorMessageText') {
+            enVal = 'We welcome you to this website in the most precious name of our Lord and savior Jesus Christ. Our Lord by His amazing grace has established AG Sharjah Tamil Church as a place of peace, comfort and harmony for His children who are residing away from their family and friends. Lord has blessed this Church as an instrument to spread the love of Christ amongst the people here, especially who belong to the Tamil community. AGSTC acts as a ladder through which we could reach greater heights in our spiritual life by growing in the knowledge of Christ, fellowshipping with Him and worshiping Him with an upright heart.';
+            taVal = 'நம்முடைய கர்த்தரும் இரட்சகருமாகிய இயேசு கிறிஸ்துவின் மகா பிரசன்னமுள்ள நாமத்தில் உங்களை இந்த இணையதளத்திற்கு அன்போடு வரவேற்கிறோம். நமது கர்த்தர் தமது ஆச்சரியமான கிருபையினால் ஏஜி ஷார்ஜா தமிழ் சபையை குடும்பங்களையும் நண்பர்களையும் பிரிந்து வாழும் தேவ பிள்ளைகளுக்கு ஒரு புகலிடமாகவும் சமாதானத்தின் இடமாகவும் ஏற்படுத்தியுள்ளார். கர்த்தர் இந்த சபையை குறிப்பாக தமிழ் மக்கள் மத்தியில் கிறிஸ்துவின் அன்பை பரப்புவதற்கான ஒரு கருவியாக ஆசீர்வதித்துள்ளார். கிறிஸ்துவின் அறிவிலும், அவரோடு ஐக்கியப்படுவதிலும், உத்தம இருதயத்தோடு அவரை ஆராதிப்பதிலும் நமது ஆவிக்குரிய வாழ்க்கையில் நாம் முன்னேற ஏஜிஎஸ்டிசி ஒரு ஏணியாக செயல்படுகிறது.';
+          } else if (key === 'heroTitle1') {
+            enVal = 'Experience Spiritual Sanctuary';
+            taVal = 'தேவனுடைய மகிமையான பிரசன்னத்தை அநுபவியுங்கள்';
+          } else if (key === 'heroSub1') {
+            enVal = 'A Tamil Assembly dedicated to deep spiritual grounding, active local cell fellowship, and sincere praise in Sharjah.';
+            taVal = 'இந்த ஞாயிற்றுக்கிழமை எங்களோடு கூடி ஆராதித்து, எல்லாக் புத்திக்கும் மேலான சமாதானத்தைப் பெற்றுக் கொள்ளுங்கள்.';
+          } else if (key === 'heroTitle2') {
+            enVal = 'We Stand in Prayer With You';
+            taVal = 'ஒருமனப்பட்ட ஜெபத்தின் வல்லமை';
+          } else if (key === 'heroSub2') {
+            enVal = 'The Jeremiah Ministry and Sister circles are interceding daily. Submit your prayer requests anonymously or publicly.';
+            taVal = 'உங்கள் ஜெப விண்ணப்பங்களை எங்களுக்கு அனுப்பி, எங்கள் ஜெபவீரர்களோடு இணைந்து ஜெபியுங்கள்.';
+          } else if (key === 'heroTitle3') {
+            enVal = 'Weekly Fellowship Assemblies';
+            taVal = 'செழித்தோங்க நாட்டப்பட்டவர்கள்';
+          } else if (key === 'heroSub3') {
+            enVal = 'Join our regional prayer groups and weekly services in Sharjah, Ajman, and Umm Al Quwain. Safe transport shuttles are provided.';
+            taVal = 'ஒவ்வொரு வயதினரையும் ஆவிக்குரிய ரீதியில் வளர்க்கும் எங்களின் துடிப்பான ஊழியங்களை கண்டறியுங்கள்.';
+          } else if (key === 'aboutImages') {
+            enVal = JSON.stringify(['/images/home-banner1.JPG', '/images/prayer.jpg', '/images/banner1.jpg']);
+            taVal = enVal;
           }
-          await db.runAsync(`INSERT INTO about_content (key, en_val, ta_val) VALUES (?, ?, ?)`, [key, enVal, taVal]);
+          await db.runAsync(`INSERT INTO about_content (\`key\`, en_val, ta_val) VALUES (?, ?, ?)`, [key, enVal, taVal]);
         }
       }
     }

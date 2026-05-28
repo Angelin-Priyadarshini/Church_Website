@@ -6,7 +6,6 @@ import { ThemeProvider } from './context/ThemeContext';
 
 import Header from './components/Header';
 import Footer from './components/Footer';
-import FloatingActions from './components/FloatingActions';
 
 import Home from './pages/Home';
 import About from './pages/About';
@@ -60,9 +59,6 @@ function App() {
                   <Route path="/admin" element={<Admin />} />
                 </Routes>
               </main>
-
-              {/* 3. Global Floating Action Widgets */}
-              <FloatingActions />
 
               {/* 4. Global Dynamic Footer */}
               <Footer />

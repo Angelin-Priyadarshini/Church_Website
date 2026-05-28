@@ -302,25 +302,28 @@ a {
    ========================================== */
 
 /* ── Base text colours ── */
-html[data-theme="light"] .text-white,
-html[data-theme="light"] .text-slate-100,
-html[data-theme="light"] .text-slate-200 {
+html[data-theme="light"] :not(footer):not(footer *):not(.dark-section):not(.dark-section *) .text-white,
+html[data-theme="light"] :not(footer):not(footer *):not(.dark-section):not(.dark-section *) .text-slate-100,
+html[data-theme="light"] :not(footer):not(footer *):not(.dark-section):not(.dark-section *) .text-slate-200 {
   color: hsl(222, 47%, 14%) !important;
 }
-html[data-theme="light"] .text-slate-300,
-html[data-theme="light"] .text-slate-400 {
+html[data-theme="light"] :not(footer):not(footer *):not(.dark-section):not(.dark-section *) .text-slate-300,
+html[data-theme="light"] :not(footer):not(footer *):not(.dark-section):not(.dark-section *) .text-slate-400 {
   color: hsl(222, 35%, 32%) !important;
 }
-html[data-theme="light"] .text-slate-500 {
+html[data-theme="light"] :not(footer):not(footer *):not(.dark-section):not(.dark-section *) .text-slate-500 {
   color: hsl(222, 25%, 45%) !important;
 }
 
-/* Keep amber/gold as-is but slightly deeper */
-html[data-theme="light"] .text-amber-400 {
-  color: hsl(38, 80%, 36%) !important;
+/* Keep amber/gold as-is but slightly deeper and much more readable */
+html[data-theme="light"] .text-amber-300,
+html[data-theme="light"] .text-amber-400,
+html[data-theme="light"] .text-gold-light,
+html[data-theme="light"] .text-gold {
+  color: #B48C28 !important;
 }
 html[data-theme="light"] .text-amber-500 {
-  color: hsl(38, 85%, 32%) !important;
+  color: #9f6c12 !important;
 }
 
 /* ── Page section backgrounds ── */
@@ -443,7 +446,7 @@ html[data-theme="light"] .border-white\/10 {
 /* ── Inputs ── */
 html[data-theme="light"] .input-control {
   background: hsl(0, 0%, 100%) !important;
-  border: 1px solid hsl(220, 25%, 82%) !important;
+  border: 1px solid #C3B59B !important;
   color: hsl(222, 47%, 12%) !important;
 }
 html[data-theme="light"] .input-control::placeholder {
@@ -507,7 +510,118 @@ html[data-theme="light"] ::-webkit-scrollbar-track {
 /* ── Light body background ── */
 html[data-theme="light"] body {
   background-color: hsl(0, 0%, 100%);
-  background-image: none;
+}
+
+/* Final light theme polish: white pages, navy copy, cream footer, gold on dark panels/images. */
+html[data-theme="light"] {
+  --bg-main: hsl(0, 0%, 100%);
+  --bg-elevated: hsl(0, 0%, 100%);
+  --text-main: hsl(222, 55%, 16%);
+  --text-muted: hsl(222, 28%, 34%);
+  --text-heading: hsl(222, 58%, 13%);
+  --footer-bg: hsl(42, 64%, 91%);
+  --footer-text: hsl(222, 45%, 20%);
+}
+
+html[data-theme="light"] body {
+  background: hsl(0, 0%, 100%) !important;
+  color: hsl(222, 55%, 16%) !important;
+}
+
+html[data-theme="light"] main,
+html[data-theme="light"] .min-h-screen.bg-slate-950,
+html[data-theme="light"] .animate-slideup.min-h-screen.bg-slate-950 {
+  background: hsl(0, 0%, 100%) !important;
+  color: hsl(222, 55%, 16%) !important;
+}
+
+html[data-theme="light"] footer {
+  background: linear-gradient(180deg, hsl(42, 70%, 94%) 0%, hsl(42, 54%, 88%) 100%) !important;
+  color: hsl(222, 45%, 20%) !important;
+  border-top-color: hsl(38, 80%, 42%) !important;
+}
+
+html[data-theme="light"] footer .text-white,
+html[data-theme="light"] footer .text-slate-200,
+html[data-theme="light"] footer .text-slate-300,
+html[data-theme="light"] footer .text-slate-400,
+html[data-theme="light"] footer strong,
+html[data-theme="light"] footer a,
+html[data-theme="light"] footer span,
+html[data-theme="light"] footer p {
+  color: hsl(222, 45%, 20%) !important;
+}
+
+html[data-theme="light"] footer .text-amber-400,
+html[data-theme="light"] footer svg {
+  color: hsl(38, 80%, 36%) !important;
+}
+
+html[data-theme="light"] footer .bg-slate-800 {
+  background: hsla(0, 0%, 100%, 0.55) !important;
+  border-color: hsla(38, 80%, 42%, 0.22) !important;
+}
+
+html[data-theme="light"] .bg-slate-950,
+html[data-theme="light"] .bg-slate-900 {
+  background-color: hsl(0, 0%, 100%) !important;
+}
+
+html[data-theme="light"] .bg-slate-950\/65,
+html[data-theme="light"] .bg-slate-950\/70,
+html[data-theme="light"] .bg-slate-950\/80,
+html[data-theme="light"] .bg-slate-950\/85,
+html[data-theme="light"] .bg-slate-950\/95,
+html[data-theme="light"] .bg-slate-900\/60,
+html[data-theme="light"] .glass-panel-dark {
+  background-color: hsl(222, 55%, 11%) !important;
+  color: hsl(42, 88%, 62%) !important;
+}
+
+html[data-theme="light"] .bg-slate-950\/65 .text-white,
+html[data-theme="light"] .bg-slate-950\/65 .text-slate-100,
+html[data-theme="light"] .bg-slate-950\/65 .text-slate-200,
+html[data-theme="light"] .bg-slate-950\/65 .text-slate-300,
+html[data-theme="light"] .bg-slate-950\/70 .text-white,
+html[data-theme="light"] .bg-slate-950\/70 .text-slate-100,
+html[data-theme="light"] .bg-slate-950\/70 .text-slate-200,
+html[data-theme="light"] .bg-slate-950\/70 .text-slate-300,
+html[data-theme="light"] .bg-slate-950\/80 .text-white,
+html[data-theme="light"] .bg-slate-950\/80 .text-slate-100,
+html[data-theme="light"] .bg-slate-950\/80 .text-slate-200,
+html[data-theme="light"] .bg-slate-950\/80 .text-slate-300,
+html[data-theme="light"] .bg-slate-950\/85 .text-white,
+html[data-theme="light"] .bg-slate-950\/85 .text-slate-100,
+html[data-theme="light"] .bg-slate-950\/85 .text-slate-200,
+html[data-theme="light"] .bg-slate-950\/85 .text-slate-300,
+html[data-theme="light"] .bg-slate-950\/95 .text-white,
+html[data-theme="light"] .bg-slate-950\/95 .text-slate-100,
+html[data-theme="light"] .bg-slate-950\/95 .text-slate-200,
+html[data-theme="light"] .bg-slate-950\/95 .text-slate-300,
+html[data-theme="light"] .glass-panel-dark,
+html[data-theme="light"] .glass-panel-dark *,
+html[data-theme="light"] [style*="background-image"] .text-white,
+html[data-theme="light"] [style*="background-image"] .text-slate-200,
+html[data-theme="light"] [style*="background-image"] .text-slate-300,
+html[data-theme="light"] .relative.overflow-hidden.bg-slate-900 .text-white {
+  color: hsl(42, 88%, 62%) !important;
+  -webkit-text-fill-color: hsl(42, 88%, 62%) !important;
+}
+
+html[data-theme="light"] .heading-primary,
+html[data-theme="light"] .heading-secondary,
+html[data-theme="light"] .glass-panel h1,
+html[data-theme="light"] .glass-panel h2,
+html[data-theme="light"] .glass-panel h3 {
+  color: hsl(222, 58%, 13%) !important;
+}
+
+html[data-theme="light"] .bg-slate-950\/65 .heading-primary,
+html[data-theme="light"] .bg-slate-950\/70 .heading-primary,
+html[data-theme="light"] [style*="background-image"] .heading-primary {
+  background: none !important;
+  color: hsl(42, 88%, 62%) !important;
+  -webkit-text-fill-color: hsl(42, 88%, 62%) !important;
 }
 
 /* ── Text on dark image overlays — always stays light ── */
@@ -516,7 +630,8 @@ html[data-theme="light"] [style*="background-image"] .text-white,
 html[data-theme="light"] [style*="background-image"] .text-slate-300,
 html[data-theme="light"] .relative.overflow-hidden .text-white,
 html[data-theme="light"] .relative.overflow-hidden .text-slate-300 {
-  color: hsl(0, 0%, 95%) !important;
+  color: hsl(42, 88%, 62%) !important;
+  -webkit-text-fill-color: hsl(42, 88%, 62%) !important;
 }
 
 /* ── Mobile menu ── */
@@ -627,7 +742,15 @@ html[data-theme="light"] .ring-amber-950\/50 {
 
   .section-padding { padding: 3.5rem 0; }
 
-  .container-box { padding: 0 1rem; }
+  /* Mobile horizontal breathing room — content doesn't touch screen edges */
+  .container-box { padding: 0 1.25rem; }
+
+  /* Sections also get side padding on mobile */
+  section > .container-box,
+  section.container-box {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
 
   /* Prevent any element from overflowing horizontally */
   img, video, iframe, table {
@@ -645,7 +768,7 @@ html[data-theme="light"] .ring-amber-950\/50 {
 
 @media (max-width: 480px) {
   body { font-size: 0.97rem; }
-  .container-box { padding: 0 0.875rem; }
+  .container-box { padding: 0 1rem; }
   .section-padding { padding: 2.75rem 0; }
   .glass-panel,
   .glass-panel-static,
@@ -665,3 +788,186 @@ html[data-theme="light"] .ring-amber-950\/50 {
 .lang-ta h1, .lang-ta h2, .lang-ta h3, .lang-ta h4 {
   font-family: var(--font-body) !important;
 }
+
+/* ==========================================
+   CREAM CARD STYLE (testimony / core value boxes)
+   ========================================== */
+.cream-card {
+  background: hsl(42, 60%, 96%) !important;
+  border-color: hsl(42, 40%, 85%) !important;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07) !important;
+  color: hsl(222, 47%, 14%) !important;
+}
+.cream-card h1, .cream-card h2, .cream-card h3, .cream-card h4 {
+  color: hsl(222, 55%, 14%) !important;
+}
+.cream-card p, .cream-card span:not(.text-amber-400):not(.text-amber-500) {
+  color: hsl(222, 40%, 22%) !important;
+}
+
+/* Dark mode — keep existing glass look for cream cards */
+html[data-theme="dark"] .cream-card {
+  background: var(--card-glass) !important;
+  border-color: var(--border-glass) !important;
+  color: var(--text-main) !important;
+}
+html[data-theme="dark"] .cream-card h1,
+html[data-theme="dark"] .cream-card h2,
+html[data-theme="dark"] .cream-card h3 {
+  color: var(--text-heading) !important;
+}
+html[data-theme="dark"] .cream-card p,
+html[data-theme="dark"] .cream-card span {
+  color: var(--text-muted) !important;
+}
+
+/* ==========================================
+   BELIEVER PORTAL — THEME-ADAPTIVE CLASSES
+   Cream + navy in light mode, dark glass in dark mode
+   ========================================== */
+
+/* Page background */
+.believer-portal-bg {
+  background: hsl(222, 47%, 7%);
+}
+html[data-theme="light"] .believer-portal-bg {
+  background: hsl(42, 50%, 97%) !important;
+}
+
+/* Cards */
+.believer-card {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(230, 175, 46, 0.2);
+}
+html[data-theme="light"] .believer-card {
+  background: hsl(42, 60%, 96%) !important;
+  border: 1px solid hsl(42, 40%, 82%) !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07) !important;
+}
+
+/* Headings inside cards */
+.believer-heading { color: hsl(0, 0%, 100%); }
+html[data-theme="light"] .believer-heading { color: hsl(222, 55%, 14%) !important; }
+
+/* Body text */
+.believer-text-body { color: hsl(215, 20%, 85%); }
+html[data-theme="light"] .believer-text-body { color: hsl(222, 47%, 18%) !important; }
+
+/* Muted text */
+.believer-text-muted { color: hsl(218, 15%, 55%); }
+html[data-theme="light"] .believer-text-muted { color: hsl(222, 30%, 38%) !important; }
+
+/* Form labels */
+.believer-label { color: hsl(218, 15%, 72%); }
+html[data-theme="light"] .believer-label { color: hsl(222, 47%, 20%) !important; }
+
+/* Form inputs */
+.believer-input {
+  background: rgba(8, 12, 28, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: hsl(215, 20%, 90%);
+}
+html[data-theme="light"] .believer-input {
+  background: hsl(0, 0%, 100%) !important;
+  border: 1px solid hsl(220, 25%, 78%) !important;
+  color: hsl(222, 47%, 12%) !important;
+}
+html[data-theme="light"] .believer-input::placeholder { color: hsl(222, 20%, 55%) !important; }
+html[data-theme="light"] .believer-input option {
+  background: white !important;
+  color: hsl(222, 47%, 12%) !important;
+}
+
+/* Badges */
+.believer-badge {
+  background: rgba(255,255,255,0.08);
+  color: hsl(215, 20%, 70%);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+html[data-theme="light"] .believer-badge {
+  background: hsl(222, 30%, 90%) !important;
+  color: hsl(222, 47%, 22%) !important;
+  border: 1px solid hsl(222, 25%, 80%) !important;
+}
+
+/* Prayer item cards */
+.believer-answered-card {
+  border: 1px solid rgba(52,211,153,0.25);
+  background: rgba(6,78,59,0.08);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+html[data-theme="light"] .believer-answered-card {
+  border: 1px solid hsl(152, 50%, 75%) !important;
+  background: hsl(152, 60%, 97%) !important;
+}
+.believer-pending-card {
+  border: 1px solid rgba(30,41,59,0.9);
+  background: rgba(15,23,42,0.4);
+}
+html[data-theme="light"] .believer-pending-card {
+  border: 1px solid hsl(220, 25%, 84%) !important;
+  background: hsl(0, 0%, 100%) !important;
+}
+html[data-theme="light"] .believer-pending-card:hover {
+  border-color: hsl(220, 25%, 70%) !important;
+}
+
+/* Divider line */
+.believer-divider { border-top: 1px solid rgba(30,41,59,0.8); }
+html[data-theme="light"] .believer-divider { border-top: 1px solid hsl(220, 25%, 88%) !important; }
+
+/* Empty state border */
+.believer-empty-border { border: 1px dashed rgba(30,41,59,0.9); }
+html[data-theme="light"] .believer-empty-border { border: 1px dashed hsl(220, 25%, 78%) !important; }
+
+/* Icon muted */
+.believer-icon-muted { color: hsl(218, 15%, 40%); }
+html[data-theme="light"] .believer-icon-muted { color: hsl(220, 20%, 72%) !important; }
+
+/* Mark answered button (not-answered state) */
+.believer-mark-btn {
+  border: 1px solid rgba(30,41,59,0.9);
+  color: hsl(215, 20%, 72%);
+}
+.believer-mark-btn:hover {
+  background: rgba(30,41,59,0.7);
+  border-color: rgba(255,255,255,0.15);
+}
+html[data-theme="light"] .believer-mark-btn {
+  border: 1px solid hsl(220, 25%, 78%) !important;
+  color: hsl(222, 47%, 28%) !important;
+}
+html[data-theme="light"] .believer-mark-btn:hover {
+  background: hsl(220, 30%, 94%) !important;
+  border-color: hsl(220, 25%, 65%) !important;
+}
+
+/* ==========================================
+   MOBILE CAROUSEL ARROWS — smaller, cleaner
+   ========================================== */
+@media (max-width: 640px) {
+  /* Make carousel arrows smaller and less intrusive on mobile */
+  .carousel-arrow {
+    width: 32px !important;
+    height: 32px !important;
+    padding: 6px !important;
+  }
+}
+
+/* ==========================================
+   SERMON FILTER SELECTS — prevent text clipping
+   ========================================== */
+select.input-control,
+.believer-input[as="select"],
+select.believer-input {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23f59e0b' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px !important;
+}
+

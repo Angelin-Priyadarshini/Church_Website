@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import VideoPlayer from '../components/VideoPlayer';
 import { Search, Play, Calendar, User, Eye, ArrowUp, ArrowDown } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 import { API_BASE } from '../config';
 
 const Services = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
   const [allSermons, setAllSermons] = useState([]);
   const [filteredSermons, setFilteredSermons] = useState([]);
   const [selectedSermon, setSelectedSermon] = useState(null);
@@ -144,9 +147,16 @@ const Services = () => {
   };
 
   return (
-    <div className="animate-slideup min-h-screen bg-slate-950 pb-20">
+    <div className="animate-slideup min-h-screen bg-slate-950 pb-16 sm:pb-20">
       {/* Header Page Title Block */}
-      <section className="bg-slate-950/70 text-white py-20 relative overflow-hidden border-b border-amber-500/25">
+      <section 
+        className="bg-slate-950/70 text-white py-14 sm:py-20 relative overflow-hidden border-b border-amber-500/25"
+        style={{
+          backgroundImage: t('bg_services') && t('bg_services') !== 'bg_services' ? `linear-gradient(rgba(10, 15, 30, 0.75), rgba(10, 15, 30, 0.75)), url(${t('bg_services')})` : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      >
         <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--primary-gold))]" style={{ filter: 'blur(100px)' }} />
         <div className="container-box text-center relative z-10">
           <span className="text-xs uppercase font-extrabold text-amber-400 tracking-[0.25em] block mb-3">
@@ -158,6 +168,22 @@ const Services = () => {
           <p className="text-slate-300 text-sm md:text-base max-w-xl mx-auto mt-4 leading-relaxed font-semibold">
             {t('watchRecentBroadcasts')}<span className="text-amber-400 font-bold">@AGSHARJAHTAMILCHURCH</span>.
           </p>
+
+          {(() => {
+            const rawParas = t('paras_services');
+            let additionalParas = [];
+            try {
+              additionalParas = typeof rawParas === 'string' ? JSON.parse(rawParas) : rawParas;
+            } catch (e) {
+              additionalParas = [];
+            }
+            if (!Array.isArray(additionalParas)) additionalParas = [];
+            return additionalParas.map((p, idx) => (
+              <p key={idx} className="text-slate-300 text-xs md:text-sm max-w-xl mx-auto mt-3 leading-relaxed">
+                {language === 'ta' ? p.ta : p.en}
+              </p>
+            ));
+          })()}
         </div>
       </section>
 
@@ -172,8 +198,8 @@ const Services = () => {
       )}
 
       {/* Filter Options Bar */}
-      <section className="container-box py-8" id="sermon-search-filters">
-        <div className="glass-panel p-6 flex flex-col gap-6 border border-white/10 shadow-2xl bg-white/5 backdrop-blur-md">
+      <section className="container-box py-6 sm:py-8" id="sermon-search-filters">
+        <div className="glass-panel p-4 sm:p-6 flex flex-col gap-4 sm:gap-6 border border-white/10 shadow-2xl bg-white/5 backdrop-blur-md">
           {/* Keyword Search Form */}
           <form onSubmit={(e) => e.preventDefault()} className="w-full relative">
             <input 
@@ -189,16 +215,16 @@ const Services = () => {
                   setPreacherFilter('');
                 }
               }}
-              className="input-control pr-12 w-full bg-slate-900/60 border border-white/10 text-white placeholder-slate-400 focus:border-amber-500"
+              className="input-control h-12 sm:h-auto pr-12 w-full bg-[#FAF7F0] border border-[#D2C2A4] text-slate-950 placeholder-slate-500 focus:border-amber-600 focus:ring-1 focus:ring-amber-600 font-semibold shadow-sm"
             />
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-amber-400">
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-[#0A1128]">
               <Search className="w-5 h-5" />
             </div>
           </form>
 
-          {/* Dynamic Select Filters */}
-          <div className="flex flex-wrap gap-4 items-center justify-between w-full">
-            <div className="flex flex-wrap gap-3 items-center flex-1">
+          {/* Dynamic Select Filters — 2-col grid on mobile, row on sm+ */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center justify-between w-full">
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:flex-1">
               {/* Static Category Selector */}
               <select 
                 id="sermon-category-select"
@@ -207,7 +233,7 @@ const Services = () => {
                   setCategoryFilter(e.target.value);
                   setSearchQuery(''); // Instantly clear search bar on filter selection
                 }}
-                className="input-control py-2.5 px-4 text-xs font-bold text-white bg-slate-900 border border-white/10 w-full sm:w-auto focus:border-amber-500 cursor-pointer"
+                className="input-control py-2 px-2.5 text-xs font-bold text-white bg-slate-900 border border-white/10 w-full sm:w-auto focus:border-amber-500 cursor-pointer"
               >
                 <option value="">{t('allCategories')}</option>
                 {STATIC_CATEGORIES.map((cat) => (
@@ -223,7 +249,7 @@ const Services = () => {
                   setPreacherFilter(e.target.value);
                   setSearchQuery(''); // Instantly clear search bar on filter selection
                 }}
-                className="input-control py-2.5 px-4 text-xs font-bold text-white bg-slate-900 border border-white/10 w-full sm:w-auto focus:border-amber-500 cursor-pointer"
+                className="input-control py-2 px-2.5 text-xs font-bold text-white bg-slate-900 border border-white/10 w-full sm:w-auto focus:border-amber-500 cursor-pointer"
               >
                 <option value="">{t('allPreachers')}</option>
                 {STATIC_PREACHERS.map((preacher) => (
@@ -236,7 +262,7 @@ const Services = () => {
                 id="sermon-sort-select"
                 value={sortOrder}
                 onChange={(e) => setSortOrder(e.target.value)}
-                className="input-control py-2.5 px-4 text-xs font-bold text-white bg-slate-900 border border-white/10 w-full sm:w-auto focus:border-amber-500 cursor-pointer"
+                className="input-control py-2 px-2.5 text-xs font-bold text-white bg-slate-900 border border-white/10 w-full sm:w-auto focus:border-amber-500 cursor-pointer col-span-2 sm:col-span-1"
               >
                 <option value="newest">{t('newestUploads')}</option>
                 <option value="oldest">{t('oldestUploads')}</option>
@@ -249,7 +275,7 @@ const Services = () => {
               <button 
                 id="clear-filters-btn"
                 onClick={handleClearFilters}
-                className="py-2.5 px-4 rounded text-xs font-bold bg-amber-500 hover:bg-amber-600 text-slate-950 transition-colors cursor-pointer w-full sm:w-auto text-center"
+                className="py-2 px-4 rounded text-xs font-bold bg-amber-500 hover:bg-amber-600 text-slate-950 transition-colors cursor-pointer w-full sm:w-auto text-center"
               >
                 {t('resetFilters')}
               </button>
@@ -257,6 +283,7 @@ const Services = () => {
           </div>
         </div>
       </section>
+
 
       {/* Sermons count summary and dynamic catalog grid */}
       <section className="container-box pb-16" id="sermons-catalog-display">
@@ -282,10 +309,9 @@ const Services = () => {
           </div>
         ) : (
           <div className="flex flex-col gap-6">
-            {/* Matches count tag */}
-            <div className="flex justify-between items-center text-xs font-semibold text-slate-400 tracking-wider">
-              <span>{t('showingSermonsCount').replace('{showing}', filteredSermons.length).replace('{total}', allSermons.length)}</span>
-              <span className="flex items-center gap-1.5 text-amber-400 uppercase font-bold">
+            {/* Sort indicator only — no count shown */}
+            <div className="flex justify-end">
+              <span className="flex items-center gap-1.5 text-amber-400 uppercase font-bold text-xs tracking-wider">
                 {sortOrder === 'newest' && <><ArrowDown className="w-3.5 h-3.5" /> {t('latestFirst')}</>}
                 {sortOrder === 'oldest' && <><ArrowUp className="w-3.5 h-3.5" /> {t('chronologicalOldest')}</>}
                 {sortOrder === 'popular' && <><Eye className="w-3.5 h-3.5" /> {t('sortByPopularity')}</>}
@@ -299,7 +325,7 @@ const Services = () => {
                   key={sermon.id}
                   id={`sermon-card-${sermon.id}`}
                   onClick={() => handleSermonSelect(sermon)}
-                  className="glass-panel overflow-hidden cursor-pointer group flex flex-col justify-between border border-white/10 hover:border-amber-500/40 transition-all duration-300 bg-white/5 hover:bg-white/10 shadow-lg hover:shadow-amber-500/5 relative"
+                  className={`overflow-hidden cursor-pointer group flex flex-col justify-between border transition-all duration-300 shadow-lg rounded-xl relative ${isLight ? 'bg-[#FAF7F0] border-[#D2C2A4] hover:border-[#0A1128]/40 hover:shadow-md' : 'glass-panel border-white/10 hover:border-amber-500/40 bg-white/5 hover:bg-white/10'}`}
                 >
                   {/* Video Thumbnail card */}
                   <div className="relative overflow-hidden bg-slate-950 aspect-video flex items-center justify-center shrink-0 border-b border-white/10">
@@ -312,8 +338,8 @@ const Services = () => {
                     <div className="absolute inset-0 bg-slate-950/50 group-hover:bg-slate-950/20 transition-colors" />
                     
                     {/* Play button micro-animation */}
-                    <div className="absolute w-12 h-12 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-300 border border-white/20">
-                      <Play className="w-5 h-5 fill-slate-950 pl-0.5" />
+                    <div className={`absolute w-12 h-12 rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-300 border ${isLight ? 'bg-[#0A1128] border-[#0A1128]/25 text-white' : 'bg-amber-500 border-white/20 text-slate-950'}`}>
+                      <Play className={`w-5 h-5 pl-0.5 ${isLight ? 'fill-white text-white' : 'fill-slate-950 text-slate-950'}`} />
                     </div>
                     <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/80 text-white text-[10px] font-bold border border-white/5">
                       {sermon.duration}
@@ -323,21 +349,21 @@ const Services = () => {
                   {/* Content details block */}
                   <div className="p-5 flex-1 flex flex-col justify-between">
                     <div>
-                      <span className="text-[10px] uppercase font-extrabold text-amber-400 tracking-wider">
+                      <span className="text-[10px] uppercase font-extrabold text-[#0A1128] dark:text-sky-400 tracking-wider">
                         {t(sermon.category)}
                       </span>
-                      <h3 className="font-serif font-bold text-base text-white mt-1 mb-3 leading-snug group-hover:text-amber-400 transition-colors line-clamp-2">
+                      <h3 className={`font-serif font-bold text-base mt-1 mb-3 leading-snug transition-colors line-clamp-2 ${isLight ? 'text-[#0A1128] group-hover:text-amber-700' : 'text-white group-hover:text-amber-400'}`}>
                         {t(sermon.title)}
                       </h3>
                     </div>
 
-                    <div className="border-t border-white/10 pt-4 flex items-center justify-between text-xs text-slate-300 font-semibold mt-auto">
+                    <div className={`border-t pt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-xs font-semibold mt-auto ${isLight ? 'border-[#D2C2A4]/40 text-[#0A1128]' : 'border-white/10 text-slate-300'}`}>
                       <span className="flex items-center gap-1.5" title="Preacher name">
-                        <User className="w-3.5 h-3.5 text-amber-400" />
+                        <User className="w-3.5 h-3.5 text-[#0A1128] dark:text-sky-400" />
                         {t(sermon.preacher)}
                       </span>
                       <span className="flex items-center gap-1.5" title="Broadcast upload date">
-                        <Calendar className="w-3.5 h-3.5 text-amber-400" />
+                        <Calendar className="w-3.5 h-3.5 text-[#0A1128] dark:text-sky-400" />
                         {sermon.upload_date ? t(sermon.upload_date) : <span className="text-slate-500 italic">Date unknown</span>}
                       </span>
                     </div>

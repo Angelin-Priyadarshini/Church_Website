@@ -6,6 +6,20 @@ const { authenticateToken } = require('../middleware/auth');
 // GET /api/about
 router.get('/', async (req, res) => {
   try {
+    // Record website visits
+    try {
+      const updated = await db.runAsync(
+        "UPDATE about_content SET en_val = CAST(en_val AS SIGNED) + 1, ta_val = CAST(ta_val AS SIGNED) + 1 WHERE `key` = 'website_visits'"
+      );
+      if (updated.changes === 0) {
+        await db.runAsync(
+          "INSERT INTO about_content (`key`, en_val, ta_val) VALUES ('website_visits', '1', '1')"
+        );
+      }
+    } catch (visitErr) {
+      console.error('Error incrementing website visits:', visitErr);
+    }
+
     const rows = await db.allAsync(`SELECT * FROM about_content`);
     const formatted = {
       en: {},
@@ -41,7 +55,7 @@ router.put('/', authenticateToken, async (req, res) => {
       const ta_val = ta[key] || '';
 
       await db.runAsync(
-        `INSERT INTO about_content (key, en_val, ta_val) VALUES (?, ?, ?)
+        `INSERT INTO about_content (\`key\`, en_val, ta_val) VALUES (?, ?, ?)
          ON DUPLICATE KEY UPDATE en_val = VALUES(en_val), ta_val = VALUES(ta_val)`,
         [key, en_val, ta_val]
       );

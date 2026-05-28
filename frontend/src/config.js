@@ -5,8 +5,11 @@ const getProductionApiBase = () => {
 
 // Use VITE_API_URL only if it's actually set to a non-empty value
 const envApiUrl = import.meta.env.VITE_API_URL;
-export const API_BASE = (envApiUrl && envApiUrl.trim() !== '')
-  ? envApiUrl
+const hasExplicitApiUrl = envApiUrl && envApiUrl.trim() !== '';
+const isLocalApiUrl = hasExplicitApiUrl && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(envApiUrl.trim());
+
+export const API_BASE = (hasExplicitApiUrl && (import.meta.env.DEV || !isLocalApiUrl))
+  ? envApiUrl.trim()
   : (import.meta.env.DEV ? 'http://localhost:5000' : getProductionApiBase());
 
 // Resolves an image/resource path to a full URL via the API base

@@ -78,7 +78,7 @@ const About = () => {
   }
 
   // Dynamic Additional Paragraphs from database
-  const rawParas = t('aboutParagraphs');
+  const rawParas = t('paras_about');
   let additionalParas = [];
   try {
     additionalParas = typeof rawParas === 'string' ? JSON.parse(rawParas) : rawParas;
@@ -110,7 +110,14 @@ const About = () => {
   return (
     <div className="animate-slideup">
       {/* 1. Header Banner */}
-      <section className="bg-slate-950/65 text-white py-16 relative overflow-hidden border-b border-amber-500/20">
+      <section 
+        className="bg-slate-950/65 text-white py-16 relative overflow-hidden border-b border-amber-500/20"
+        style={{
+          backgroundImage: t('bg_about') && t('bg_about') !== 'bg_about' ? `linear-gradient(rgba(10, 15, 30, 0.75), rgba(10, 15, 30, 0.75)), url(${t('bg_about')})` : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      >
         <div className="absolute inset-0 opacity-15 bg-[radial-gradient(circle_at_center,_var(--primary-gold))]" style={{ filter: 'blur(80px)' }} />
         <div className="container-box text-center relative z-10">
           <span className="text-xs uppercase font-extrabold text-amber-400 tracking-widest block">

@@ -522,78 +522,86 @@ async function run() {
     console.log('Initiating YouTube Data API-based Synchronization (Auto-Sync Mode)...');
     try {
       const allVideos = [];
-      const uploadsPlaylistId = 'UU510Q7Wp2N7uXpB4R_Z-u5Q';
-      let pageToken = '';
-      let fetchedAll = false;
-      let apiCallCount = 0;
-      const maxApiCalls = 25; // Safety cap (handles up to 1250 videos)
+      const playlists = ['UU510Q7Wp2N7uXpB4R_Z-u5Q', 'UULv8LeRIHzaMtbzmow_HjbA'];
+      
+      for (const playlistId of playlists) {
+        console.log(`[Sync] Fetching playlist items for playlist: ${playlistId}`);
+        let pageToken = '';
+        let fetchedAll = false;
+        let apiCallCount = 0;
+        const maxApiCalls = 25; // Safety cap (handles up to 1250 videos)
 
-      while (!fetchedAll && apiCallCount < maxApiCalls) {
-        apiCallCount++;
-        const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=50&playlistId=${uploadsPlaylistId}&key=${apiKey}&pageToken=${pageToken}`;
-        
-        const resData = await getHttps(url);
-        const resJson = JSON.parse(resData);
-        
-        if (!resJson.items || resJson.items.length === 0) {
-          break;
-        }
+        while (!fetchedAll && apiCallCount < maxApiCalls) {
+          apiCallCount++;
+          const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=50&playlistId=${playlistId}&key=${apiKey}&pageToken=${pageToken}`;
+          
+          const resData = await getHttps(url);
+          const resJson = JSON.parse(resData);
+          
+          if (!resJson.items || resJson.items.length === 0) {
+            break;
+          }
 
-        const batchVideos = [];
-        const videoIds = [];
+          const batchVideos = [];
+          const videoIds = [];
 
-        for (const item of resJson.items) {
-          const snippet = item.snippet;
-          const videoId = snippet.resourceId ? snippet.resourceId.videoId : null;
-          if (!videoId) continue;
+          for (const item of resJson.items) {
+            const snippet = item.snippet;
+            const videoId = snippet.resourceId ? snippet.resourceId.videoId : null;
+            if (!videoId) continue;
 
-          const title = snippet.title || 'Untitled Sermon';
-          const description = snippet.description || '';
-          const publishedAt = item.contentDetails?.videoPublishedAt || snippet.publishedAt || '';
-          const upload_date = publishedAt ? publishedAt.split('T')[0] : new Date().toISOString().split('T')[0];
+            const title = snippet.title || 'Untitled Sermon';
+            const description = snippet.description || '';
+            const publishedAt = item.contentDetails?.videoPublishedAt || snippet.publishedAt || '';
+            const upload_date = publishedAt ? publishedAt.split('T')[0] : new Date().toISOString().split('T')[0];
 
-          const { category, preacher } = classifySermon(title);
+            const { category, preacher } = classifySermon(title);
 
-          batchVideos.push({
-            youtube_video_id: videoId,
-            title,
-            description,
-            upload_date,
-            category,
-            preacher,
-            duration: '1:30:00'
-          });
-          videoIds.push(videoId);
-        }
+            batchVideos.push({
+              youtube_video_id: videoId,
+              title,
+              description,
+              upload_date,
+              category,
+              preacher,
+              duration: '1:30:00'
+            });
+            videoIds.push(videoId);
+          }
 
-        // Batch fetch accurate durations
-        if (videoIds.length > 0) {
-          try {
-            const durUrl = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoIds.join(',')}&key=${apiKey}`;
-            const durData = await getHttps(durUrl);
-            const durJson = JSON.parse(durData);
-            if (durJson.items) {
-              const durationMap = {};
-              for (const durItem of durJson.items) {
-                durationMap[durItem.id] = parseISODuration(durItem.contentDetails?.duration);
-              }
-              for (const v of batchVideos) {
-                if (durationMap[v.youtube_video_id]) {
-                  v.duration = durationMap[v.youtube_video_id];
+          // Batch fetch accurate durations
+          if (videoIds.length > 0) {
+            try {
+              const durUrl = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoIds.join(',')}&key=${apiKey}`;
+              const durData = await getHttps(durUrl);
+              const durJson = JSON.parse(durData);
+              if (durJson.items) {
+                const durationMap = {};
+                for (const durItem of durJson.items) {
+                  durationMap[durItem.id] = parseISODuration(durItem.contentDetails?.duration);
+                }
+                for (const v of batchVideos) {
+                  if (durationMap[v.youtube_video_id]) {
+                    v.duration = durationMap[v.youtube_video_id];
+                  }
                 }
               }
+            } catch (durErr) {
+              console.error('Error fetching video durations:', durErr.message);
             }
-          } catch (durErr) {
-            console.error('Error fetching video durations:', durErr.message);
           }
-        }
 
-        allVideos.push(...batchVideos);
+          for (const v of batchVideos) {
+            if (!allVideos.some(av => av.youtube_video_id === v.youtube_video_id)) {
+              allVideos.push(v);
+            }
+          }
 
-        if (resJson.nextPageToken) {
-          pageToken = resJson.nextPageToken;
-        } else {
-          fetchedAll = true;
+          if (resJson.nextPageToken) {
+            pageToken = resJson.nextPageToken;
+          } else {
+            fetchedAll = true;
+          }
         }
       }
 
@@ -647,65 +655,81 @@ async function run() {
   
   try {
     const allVideos = [];
-    
-    // 1. Fetch channel videos tab
+    const channels = ['@AGSHARJAHTAMILCHURCH', '@agstchurch'];
     let apiKey = null;
-    try {
-      console.log('Fetching videos from YouTube channel videos page...');
-      const videosUrl = 'https://www.youtube.com/@AGSHARJAHTAMILCHURCH/videos';
-      const videosHtml = await getHttps(videosUrl);
-      
-      apiKey = extractApiKey(videosHtml);
-      console.log('Extracted Innertube API Key:', apiKey ? 'Success' : 'Failed');
-      
-      const { videos: initialVideos, continuationToken } = parseInitialHtml(videosHtml);
-      console.log(`Parsed ${initialVideos.length} initial sermons from videos tab.`);
-      allVideos.push(...initialVideos);
-      
-      if (apiKey && continuationToken) {
-        console.log('Starting recursive crawling for videos tab...');
-        const continuationVideos = await fetchAllContinuations(apiKey, continuationToken, videosUrl);
-        console.log(`Recursively parsed ${continuationVideos.length} additional sermons from videos tab.`);
-        allVideos.push(...continuationVideos);
-      } else {
-        console.warn('Cannot run recursive crawl for videos: Key or Token is missing.');
-      }
-    } catch (err) {
-      console.error('Error fetching videos tab:', err.message);
-    }
     
-    // 2. Fetch channel live tab (main Sunday services and prayer streams)
-    try {
-      console.log('Fetching videos from YouTube channel live page...');
-      const liveUrl = 'https://www.youtube.com/@AGSHARJAHTAMILCHURCH/live';
-      const liveHtml = await getHttps(liveUrl);
+    for (const ch of channels) {
+      console.log(`[Sync] Scraping channel handle: ${ch}`);
       
-      const { videos: initialLiveVideos, continuationToken: liveContinuationToken } = parseInitialHtml(liveHtml);
-      console.log(`Parsed ${initialLiveVideos.length} initial live services from live tab.`);
-      
-      // Merge initial live streams
-      for (const v of initialLiveVideos) {
-        if (!allVideos.some(av => av.youtube_video_id === v.youtube_video_id)) {
-          allVideos.push(v);
-        }
-      }
-      
-      if (apiKey && liveContinuationToken) {
-        console.log('Starting recursive crawling for live tab...');
-        const continuationLiveVideos = await fetchAllContinuations(apiKey, liveContinuationToken, liveUrl);
-        console.log(`Recursively parsed ${continuationLiveVideos.length} additional live services from live tab.`);
+      // 1. Fetch channel videos tab
+      try {
+        console.log(`Fetching videos from YouTube channel videos page for ${ch}...`);
+        const videosUrl = `https://www.youtube.com/${ch}/videos`;
+        const videosHtml = await getHttps(videosUrl);
         
-        // Merge continuation live streams
-        for (const v of continuationLiveVideos) {
+        if (!apiKey) {
+          apiKey = extractApiKey(videosHtml);
+          console.log(`Extracted Innertube API Key from ${ch}:`, apiKey ? 'Success' : 'Failed');
+        }
+        
+        const { videos: initialVideos, continuationToken } = parseInitialHtml(videosHtml);
+        console.log(`Parsed ${initialVideos.length} initial sermons from videos tab for ${ch}.`);
+        
+        for (const v of initialVideos) {
           if (!allVideos.some(av => av.youtube_video_id === v.youtube_video_id)) {
             allVideos.push(v);
           }
         }
-      } else {
-        console.warn('Cannot run recursive crawl for live: Key or Token is missing.');
+        
+        if (apiKey && continuationToken) {
+          console.log(`Starting recursive crawling for videos tab of ${ch}...`);
+          const continuationVideos = await fetchAllContinuations(apiKey, continuationToken, videosUrl);
+          console.log(`Recursively parsed ${continuationVideos.length} additional sermons from videos tab for ${ch}.`);
+          for (const v of continuationVideos) {
+            if (!allVideos.some(av => av.youtube_video_id === v.youtube_video_id)) {
+              allVideos.push(v);
+            }
+          }
+        } else {
+          console.warn(`Cannot run recursive crawl for videos of ${ch}: Key or Token is missing.`);
+        }
+      } catch (err) {
+        console.error(`Error fetching videos tab for ${ch}:`, err.message);
       }
-    } catch (err) {
-      console.error('Error fetching live tab:', err.message);
+      
+      // 2. Fetch channel live tab (main Sunday services and prayer streams)
+      try {
+        console.log(`Fetching videos from YouTube channel live page for ${ch}...`);
+        const liveUrl = `https://www.youtube.com/${ch}/live`;
+        const liveHtml = await getHttps(liveUrl);
+        
+        const { videos: initialLiveVideos, continuationToken: liveContinuationToken } = parseInitialHtml(liveHtml);
+        console.log(`Parsed ${initialLiveVideos.length} initial live services from live tab for ${ch}.`);
+        
+        // Merge initial live streams
+        for (const v of initialLiveVideos) {
+          if (!allVideos.some(av => av.youtube_video_id === v.youtube_video_id)) {
+            allVideos.push(v);
+          }
+        }
+        
+        if (apiKey && liveContinuationToken) {
+          console.log(`Starting recursive crawling for live tab of ${ch}...`);
+          const continuationLiveVideos = await fetchAllContinuations(apiKey, liveContinuationToken, liveUrl);
+          console.log(`Recursively parsed ${continuationLiveVideos.length} additional live services from live tab for ${ch}.`);
+          
+          // Merge continuation live streams
+          for (const v of continuationLiveVideos) {
+            if (!allVideos.some(av => av.youtube_video_id === v.youtube_video_id)) {
+              allVideos.push(v);
+            }
+          }
+        } else {
+          console.warn(`Cannot run recursive crawl for live of ${ch}: Key or Token is missing.`);
+        }
+      } catch (err) {
+        console.error(`Error fetching live tab for ${ch}:`, err.message);
+      }
     }
     
     console.log(`Total unique sermons extracted keylessly: ${allVideos.length}`);

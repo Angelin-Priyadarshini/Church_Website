@@ -37,7 +37,7 @@ async function sendVerificationEmail(email, name, verificationCode) {
     to: email,
     subject: `${verificationCode} is your AGSTC Verification Code`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 /images/logo.png auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
         <h2 style="color: #6366f1; text-align: center;">AG Sharjah Tamil Church</h2>
         <hr style="border: 0; border-top: 1px solid #eeeeee;" />
         <p>Dear ${name},</p>
@@ -79,8 +79,12 @@ router.post('/login', async (req, res) => {
 
     // Check if account is verified
     if (user.is_verified === 0) {
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+      await db.runAsync(`UPDATE users SET verification_code = ? WHERE id = ?`, [verificationCode, user.id]);
+      await sendVerificationEmail(user.email, user.name, verificationCode);
+
       return res.status(403).json({
-        error: 'Your email has not been verified yet.',
+        error: 'Your email has not been verified yet. A new 6-digit verification code has been sent to your email.',
         requiresVerification: true,
         email: user.email
       });
@@ -146,10 +150,7 @@ router.post('/register', async (req, res) => {
           [name, passwordHash, verificationCode, existingUser.id]
         );
 
-        sendVerificationEmail(email, name, verificationCode).catch(mailErr => {
-          console.error('SMTP background mailer error on re-register:', mailErr);
-          console.log(`[SMTP Mailer Error Code Backup]: ${verificationCode} for ${email}`);
-        });
+        await sendVerificationEmail(email, name, verificationCode);
 
         return res.status(201).json({
           message: 'This email is already registered but unverified. We have sent a new 6-digit verification code to your email.',
@@ -176,11 +177,7 @@ router.post('/register', async (req, res) => {
         [name, email, passwordHash, 'user', 0, verificationCode]
       );
 
-      // Trigger email asynchronously in the background (prevents blocking HTTP response, making registration extremely fast!)
-      sendVerificationEmail(email, name, verificationCode).catch(mailErr => {
-        console.error('SMTP background mailer error:', mailErr);
-        console.log(`[SMTP Mailer Error Code Backup]: ${verificationCode} for ${email}`);
-      });
+      await sendVerificationEmail(email, name, verificationCode);
 
       res.status(201).json({
         message: 'Registration successful! A 6-digit verification code has been sent to your email.',
@@ -248,11 +245,7 @@ router.post('/resend-code', async (req, res) => {
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     await db.runAsync(`UPDATE users SET verification_code = ? WHERE id = ?`, [verificationCode, user.id]);
 
-    // Trigger email asynchronously in the background
-    sendVerificationEmail(email, user.name, verificationCode).catch(mailErr => {
-      console.error('SMTP background mailer error:', mailErr);
-      console.log(`[SMTP Mailer Error Code Backup]: ${verificationCode} for ${email}`);
-    });
+    await sendVerificationEmail(email, user.name, verificationCode);
 
     res.json({ message: 'A new 6-digit verification code has been sent to your email.' });
   } catch (err) {
@@ -273,6 +266,38 @@ router.get('/users', authenticateToken, async (req, res) => {
   } catch (err) {
     console.error('Error fetching users:', err);
     res.status(500).json({ error: 'Server error fetching user accounts.' });
+  }
+});
+
+// PUT /api/auth/users/:id/role (Promote/demote user roles - Admin locked)
+router.put('/users/:id/role', authenticateToken, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Access denied. Admin role required.' });
+  }
+
+  const { id } = req.params;
+  const { role } = req.body;
+
+  if (!role || !['admin', 'user', 'moderator', 'data_admin', 'usher'].includes(role)) {
+    return res.status(400).json({ error: 'Valid role (admin, user, moderator, data_admin, usher) is required.' });
+  }
+
+  try {
+    const user = await db.getAsync(`SELECT * FROM users WHERE id = ?`, [id]);
+    if (!user) {
+      return res.status(404).json({ error: 'User account not found.' });
+    }
+
+    // Protect the primary admin email from role demotion
+    if (user.email === 'tamilselvimariappan@gmail.com' && role !== 'admin') {
+      return res.status(400).json({ error: 'Primary admin tamilselvimariappan@gmail.com cannot be demoted.' });
+    }
+
+    await db.runAsync(`UPDATE users SET role = ? WHERE id = ?`, [role, id]);
+    res.json({ message: `Successfully updated user role to ${role}.` });
+  } catch (err) {
+    console.error('Error updating user role:', err);
+    res.status(500).json({ error: 'Server error updating user role.' });
   }
 });
 

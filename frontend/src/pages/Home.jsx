@@ -19,7 +19,7 @@ const Home = () => {
       try {
         const [schedRes, servRes, testRes] = await Promise.all([
           fetch(`${API_BASE}/api/schedule`),
-          fetch(`${API_BASE}/api/services?category=${encodeURIComponent('Sunday Service')}&search=${encodeURIComponent('SUNDAY SERVICE')}&limit=1`),
+          fetch(`${API_BASE}/api/services?category=${encodeURIComponent('Sunday Service')}&limit=1`),
           fetch(`${API_BASE}/api/testimonies`)
         ]);
         
@@ -53,7 +53,7 @@ const Home = () => {
             <div className="relative inline-block">
               <div className="absolute -inset-1 rounded-full bg-amber-500/25 blur opacity-45 animate-pulse" />
               <img 
-                src="/images/pastor-immanuel.png" 
+                src={t('pastorImage') || '/images/pastor-immanuel.png'} 
                 alt="Pastor Immanuel"
                 className="relative w-48 h-48 rounded-full object-cover border-4 border-amber-500 shadow-lg mx-auto bg-slate-950"
               />
@@ -160,7 +160,7 @@ const Home = () => {
       {/* 5. Core Values */}
       <section className="bg-slate-950/60 border-t border-b border-slate-900 py-16">
         <div className="container-box grid-three">
-          <div className="glass-panel-static p-6 text-center flex flex-col items-center gap-3">
+          <div className="glass-panel-static cream-card p-6 text-center flex flex-col items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400">
               <Heart className="w-6 h-6" />
             </div>
@@ -170,7 +170,7 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="glass-panel-static p-6 text-center flex flex-col items-center gap-3">
+          <div className="glass-panel-static cream-card p-6 text-center flex flex-col items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400">
               <Shield className="w-6 h-6" />
             </div>
@@ -180,7 +180,7 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="glass-panel-static p-6 text-center flex flex-col items-center gap-3">
+          <div className="glass-panel-static cream-card p-6 text-center flex flex-col items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400">
               <HelpCircle className="w-6 h-6" />
             </div>
@@ -208,7 +208,7 @@ const Home = () => {
             {testimonies.map((test) => (
               <div
                 key={test.id}
-                className="glass-panel-static p-6 relative flex flex-col justify-between"
+                className="glass-panel-static cream-card p-6 relative flex flex-col justify-between"
               >
                 <div className="absolute top-4 right-4 text-amber-400">
                   <Star className="w-5 h-5 fill-amber-400" />

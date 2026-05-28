@@ -3,8 +3,22 @@ const router = express.Router();
 const db = require('../config/db');
 const { authenticateToken } = require('../middleware/auth');
 
+// Memory cache for sermons
+let servicesCache = {};
+
+function clearServicesCache() {
+  servicesCache = {};
+  console.log('[Cache] Services memory cache cleared.');
+}
+
 // GET /api/services (list cached services with filters)
 router.get('/', async (req, res) => {
+  const cacheKey = JSON.stringify(req.query);
+  if (servicesCache[cacheKey]) {
+    console.log('[Cache] Serving services from memory cache.');
+    return res.json(servicesCache[cacheKey]);
+  }
+
   const { search, category, preacher, sort, limit } = req.query;
   let sql = `SELECT * FROM services WHERE 1=1`;
   const params = [];
@@ -25,11 +39,11 @@ router.get('/', async (req, res) => {
   }
 
   if (sort === 'oldest') {
-    sql += ` ORDER BY upload_date ASC NULLS LAST, id ASC`;
+    sql += ` ORDER BY (upload_date IS NULL), upload_date ASC, id ASC`;
   } else if (sort === 'popular') {
-    sql += ` ORDER BY view_count DESC, upload_date DESC NULLS LAST`;
+    sql += ` ORDER BY view_count DESC, (upload_date IS NULL), upload_date DESC`;
   } else {
-    sql += ` ORDER BY upload_date DESC NULLS LAST, id DESC`;
+    sql += ` ORDER BY (upload_date IS NULL), upload_date DESC, id DESC`;
   }
 
   if (limit) {
@@ -42,6 +56,7 @@ router.get('/', async (req, res) => {
 
   try {
     const services = await db.allAsync(sql, params);
+    servicesCache[cacheKey] = services; // Cache the response
     res.json(services);
   } catch (err) {
     console.error('Error fetching services:', err);
@@ -370,6 +385,9 @@ router.post('/sync', authenticateToken, async (req, res) => {
     const { syncChannelVideos } = require('../sync_channel');
     const crawlStats = await syncChannelVideos();
     
+    // Invalidate memory cache
+    clearServicesCache();
+
     return res.json({
       message: 'YouTube synchronization completed successfully.',
       isFullSync: true,
@@ -397,6 +415,10 @@ router.post('/', authenticateToken, async (req, res) => {
       `INSERT INTO services (title, description, youtube_video_id, category, duration, upload_date, preacher) VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [title, description, youtube_video_id, category || 'Sunday Service', duration || '1:30:00', upload_date || new Date().toISOString().split('T')[0], preacher || 'Pastor Immanuel']
     );
+
+    // Invalidate memory cache
+    clearServicesCache();
+
     res.status(201).json({ message: 'Sermon created successfully', serviceId: result.lastID });
   } catch (err) {
     console.error('Error creating sermon:', err);
@@ -412,6 +434,10 @@ router.delete('/:id', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'Sermon not found.' });
     }
     await db.runAsync(`DELETE FROM services WHERE id = ?`, [req.params.id]);
+
+    // Invalidate memory cache
+    clearServicesCache();
+
     res.json({ message: 'Sermon deleted successfully.' });
   } catch (err) {
     console.error('Error deleting sermon:', err);
