@@ -74,6 +74,7 @@ router.get('/:id', async (req, res) => {
     // Increment view count locally
     await db.runAsync(`UPDATE services SET view_count = view_count + 1 WHERE id = ?`, [req.params.id]);
     service.view_count += 1;
+    clearServicesCache();
     res.json(service);
   } catch (err) {
     console.error('Error fetching single service:', err);

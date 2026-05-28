@@ -133,10 +133,21 @@ const Services = () => {
     setVisibleCount(18);
   }, [searchQuery, categoryFilter, preacherFilter, sortOrder, allSermons]);
 
-  const handleSermonSelect = (sermon) => {
+  const handleSermonSelect = async (sermon) => {
     setSelectedSermon(sermon);
     // Smooth scroll to the top of the video player display
     window.scrollTo({ top: 120, behavior: 'smooth' });
+
+    try {
+      const res = await fetch(`${API_BASE}/api/services/${sermon.id}`);
+      if (res.ok) {
+        const updatedSermon = await res.json();
+        setSelectedSermon(updatedSermon);
+        setAllSermons(prev => prev.map(s => s.id === sermon.id ? updatedSermon : s));
+      }
+    } catch (err) {
+      console.error('Error incrementing sermon view count:', err);
+    }
   };
 
   const handleClearFilters = () => {
