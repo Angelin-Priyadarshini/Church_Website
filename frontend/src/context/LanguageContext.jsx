@@ -252,7 +252,15 @@ const translations = {
     adminPortal: 'Login',
     adminDashboard: 'Dashboard',
     adminDashboardTitle: 'Admin Dashboard',
-    adminPortalLogin: 'Login'
+    adminPortalLogin: 'Login',
+    pastorImage: '/images/pastor-immanuel.png',
+    aboutImage: '/images/home-banner1.JPG',
+    bg_about: '/images/home-banner1.JPG',
+    bg_services: '/images/home-banner1.JPG',
+    bg_ministries: '/images/home-banner1.JPG',
+    bg_events: '/images/home-banner1.JPG',
+    bg_resources: '/images/home-banner1.JPG',
+    bg_contact: '/images/home-banner1.JPG'
   },
   ta: {
     navHome: 'முதற்பக்கம்',
@@ -584,7 +592,15 @@ const translations = {
     adminPortal: 'உள்நுழை',
     adminDashboard: 'நிர்வாகி பகுதி',
     adminDashboardTitle: 'நிர்வாகி பலகை',
-    adminPortalLogin: 'உள்நுழை'
+    adminPortalLogin: 'உள்நுழை',
+    pastorImage: '/images/pastor-immanuel.png',
+    aboutImage: '/images/home-banner1.JPG',
+    bg_about: '/images/home-banner1.JPG',
+    bg_services: '/images/home-banner1.JPG',
+    bg_ministries: '/images/home-banner1.JPG',
+    bg_events: '/images/home-banner1.JPG',
+    bg_resources: '/images/home-banner1.JPG',
+    bg_contact: '/images/home-banner1.JPG'
   }
 };
 
