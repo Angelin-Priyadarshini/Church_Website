@@ -12,10 +12,20 @@ export const API_BASE = (hasExplicitApiUrl && (import.meta.env.DEV || !isLocalAp
   ? envApiUrl.trim()
   : (import.meta.env.DEV ? 'http://localhost:5000' : getProductionApiBase());
 
-// Resolves an image/resource path to a full URL via the API base
+// Resolves an image/resource path to a full URL via the API base or local frontend path
 export const resolveImageUrl = (path) => {
   if (!path) return '';
   if (path.startsWith('http')) return path;
+  
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  
+  // If it's a frontend static image, resolve it relative to the frontend base path
+  if (cleanPath.startsWith('/images/')) {
+    const isHostinger = window.location.pathname.startsWith('/new') || window.location.hostname.includes('agsharjah.org');
+    return isHostinger ? `/new${cleanPath}` : cleanPath;
+  }
+  
+  // Otherwise, it's a backend dynamic asset (like /uploads/)
   const base = API_BASE.endsWith('/') ? API_BASE.slice(0, -1) : API_BASE;
-  return `${base}${path.startsWith('/') ? '' : '/'}${path}`;
+  return `${base}${cleanPath}`;
 };
