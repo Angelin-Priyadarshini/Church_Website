@@ -12,6 +12,13 @@ export const API_BASE = (hasExplicitApiUrl && (import.meta.env.DEV || !isLocalAp
   ? envApiUrl.trim()
   : (import.meta.env.DEV ? 'http://localhost:5000' : getProductionApiBase());
 
+// Checks if a path represents a valid image file location (frontend asset or backend upload)
+export const isValidImagePath = (path) => {
+  if (!path) return false;
+  const p = path.trim().toLowerCase();
+  return p.startsWith('/images/') || p.startsWith('images/') || p.startsWith('/uploads/') || p.startsWith('uploads/') || p.startsWith('http');
+};
+
 // Resolves an image/resource path to a full URL via the API base or local frontend path
 export const resolveImageUrl = (path) => {
   if (!path) return '';

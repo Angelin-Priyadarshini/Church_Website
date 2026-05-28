@@ -4,7 +4,7 @@ import HeroBanner from '../components/HeroBanner';
 import VideoPlayer from '../components/VideoPlayer';
 import { Calendar, Heart, Shield, HelpCircle, ArrowRight, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { API_BASE, resolveImageUrl } from '../config';
+import { API_BASE, resolveImageUrl, isValidImagePath } from '../config';
 
 const Home = () => {
   const { t } = useLanguage();
@@ -58,7 +58,7 @@ const Home = () => {
             <div className="relative inline-block">
               <div className="absolute -inset-1 rounded-full bg-amber-500/25 blur opacity-45 animate-pulse" />
               <img 
-                src={resolveImageUrl(t('pastorImage') || '/images/pastor-immanuel.png')} 
+                src={resolveImageUrl(isValidImagePath(t('pastorImage')) ? t('pastorImage') : '/images/pastor-immanuel.png')} 
                 alt="Pastor Immanuel"
                 className="relative w-48 h-48 rounded-full object-cover border-4 border-amber-500 shadow-lg mx-auto bg-slate-950"
               />

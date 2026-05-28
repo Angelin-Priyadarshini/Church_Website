@@ -114,7 +114,7 @@ const About = () => {
       <section 
         className="bg-slate-950/65 text-white py-16 relative overflow-hidden border-b border-amber-500/20"
         style={{
-          backgroundImage: t('bg_about') && t('bg_about') !== 'bg_about' ? `linear-gradient(rgba(10, 15, 30, 0.75), rgba(10, 15, 30, 0.75)), url(${t('bg_about')})` : undefined,
+          backgroundImage: t('bg_about') && t('bg_about') !== 'bg_about' ? `linear-gradient(rgba(10, 15, 30, 0.75), rgba(10, 15, 30, 0.75)), url(${resolveImageUrl(t('bg_about'))})` : undefined,
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}
