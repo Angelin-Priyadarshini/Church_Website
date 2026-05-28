@@ -5,6 +5,7 @@ import { resolveImageUrl } from '../config';
 
 const About = () => {
   const { t, language } = useLanguage();
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
   // Dynamic Statements of Faith from database
   const rawFaith = t('faithStatements');
@@ -108,7 +109,7 @@ const About = () => {
   };
 
   return (
-    <div className="animate-slideup">
+    <div className={`animate-slideup ${isLocal ? 'about-localhost-fonts' : ''}`}>
       {/* 1. Header Banner */}
       <section 
         className="bg-slate-950/65 text-white py-16 relative overflow-hidden border-b border-amber-500/20"
@@ -138,16 +139,16 @@ const About = () => {
           <h2 className="heading-secondary">
             {t('aboutTitle')}
           </h2>
-          <p className="text-slate-300 leading-relaxed mb-4 font-serif">
+          <p className="text-slate-300 leading-relaxed mb-4">
             {t('aboutPara1')}
           </p>
-          <p className="text-slate-300 leading-relaxed mb-4 font-serif">
+          <p className="text-slate-300 leading-relaxed mb-4">
             {t('aboutPara2')}
           </p>
           
           {/* Dynamic Extra Paragraphs */}
           {additionalParas.map((p, idx) => (
-            <p key={idx} className="text-slate-300 leading-relaxed mb-4 font-serif">
+            <p key={idx} className="text-slate-300 leading-relaxed mb-4">
               {language === 'ta' ? p.ta : p.en}
             </p>
           ))}

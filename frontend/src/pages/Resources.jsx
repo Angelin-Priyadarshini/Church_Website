@@ -17,13 +17,15 @@ const Resources = () => {
         fetch(`${API_BASE}/api/resources`)
       ]);
 
-      const devData = await devRes.json();
-      const fileData = await fileRes.json();
+      const devData = devRes.ok ? await devRes.json() : [];
+      const fileData = fileRes.ok ? await fileRes.json() : [];
 
-      setDevotionals(devData);
-      setResources(fileData);
+      setDevotionals(Array.isArray(devData) ? devData : []);
+      setResources(Array.isArray(fileData) ? fileData : []);
     } catch (err) {
       console.error('Error fetching resources collections:', err);
+      setDevotionals([]);
+      setResources([]);
     } finally {
       setLoading(false);
     }

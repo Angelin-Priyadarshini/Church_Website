@@ -23,17 +23,22 @@ const Home = () => {
           fetch(`${API_BASE}/api/testimonies`)
         ]);
         
-        const schedData = await schedRes.json();
-        const servData = await servRes.json();
-        const testData = await testRes.json();
+        const schedData = schedRes.ok ? await schedRes.json() : [];
+        const servData = servRes.ok ? await servRes.json() : [];
+        const testData = testRes.ok ? await testRes.json() : [];
         
-        setSchedules(schedData);
-        if (servData.length > 0) {
+        setSchedules(Array.isArray(schedData) ? schedData : []);
+        if (Array.isArray(servData) && servData.length > 0) {
           setLatestSermon(servData[0]);
+        } else {
+          setLatestSermon(null);
         }
-        setTestimonies(testData.slice(0, 3)); // show top 3
+        setTestimonies(Array.isArray(testData) ? testData.slice(0, 3) : []);
       } catch (err) {
         console.error('Error fetching landing page data:', err);
+        setSchedules([]);
+        setLatestSermon(null);
+        setTestimonies([]);
       } finally {
         setLoading(false);
       }

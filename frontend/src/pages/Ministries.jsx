@@ -11,13 +11,14 @@ const Ministries = () => {
 
   useEffect(() => {
     fetch(`${API_BASE}/api/ministries`)
-      .then(res => res.json())
+      .then(res => res.ok ? res.json() : [])
       .then(data => {
-        setMinistries(data);
+        setMinistries(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch(err => {
         console.error('Error fetching ministries:', err);
+        setMinistries([]);
         setLoading(false);
       });
   }, []);

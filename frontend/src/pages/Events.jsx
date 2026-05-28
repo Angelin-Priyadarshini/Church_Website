@@ -23,10 +23,11 @@ const Events = () => {
   const fetchEvents = async () => {
     try {
       const res = await fetch(`${API_BASE}/api/events`);
-      const data = await res.json();
-      setEvents(data);
+      const data = res.ok ? await res.json() : [];
+      setEvents(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Error fetching calendar events:', err);
+      setEvents([]);
     } finally {
       setLoading(false);
     }

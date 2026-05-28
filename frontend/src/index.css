@@ -971,3 +971,10 @@ select.believer-input {
   padding-right: 28px !important;
 }
 
+/* ==========================================
+   LOCALHOST-ONLY FONTS OVERRIDE FOR ABOUT US PAGE
+   ========================================== */
+.about-localhost-fonts {
+  --font-serif: 'Druk Wide Bold', 'Impact', 'Arial Black', sans-serif !important;
+  --font-body: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif !important;
+}
