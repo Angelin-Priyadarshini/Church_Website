@@ -6,5 +6,5 @@ import react from '@vitejs/plugin-react'
 // For Vercel previews, set VITE_BASE='/' in Vercel environment variables
 export default defineConfig({
   plugins: [react()],
-  base: process.env.VITE_BASE || '/new/',
+  base: process.env.VERCEL === '1' ? '/' : (process.env.VITE_BASE || '/new/'),
 })

@@ -29,11 +29,9 @@ function ScrollToTop() {
 }
 
 function App() {
-  // This app is always served at /new/ on Hostinger (agsharjah.org/new).
-  // On Vercel the VITE_BASE env var is set to '/' so vite.config.js handles that,
-  // but the router basename must also match. We read the same env var at build time
-  // via a data attribute injected by vite, or fall back to /new.
-  const routerBasename = import.meta.env.VITE_BASE || '/new';
+  // Dynamically resolve basename: uses '/new' if URL pathname starts with '/new' (Hostinger/Dev), otherwise '/' (Vercel)
+  const isHostinger = window.location.pathname.startsWith('/new');
+  const routerBasename = isHostinger ? '/new' : '/';
 
   return (
     <Router basename={routerBasename}>
