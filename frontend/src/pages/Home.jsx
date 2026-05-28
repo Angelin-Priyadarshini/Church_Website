@@ -8,7 +8,6 @@ import { API_BASE, resolveImageUrl, isValidImagePath } from '../config';
 
 const Home = () => {
   const { t } = useLanguage();
-  const [schedules, setSchedules] = useState([]);
   const [latestSermon, setLatestSermon] = useState(null);
   const [testimonies, setTestimonies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,17 +16,14 @@ const Home = () => {
     // Fetch home data from backend APIs
     const fetchData = async () => {
       try {
-        const [schedRes, servRes, testRes] = await Promise.all([
-          fetch(`${API_BASE}/api/schedule`),
+        const [servRes, testRes] = await Promise.all([
           fetch(`${API_BASE}/api/services?category=${encodeURIComponent('Sunday Service')}&limit=1`),
           fetch(`${API_BASE}/api/testimonies`)
         ]);
         
-        const schedData = schedRes.ok ? await schedRes.json() : [];
         const servData = servRes.ok ? await servRes.json() : [];
         const testData = testRes.ok ? await testRes.json() : [];
         
-        setSchedules(Array.isArray(schedData) ? schedData : []);
         if (Array.isArray(servData) && servData.length > 0) {
           setLatestSermon(servData[0]);
         } else {
@@ -36,7 +32,6 @@ const Home = () => {
         setTestimonies(Array.isArray(testData) ? testData.slice(0, 3) : []);
       } catch (err) {
         console.error('Error fetching landing page data:', err);
-        setSchedules([]);
         setLatestSermon(null);
         setTestimonies([]);
       } finally {
@@ -61,6 +56,11 @@ const Home = () => {
                 src={resolveImageUrl(isValidImagePath(t('pastorImage')) ? t('pastorImage') : '/images/pastor-immanuel.png')} 
                 alt="Pastor Immanuel"
                 className="relative w-48 h-48 rounded-full object-cover border-4 border-amber-500 shadow-lg mx-auto bg-slate-950"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  const isHostinger = window.location.pathname.startsWith('/new') || window.location.hostname.includes('agsharjah.org');
+                  e.target.src = isHostinger ? '/new/images/pastor-immanuel.png' : '/images/pastor-immanuel.png';
+                }}
               />
             </div>
             <h3 className="font-serif font-bold text-xl text-white mt-4 leading-tight">
@@ -107,60 +107,7 @@ const Home = () => {
         </section>
       )}
 
-      {/* 4. Service Timings Schedule Grid */}
-      <section className="section-padding container-box">
-        <div className="text-center mb-12">
-          <span className="text-xs uppercase font-extrabold text-amber-400 tracking-widest block">
-            {t('weeklySchedule')}
-          </span>
-          <h2 className="heading-secondary">
-            {t('timingTableTitle')}
-          </h2>
-        </div>
 
-        {loading ? (
-          <div className="text-center py-8 text-slate-400 font-semibold">Loading schedule...</div>
-        ) : (
-          <div className="glass-panel overflow-hidden">
-            {/* Desktop Table View */}
-            <div className="hidden sm:block overflow-x-auto w-full">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-slate-950/70 text-amber-400 text-sm uppercase tracking-wider font-bold border-b border-amber-500/20">
-                    <th className="p-4 md:p-6">{t('serviceName')}</th>
-                    <th className="p-4 md:p-6">{t('serviceHour')}</th>
-                    <th className="p-4 md:p-6">{t('serviceVenue')}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-800">
-                  {schedules.map((sched) => (
-                    <tr key={sched.id} className="transition-colors">
-                      <td className="p-4 md:p-6 font-semibold text-slate-200">{t(sched.name)}</td>
-                      <td className="p-4 md:p-6 text-amber-400 font-bold">{t(sched.time)}</td>
-                      <td className="p-4 md:p-6 text-slate-300 font-medium">{t(sched.location)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Mobile Cards List View */}
-            <div className="block sm:hidden divide-y divide-slate-800">
-              {schedules.map((sched) => (
-                <div key={sched.id} className="p-5 flex flex-col gap-2 bg-slate-950/20 transition-colors">
-                  <div className="flex justify-between items-start gap-2">
-                    <span className="font-serif font-bold text-sm text-white">{t(sched.name)}</span>
-                    <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 text-xs font-bold shrink-0">{t(sched.time)}</span>
-                  </div>
-                  <div className="text-slate-400 text-xs font-semibold">
-                    <span className="text-amber-400/80 mr-1">📍</span> {t(sched.location)}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </section>
 
       {/* 5. Core Values */}
       <section className="bg-slate-950/60 border-t border-b border-slate-900 py-16">

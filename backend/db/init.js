@@ -520,6 +520,62 @@ async function seedDatabase() {
       console.log('Download resources seeded.');
     }
 
+    // Seed Events if empty
+    const eventCount = await db.getAsync(`SELECT COUNT(*) as count FROM events`);
+    if (eventCount.count === 0) {
+      await db.runAsync(`INSERT INTO events (title, description, date, time, location, image_url, capacity) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [
+          'Pentecost Power Meeting (பெந்தெகொஸ்தே வல்லமை கூடுகை)',
+          'An intense worship experience celebrating the outpouring of the Holy Spirit. Join us for a time of healing, deliverance, and spiritual re-firing. \n\nதூய ஆவியானவரின் அளவற்ற அபிஷேகத்தையும் வல்லமையையும் பெற்றுக்கொள்ளும் எழுப்புதல் மற்றும் விடுதலை கூடுகை. அனைவரும் கலந்து கொண்டு ஆசீர்வதிக்கப்படுங்கள்.',
+          '2026-05-31',
+          '06:30 PM - 09:30 PM',
+          'Sharjah Worship Center Hall A',
+          '/images/home-banner1.JPG',
+          120
+        ]
+      );
+      await db.runAsync(`INSERT INTO events (title, description, date, time, location, image_url, capacity) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [
+          'Family Blessing Seminar (குடும்ப ஆசீர்வாத கருத்தரங்கு)',
+          'A special seminar for couples and youth. Pastor Immanuel will share biblically grounded principles for fostering peaceful homes and strong marriages. \n\nதம்பதியர் மற்றும் வாலிபர்களுக்கான விசேஷ கருத்தரங்கு. சமாதானம் நிறைந்த குடும்பங்களையும் பலமான திருமண வாழ்க்கையையும் உருவாக்க போதகர் இம்மானுவேல் வேதப்பூர்வமான கருத்துக்களைப் பகிர்ந்து கொள்வார்.',
+          '2026-06-07',
+          '09:00 AM - 12:30 PM',
+          'Sharjah Worship Center Hall A',
+          '/images/pastor-immanuel.png',
+          80
+        ]
+      );
+      await db.runAsync(`INSERT INTO events (title, description, date, time, location, image_url, capacity) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [
+          'Jeremiah Fasting Prayer Crusade',
+          'A combined regional intercession assembly gathering intercessors from Sharjah, Ajman, and Umm Al Quwain to stand in the gap for our communities.',
+          '2026-06-12',
+          '08:00 PM - 10:30 PM',
+          'Main Sanctuary Hall B, Sharjah',
+          '/images/prayer.jpg',
+          150
+        ]
+      );
+      console.log('Default events seeded.');
+    }
+
+    // Explicitly guarantee RETREAT 2026 exists
+    const retreatExists = await db.getAsync(`SELECT id FROM events WHERE title LIKE '%RETREAT 2026%'`);
+    if (!retreatExists) {
+      await db.runAsync(`INSERT INTO events (title, description, date, time, location, image_url, capacity) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [
+          'RETREAT 2026 (ரிட்ரீட் 2026)',
+          'Join us for an inspiring and spiritually enriching \'RETREAT 2026\' at the elegant St. Mary\'s Hall (St. Martin\'s Anglican Church Campus, Yarmook). We are deeply privileged to have our beloved Senior Pastor Immanuel share an empowering and timely message centered on the foundational Christian family values. Guided by scriptural wisdom, this seminar is designed to cultivate, fortify, and bless the family altar with love, mutual respect, faith, and El Shaddai\'s enduring grace. A delicious take-away lunch will be provided. Come with an expectant heart to be transformed and uplifted! \n\nஎங்கள் அன்பான தலைமை போதகர் இம்மானுவேல் அவர்களால் நடத்தப்படும் \'ரிட்ரீட் 2026\' சிறப்பு ஆராதனையில் பங்குபெற உங்களை அன்போடு அழைக்கிறோம். ஒரு கிறிஸ்தவ குடும்பத்தின் அடிப்படை விழுமியங்கள், தெய்வீக அன்பு, விசுவாசம் மற்றும் கர்த்தருடைய ஆச்சரியமான கிருபையைப் பற்றிய ஒரு எழுப்புதல் செய்தி இக்கூட்டத்தில் வல்லமையோடு பகிர்ந்து கொள்ளப்படும். எடுத்துச் செல்லும் சுவையான மதிய உணவு வழங்கப்படும். உங்கள் குடும்பத்தோடு வந்து தேவ ஆசீர்வாதத்தைப் பெற்றுக்கொள்ளுங்கள்!',
+          '2026-05-27',
+          '9:00 AM - 1:00 PM',
+          'St. Mary\'s Hall, St. Martin\'s Anglican Church Campus, Yarmook',
+          '/images/retreat-2026-flyer.jpg',
+          450
+        ]
+      );
+      console.log('RETREAT 2026 event successfully seeded.');
+    }
+
     // 9. Seed Dynamic About Us Content if empty
     const aboutCount = await db.getAsync(`SELECT COUNT(*) as count FROM about_content`);
     if (aboutCount.count === 0) {

@@ -13,7 +13,17 @@ const Ministries = () => {
     fetch(`${API_BASE}/api/ministries`)
       .then(res => res.ok ? res.json() : [])
       .then(data => {
-        setMinistries(Array.isArray(data) ? data : []);
+        const hiddenMinistries = [
+          'ajman ministry',
+          'choir ministry',
+          'jeremiah ministry',
+          'umm-al-quwain ministry',
+          'umm al quwain ministry'
+        ];
+        const filtered = (Array.isArray(data) ? data : []).filter(
+          min => !hiddenMinistries.includes(min.name.toLowerCase().trim())
+        );
+        setMinistries(filtered);
         setLoading(false);
       })
       .catch(err => {

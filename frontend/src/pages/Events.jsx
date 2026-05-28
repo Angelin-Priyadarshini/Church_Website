@@ -6,7 +6,9 @@ import { API_BASE, resolveImageUrl } from '../config';
 const Events = () => {
   const { t, language } = useLanguage();
   const [events, setEvents] = useState([]);
+  const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [schedLoading, setSchedLoading] = useState(true);
   
   // Roster booking state variables
   const [activeBookingEvent, setActiveBookingEvent] = useState(null);
@@ -33,8 +35,22 @@ const Events = () => {
     }
   };
 
+  const fetchSchedules = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/schedule`);
+      const data = res.ok ? await res.json() : [];
+      setSchedules(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Error fetching weekly schedules:', err);
+      setSchedules([]);
+    } finally {
+      setSchedLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchEvents();
+    fetchSchedules();
   }, []);
 
   const handleInputChange = (e) => {
@@ -206,6 +222,90 @@ const Events = () => {
                 </div>
               );
             })}
+          </div>
+        )}
+      </section>
+
+      {/* Weekly Service Timings Section */}
+      <section className="container-box pb-20 pt-6">
+        <div className="text-center mb-12 relative">
+          <div className="absolute inset-x-0 -top-8 -z-10 h-24 bg-gradient-to-r from-amber-500/0 via-amber-500/10 to-amber-500/0 blur-2xl" />
+          <span className="text-xs uppercase font-extrabold text-amber-400 tracking-widest block">
+            {language === 'ta' ? 'ஆராதனை நேரங்கள்' : 'Weekly Schedule'}
+          </span>
+          <h2 className="heading-secondary text-white font-serif font-bold text-3xl mt-2 leading-tight">
+            {language === 'ta' ? 'வாராந்திர ஆராதனை நேரங்கள்' : 'Weekly Service Timings'}
+          </h2>
+          <p className="text-slate-400 text-xs sm:text-sm max-w-lg mx-auto mt-3 leading-relaxed">
+            {language === 'ta' 
+              ? 'எங்களோடு இணைந்து கர்த்தரை ஆராதித்து, அவருடைய மாறாத அன்பையும் கிருபையையும் உங்கள் வாழ்வில் அநுபவியுங்கள்.' 
+              : 'Join us in fellowship and worship, and experience the grace of God Shaddai in our regional gatherings.'}
+          </p>
+        </div>
+
+        {schedLoading ? (
+          <div className="text-center py-12 text-slate-400 font-semibold animate-pulse">
+            {language === 'ta' ? 'ஆராதனை நேரங்கள் ஏற்றப்படுகின்றன...' : 'Loading schedules...'}
+          </div>
+        ) : schedules.length === 0 ? (
+          <div className="text-center py-12 text-slate-400 glass-panel">
+            {language === 'ta' ? 'ஆராதனை அட்டவணைகள் எதுவும் இல்லை.' : 'No service schedules found.'}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {schedules.map((sched, idx) => (
+              <div 
+                key={sched.id || idx}
+                className="bg-slate-900/45 hover:bg-slate-900/65 backdrop-blur-md border border-white/5 hover:border-amber-500/25 transition-all duration-300 rounded-2xl p-6 relative overflow-hidden group shadow-lg flex flex-col justify-between gap-4 transform hover:-translate-y-1"
+              >
+                {/* Visual Glow Ornament */}
+                <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 rounded-bl-full pointer-events-none group-hover:bg-amber-500/10 transition-all duration-300" />
+                
+                <div>
+                  {/* Service Badge Header */}
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider">
+                      {t(sched.category) || (language === 'ta' ? 'ஆராதனை' : 'Worship')}
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">
+                      {t(sched.recurrence) || (language === 'ta' ? 'வாராந்திரம்' : 'Weekly')}
+                    </span>
+                  </div>
+
+                  {/* Service Name */}
+                  <h3 className="font-serif font-bold text-lg sm:text-xl text-white group-hover:text-amber-400 transition-colors duration-300 mb-4 pr-6 leading-tight">
+                    {t(sched.name)}
+                  </h3>
+                </div>
+
+                {/* Logistics */}
+                <div className="flex flex-col gap-3 text-xs sm:text-sm font-semibold text-slate-300 mt-2">
+                  <div className="flex items-start gap-2.5">
+                    <Clock className="w-4.5 h-4.5 text-amber-400 shrink-0 mt-0.5" />
+                    <div className="flex flex-col">
+                      <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
+                        {language === 'ta' ? 'நேரம்' : 'Timing'}
+                      </span>
+                      <strong className="text-white font-bold text-sm tracking-tight mt-0.5">
+                        {t(sched.time)}
+                      </strong>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2.5 border-t border-white/5 pt-3 mt-1">
+                    <MapPin className="w-4.5 h-4.5 text-amber-400 shrink-0 mt-0.5" />
+                    <div className="flex flex-col">
+                      <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
+                        {language === 'ta' ? 'இடம்' : 'Venue'}
+                      </span>
+                      <span className="text-slate-300 font-medium text-xs sm:text-sm mt-0.5 leading-relaxed">
+                        {t(sched.location)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </section>

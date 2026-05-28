@@ -125,6 +125,20 @@ const Header = () => {
                 {language === 'ta' ? 'உள்நுழை' : 'Login'}
               </Link>
             )}
+
+            {/* Assemblies of God Shield Logo (Far Right) */}
+            <div className={`flex items-center shrink-0 pl-3 xl:pl-4 border-l ${isDark ? 'border-slate-700' : 'border-slate-300'}`}>
+              <img 
+                src="/images/ag-right-logo.png" 
+                alt="Assemblies of God Logo" 
+                className="w-11 h-11 object-contain transition-transform duration-300 hover:scale-105 shrink-0"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  const isHostinger = window.location.pathname.startsWith('/new') || window.location.hostname.includes('agsharjah.org');
+                  e.target.src = isHostinger ? '/new/images/ag-right-logo.png' : '/images/ag-right-logo.png';
+                }}
+              />
+            </div>
           </div>
 
           {/* Mobile Controls */}
@@ -155,6 +169,18 @@ const Header = () => {
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
+
+            {/* Assemblies of God Shield Logo (Far Right Mobile) */}
+            <img 
+              src="/images/ag-right-logo.png" 
+              alt="Assemblies of God Logo" 
+              className="w-9 h-9 object-contain ml-1 transition-transform duration-300 hover:scale-105 shrink-0"
+              onError={(e) => {
+                e.target.onerror = null;
+                const isHostinger = window.location.pathname.startsWith('/new') || window.location.hostname.includes('agsharjah.org');
+                e.target.src = isHostinger ? '/new/images/ag-right-logo.png' : '/images/ag-right-logo.png';
+              }}
+            />
           </div>
         </div>
       </div>
