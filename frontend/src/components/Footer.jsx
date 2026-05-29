@@ -66,8 +66,8 @@ const Footer = () => {
                 10:00 AM - 12:45 PM (Fasting Prayer)
               </li>
               <li>
-                <strong className="text-white block">{t('Wednesdays')}:</strong>
-                8:30 PM - 9:55 PM (Midweek Service)
+                <strong className="text-white block">{t('Thursdays')}:</strong>
+                8:00 PM - 9:55 PM (Midweek Service)
               </li>
             </ul>
           </div>
@@ -118,16 +118,6 @@ const Footer = () => {
             <Link to="/admin" className="hover:text-slate-200 transition-colors">
               Login
             </Link>
-            <img 
-              src="/images/ag-right-logo.png" 
-              alt="Assemblies of God Shield"
-              className="w-8 h-8 object-contain transition-transform duration-300 hover:scale-105 shrink-0"
-              onError={(e) => {
-                e.target.onerror = null;
-                const isHostinger = window.location.pathname.startsWith('/new') || window.location.hostname.includes('agsharjah.org');
-                e.target.src = isHostinger ? '/new/images/ag-right-logo.png' : '/images/ag-right-logo.png';
-              }}
-            />
           </div>
         </div>
       </div>

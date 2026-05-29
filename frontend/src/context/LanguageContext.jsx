@@ -122,6 +122,7 @@ const translations = {
     'Sundays': 'Sundays',
     'Saturdays': 'Saturdays',
     'Wednesdays': 'Wednesdays',
+    'Thursdays': 'Thursdays',
     'Sunday Service': 'Sunday Service',
     'Midweek Prayer': 'Midweek Service',
     'New Year Service': 'New Year Service',
@@ -387,6 +388,7 @@ const translations = {
     '06:45 AM - 08:30 AM': 'காலை 06:45 - 08:30 மணி',
     '09:00 AM - 10:45 AM': 'காலை 09:00 - 10:45 மணி',
     '11:15 AM - 12:45 PM': 'மதியம் 11:15 - 12:45 மணி',
+    '08:00 PM - 09:55 PM': 'இரவு 08:00 - 09:55 மணி',
     '08:30 PM - 09:55 PM': 'இரவு 08:30 - 09:55 மணி',
     '10:00 AM - 12:45 PM': 'காலை 10:00 - மதியம் 12:45 மணி',
     '08:30 PM - 10:00 PM': 'இரவு 08:30 - 10:00 மணி',
@@ -423,6 +425,7 @@ const translations = {
     'Sundays': 'ஞாயிற்றுக்கிழமைகள்',
     'Saturdays': 'சனிக்கிழமைகள்',
     'Wednesdays': 'புதன்கிழமைகள்',
+    'Thursdays': 'வியாழக்கிழமைகள்',
 
     // Database seeded ministries translation mappings
     'Ajman Ministry': 'அஜ்மான் ஊழியம்',

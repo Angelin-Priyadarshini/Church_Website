@@ -64,85 +64,82 @@ const Header = () => {
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden xl:flex items-center gap-3 xl:gap-4 2xl:gap-6 shrink-0">
+          {/* Desktop Navigation with perfectly equal spacing between everything */}
+          <div className="hidden xl:flex items-center justify-between flex-grow ml-8 xl:ml-12 2xl:ml-16">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
-                className={`${language === 'ta' ? 'text-[12.5px] 2xl:text-[14px] tracking-tighter' : 'text-[16px] 2xl:text-[17px]'} font-semibold transition-colors ${navTextColor} ${navHoverColor} whitespace-nowrap`}
+                className={`${language === 'ta' ? 'text-[12.5px] 2xl:text-[14px] tracking-tighter' : 'text-[15px] 2xl:text-[16px]'} font-semibold transition-colors ${navTextColor} ${navHoverColor} whitespace-nowrap`}
               >
                 {link.label}
               </Link>
             ))}
 
-            {/* Right Utilities Container with tight spacing */}
-            <div className="flex items-center gap-1.5 xl:gap-2 shrink-0">
-              {/* Language Toggle */}
-              <button
-                onClick={toggleLanguage}
-                className={`flex items-center gap-1 p-1 rounded-full hover:bg-amber-500/10 transition-colors ${iconColor} shrink-0`}
-                title="Toggle Language / மொழி மாற்று"
-              >
-                <Globe className="w-4 h-4 xl:w-5 xl:h-5" />
-                <span className={`text-xs xl:text-sm font-bold uppercase transition-colors ${navTextColor} ${navHoverColor}`}>
-                  {language === 'en' ? 'தமிழ்' : 'EN'}
-                </span>
-              </button>
+            {/* Language Toggle */}
+            <button
+              onClick={toggleLanguage}
+              className={`flex items-center gap-1 p-1 rounded-full hover:bg-amber-500/10 transition-colors ${iconColor} shrink-0`}
+              title="Toggle Language / மொழி மாற்று"
+            >
+              <Globe className="w-4 h-4 xl:w-5 xl:h-5" />
+              <span className={`text-xs xl:text-sm font-bold uppercase transition-colors ${navTextColor} ${navHoverColor}`}>
+                {language === 'en' ? 'தமிழ்' : 'EN'}
+              </span>
+            </button>
 
-              {/* Theme Toggle */}
-              <button
-                onClick={toggleTheme}
-                className={`p-1.5 rounded-full hover:bg-amber-500/10 transition-colors ${iconColor} shrink-0`}
-                title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-                id="theme-toggle-btn"
-              >
-                {isDark
-                  ? <Sun className="w-4 h-4 xl:w-5 xl:h-5 text-amber-400" />
-                  : <Moon className="w-4 h-4 xl:w-5 xl:h-5 text-slate-500" />
-                }
-              </button>
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className={`p-1.5 rounded-full hover:bg-amber-500/10 transition-colors ${iconColor} shrink-0`}
+              title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              id="theme-toggle-btn"
+            >
+              {isDark
+                ? <Sun className="w-4 h-4 xl:w-5 xl:h-5 text-amber-400" />
+                : <Moon className="w-4 h-4 xl:w-5 xl:h-5 text-slate-500" />
+              }
+            </button>
 
-              {/* Auth with minimal padding to avoid excessive whitespace */}
-              {user ? (
-                <div className={`flex items-center gap-1 pl-1.5 border-l ${isDark ? 'border-slate-700' : 'border-slate-300'} shrink-0`}>
-                  <Link
-                    to="/admin"
-                    className={`flex items-center gap-0.5 text-xs xl:text-sm font-semibold ${navTextColor} ${navHoverColor} px-1`}
-                  >
-                    <User className="w-3.5 h-3.5 mr-0.5" />
-                    {dashboardLabel}
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="p-1 rounded-full hover:bg-red-950/50 text-red-400 transition-colors"
-                    title="Logout"
-                  >
-                    <LogOut className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              ) : (
+            {/* Auth with minimal padding */}
+            {user ? (
+              <div className={`flex items-center gap-1 pl-1.5 border-l ${isDark ? 'border-slate-700' : 'border-slate-300'} shrink-0`}>
                 <Link
                   to="/admin"
-                  className={`text-[12px] xl:text-xs font-semibold transition-colors pl-1.5 border-l ${isDark ? 'border-slate-700 text-slate-400 hover:text-slate-200' : 'border-slate-300 text-slate-500 hover:text-slate-800'} shrink-0`}
+                  className={`flex items-center gap-0.5 text-xs xl:text-sm font-semibold ${navTextColor} ${navHoverColor} px-1`}
                 >
-                  {language === 'ta' ? 'உள்நுழை' : 'Login'}
+                  <User className="w-3.5 h-3.5 mr-0.5" />
+                  {dashboardLabel}
                 </Link>
-              )}
-
-              {/* Assemblies of God Shield Logo (Far Right) with negative margin to push to absolute end */}
-              <div className="flex items-center shrink-0 -mr-3 sm:-mr-6 lg:-mr-9 xl:-mr-12 pl-1.5">
-                <img 
-                  src="/images/ag-right-logo.png" 
-                  alt="Assemblies of God Logo" 
-                  className="w-11 h-11 object-contain transition-transform duration-300 hover:scale-105 shrink-0"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    const isHostinger = window.location.pathname.startsWith('/new') || window.location.hostname.includes('agsharjah.org');
-                    e.target.src = isHostinger ? '/new/images/ag-right-logo.png' : '/images/ag-right-logo.png';
-                  }}
-                />
+                <button
+                  onClick={handleLogout}
+                  className="p-1 rounded-full hover:bg-red-950/50 text-red-400 transition-colors"
+                  title="Logout"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                </button>
               </div>
+            ) : (
+              <Link
+                to="/admin"
+                className={`text-[12px] xl:text-xs font-semibold transition-colors pl-1.5 border-l ${isDark ? 'border-slate-700 text-slate-400 hover:text-slate-200' : 'border-slate-300 text-slate-500 hover:text-slate-800'} shrink-0`}
+              >
+                {language === 'ta' ? 'உள்நுழை' : 'Login'}
+              </Link>
+            )}
+
+            {/* Assemblies of God Shield Logo (Far Right) with negative margin to align perfectly to the right end */}
+            <div className="flex items-center shrink-0 -mr-3 sm:-mr-6 lg:-mr-9 xl:-mr-12 pl-1.5">
+              <img 
+                src="/images/ag-right-logo.png" 
+                alt="Assemblies of God Logo" 
+                className="w-11 h-11 object-contain transition-transform duration-300 hover:scale-105 shrink-0"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  const isHostinger = window.location.pathname.startsWith('/new') || window.location.hostname.includes('agsharjah.org');
+                  e.target.src = isHostinger ? '/new/images/ag-right-logo.png' : '/images/ag-right-logo.png';
+                }}
+              />
             </div>
           </div>
 

@@ -261,7 +261,7 @@ const Events = () => {
       </section>
 
       {/* Weekly Service Timings Section */}
-      <section className="container-box pb-20 pt-6">
+      <section className="container-box pb-32 pt-6">
         <div className="text-center mb-12 relative">
           <div className="absolute inset-x-0 -top-8 -z-10 h-24 bg-gradient-to-r from-amber-500/0 via-amber-500/10 to-amber-500/0 blur-2xl" />
           <span className="text-xs uppercase font-extrabold text-amber-400 tracking-widest block">
@@ -291,7 +291,7 @@ const Events = () => {
               const isLight = theme === 'light';
               const cardClass = isLight 
                 ? 'bg-white border-2 border-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.12)]'
-                : 'bg-slate-900/45 border-2 border-amber-500/70 shadow-lg';
+                : 'bg-slate-900/45 border-2 border-amber-500 shadow-lg';
               
               const titleColor = isLight ? 'text-[#0A1931]' : 'text-white';
               const labelColor = isLight ? 'text-[#1F4068]/65 font-extrabold' : 'text-slate-500';

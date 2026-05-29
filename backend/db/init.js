@@ -295,7 +295,7 @@ async function seedDatabase() {
       ['Brothers & Sisters Meeting', '11:15 AM - 12:45 PM', 'St. Martin\'s Anglican Church, Sharjah', 'Fellowship', 'Monthly (2nd Sunday)']
     );
     await db.runAsync(`INSERT INTO schedule (name, time, location, category, recurrence) VALUES (?, ?, ?, ?, ?)`,
-      ['Thursday Midweek Service', '08:30 PM - 09:55 PM', 'St. Martin\'s Anglican Church, Sharjah', 'Prayer Meeting', 'Weekly']
+      ['Thursday Midweek Service', '08:00 PM - 09:55 PM', 'St. Martin\'s Anglican Church, Sharjah', 'Prayer Meeting', 'Weekly']
     );
     await db.runAsync(`INSERT INTO schedule (name, time, location, category, recurrence) VALUES (?, ?, ?, ?, ?)`,
       ['Saturday Fasting Prayer', '10:00 AM - 12:45 PM', 'St. Martin\'s Anglican Church, Sharjah', 'Prayer Meeting', 'Weekly']
