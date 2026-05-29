@@ -2,7 +2,7 @@ import React from 'react';
 import { Calendar, User, Eye, Play } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
-const VideoPlayer = ({ video, onClose, autoplay = true }) => {
+const VideoPlayer = ({ video, onClose, autoplay = true, showFooter = true }) => {
   const { theme } = useTheme();
   const isLight = theme === 'light';
   if (!video) return null;
@@ -41,25 +41,27 @@ const VideoPlayer = ({ video, onClose, autoplay = true }) => {
       </div>
 
       {/* Meta details footer */}
-      <div className={`p-6 border-t ${isLight ? 'bg-[#FAF7F0] border-[#D2C2A4]' : 'bg-slate-900/60 border-amber-500/20'}`}>
-        <h4 className={`font-serif font-bold text-base sm:text-lg mb-4 leading-tight ${isLight ? 'text-[#0A1128]' : 'text-white'}`}>
-          {video.title}
-        </h4>
-        <div className={`flex flex-wrap gap-6 text-sm font-semibold mb-2 ${isLight ? 'text-[#0A1128]' : 'text-slate-300'}`}>
-          <span className="flex items-center gap-2">
-            <User className={`w-4 h-4 ${isLight ? 'text-[#0A1128]' : 'text-amber-400'}`} />
-            Preacher: <strong className={isLight ? 'text-[#0A1128]' : 'text-slate-100'}>{video.preacher || 'Pastor Immanuel'}</strong>
-          </span>
-          <span className="flex items-center gap-2">
-            <Calendar className={`w-4 h-4 ${isLight ? 'text-[#0A1128]' : 'text-amber-400'}`} />
-            Uploaded: <strong className={isLight ? 'text-[#0A1128]' : 'text-slate-100'}>{video.upload_date}</strong>
-          </span>
-          <span className="flex items-center gap-2">
-            <Eye className={`w-4 h-4 ${isLight ? 'text-[#0A1128]' : 'text-amber-400'}`} />
-            Views: <strong className={isLight ? 'text-[#0A1128]' : 'text-slate-100'}>{video.view_count || 0}</strong>
-          </span>
+      {showFooter && (
+        <div className={`p-6 border-t ${isLight ? 'bg-[#FAF7F0] border-[#D2C2A4]' : 'bg-slate-900/60 border-amber-500/20'}`}>
+          <h4 className={`font-serif font-bold text-base sm:text-lg mb-4 leading-tight ${isLight ? 'text-[#0A1128]' : 'text-white'}`}>
+            {video.title}
+          </h4>
+          <div className={`flex flex-wrap gap-6 text-sm font-semibold mb-2 ${isLight ? 'text-[#0A1128]' : 'text-slate-300'}`}>
+            <span className="flex items-center gap-2">
+              <User className={`w-4 h-4 ${isLight ? 'text-[#0A1128]' : 'text-amber-400'}`} />
+              Preacher: <strong className={isLight ? 'text-[#0A1128]' : 'text-slate-100'}>{video.preacher || 'Pastor Immanuel'}</strong>
+            </span>
+            <span className="flex items-center gap-2">
+              <Calendar className={`w-4 h-4 ${isLight ? 'text-[#0A1128]' : 'text-amber-400'}`} />
+              Uploaded: <strong className={isLight ? 'text-[#0A1128]' : 'text-slate-100'}>{video.upload_date}</strong>
+            </span>
+            <span className="flex items-center gap-2">
+              <Eye className={`w-4 h-4 ${isLight ? 'text-[#0A1128]' : 'text-amber-400'}`} />
+              Views: <strong className={isLight ? 'text-[#0A1128]' : 'text-slate-100'}>{video.view_count || 0}</strong>
+            </span>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

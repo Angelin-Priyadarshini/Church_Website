@@ -87,7 +87,7 @@ const Home = () => {
               </h2>
             </div>
             
-            <VideoPlayer video={latestSermon} autoplay={false} />
+            <VideoPlayer video={latestSermon} autoplay={false} showFooter={false} />
             
             <div className="text-center mt-8">
               <Link to="/services" className="btn-secondary gap-2">
