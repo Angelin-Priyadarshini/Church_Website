@@ -301,8 +301,8 @@ router.put('/users/:id/role', authenticateToken, async (req, res) => {
   }
 });
 
-// POST /api/auth/change-password (allows logged-in admins/users to securely update their password)
-router.post('/change-password', authenticateToken, async (req, res) => {
+// POST /api/auth/request-password-change (Initiates password change and sends 6-digit OTP)
+router.post('/request-password-change', authenticateToken, async (req, res) => {
   const { currentPassword, newPassword } = req.body;
 
   if (!currentPassword || !newPassword) {
@@ -324,12 +324,79 @@ router.post('/change-password', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'Current password is incorrect.' });
     }
 
+    // Generate 6-digit OTP code
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    await db.runAsync(`UPDATE users SET verification_code = ? WHERE id = ?`, [otp, req.user.id]);
+
+    // Send OTP email
+    if (process.env.EMAIL_PASS) {
+      const mailOptions = {
+        from: `"AG Sharjah Tamil Church" <agsharjahtamil@gmail.com>`,
+        to: user.email,
+        subject: `${otp} is your AGSTC Password Change Verification Code`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+            <h2 style="color: #d97706; text-align: center;">AG Sharjah Tamil Church</h2>
+            <h3 style="text-align: center; color: #1f2937;">Password Change Verification</h3>
+            <hr style="border: 0; border-top: 1px solid #eeeeee;" />
+            <p>Dear ${user.name},</p>
+            <p>We received a request to change the password for your Assemblies of God Sharjah Tamil Church account. Please use the following 6-digit verification code (OTP) to authorize this change:</p>
+            <div style="background-color: #f3f4f6; padding: 15px; text-align: center; font-size: 28px; font-weight: bold; letter-spacing: 5px; color: #1f2937; border-radius: 6px; margin: 20px 0;">
+              ${otp}
+            </div>
+            <p style="color: #dc2626; font-size: 14px; font-weight: bold;">If you did not request a password change, please log in immediately and update your security settings, as your password may have been compromised.</p>
+            <hr style="border: 0; border-top: 1px solid #eeeeee; margin-top: 30px;" />
+            <p style="text-align: center; font-size: 12px; color: #9ca3af;">
+              Assemblies of God Sharjah Tamil Church, Sharjah, UAE<br/>
+              Email: agsharjahtamil@gmail.com | Website: agsharjah.org
+            </p>
+          </div>
+        `
+      };
+      await transporter.sendMail(mailOptions);
+    } else {
+      console.log(`\n==================================================`);
+      console.log(`[PASSWORD CHANGE OTP EMAIL FALLBACK]`);
+      console.log(`To: ${user.email}`);
+      console.log(`OTP Code: ${otp}`);
+      console.log(`==================================================\n`);
+    }
+
+    res.json({ message: 'A 6-digit verification code (OTP) has been sent to your registered email address.' });
+  } catch (err) {
+    console.error('Password change request error:', err);
+    res.status(500).json({ error: 'Server error during password change request.' });
+  }
+});
+
+// POST /api/auth/confirm-password-change (Verifies OTP and updates the password)
+router.post('/confirm-password-change', authenticateToken, async (req, res) => {
+  const { code, newPassword } = req.body;
+
+  if (!code || !newPassword) {
+    return res.status(400).json({ error: 'Verification code and new password are required.' });
+  }
+
+  if (newPassword.length < 6) {
+    return res.status(400).json({ error: 'New password must be at least 6 characters long.' });
+  }
+
+  try {
+    const user = await db.getAsync(`SELECT * FROM users WHERE id = ?`, [req.user.id]);
+    if (!user) {
+      return res.status(404).json({ error: 'User account not found.' });
+    }
+
+    if (!user.verification_code || user.verification_code !== code.toString().trim()) {
+      return res.status(400).json({ error: 'Invalid or expired verification code (OTP).' });
+    }
+
     const newHash = bcrypt.hashSync(newPassword, 10);
-    await db.runAsync(`UPDATE users SET password_hash = ? WHERE id = ?`, [newHash, req.user.id]);
+    await db.runAsync(`UPDATE users SET password_hash = ?, verification_code = NULL WHERE id = ?`, [newHash, req.user.id]);
 
     res.json({ message: 'Password updated successfully.' });
   } catch (err) {
-    console.error('Password change error:', err);
+    console.error('Password change confirmation error:', err);
     res.status(500).json({ error: 'Server error during password update.' });
   }
 });

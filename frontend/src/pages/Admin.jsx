@@ -254,6 +254,9 @@ const Admin = () => {
   const [pwSuccess, setPwSuccess] = useState('');
   const [pwError, setPwError] = useState('');
   const [isChangingPw, setIsChangingPw] = useState(false);
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
 
   // --- PORTAL PORTING API METHODS ---
 
@@ -1498,7 +1501,7 @@ const Admin = () => {
     }
   };
 
-  const handlePasswordChange = async (e) => {
+  const handlePasswordChangeRequest = async (e) => {
     e.preventDefault();
     setPwSuccess('');
     setPwError('');
@@ -1515,7 +1518,7 @@ const Admin = () => {
 
     setIsChangingPw(true);
     try {
-      const res = await fetch(`${API_BASE}/api/auth/change-password`, {
+      const res = await fetch(`${API_BASE}/api/auth/request-password-change`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1526,17 +1529,54 @@ const Admin = () => {
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to update password.');
+        throw new Error(data.error || 'Failed to request password change.');
+      }
+
+      setPwSuccess(data.message);
+      setIsOtpSent(true);
+    } catch (err) {
+      setPwError(err.message || 'Error requesting password change.');
+    } finally {
+      setIsChangingPw(false);
+    }
+  };
+
+  const handlePasswordChangeConfirm = async (e) => {
+    e.preventDefault();
+    setPwSuccess('');
+    setPwError('');
+
+    if (!otpCode) {
+      setPwError('Please enter the 6-digit verification code sent to your email.');
+      return;
+    }
+
+    setIsVerifyingOtp(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/confirm-password-change`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ code: otpCode, newPassword })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to verify OTP code.');
       }
 
       setPwSuccess('Password changed successfully!');
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
+      setOtpCode('');
+      setIsOtpSent(false);
     } catch (err) {
-      setPwError(err.message || 'Error changing password.');
+      setPwError(err.message || 'Error verifying OTP code.');
     } finally {
-      setIsChangingPw(false);
+      setIsVerifyingOtp(false);
     }
   };
 
@@ -6499,64 +6539,122 @@ const Admin = () => {
               </p>
             </div>
 
-            <form onSubmit={handlePasswordChange} className="glass-panel p-6 bg-white border-slate-200 shadow-sm flex flex-col gap-4">
-              {pwError && (
-                <div className="bg-red-50 border border-red-200 text-red-600 rounded-lg p-3 text-xs font-bold text-left">
-                  {pwError}
+            {!isOtpSent ? (
+              <form onSubmit={handlePasswordChangeRequest} className="glass-panel p-6 bg-white border-slate-200 shadow-sm flex flex-col gap-4">
+                {pwError && (
+                  <div className="bg-red-50 border border-red-200 text-red-600 rounded-lg p-3 text-xs font-bold text-left animate-shake">
+                    {pwError}
+                  </div>
+                )}
+                {pwSuccess && (
+                  <div className="bg-emerald-50 border border-emerald-200 text-emerald-600 rounded-lg p-3 text-xs font-bold text-left font-semibold">
+                    {pwSuccess}
+                  </div>
+                )}
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1 text-left">Current Password</label>
+                  <input 
+                    type="password"
+                    required
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    placeholder="Enter current password"
+                    className="input-control w-full text-slate-900 bg-white"
+                  />
                 </div>
-              )}
-              {pwSuccess && (
-                <div className="bg-emerald-50 border border-emerald-200 text-emerald-600 rounded-lg p-3 text-xs font-bold text-left font-semibold">
-                  {pwSuccess}
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1 text-left">New Password</label>
+                  <input 
+                    type="password"
+                    required
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Enter new password (min. 6 characters)"
+                    className="input-control w-full text-slate-900 bg-white"
+                  />
                 </div>
-              )}
 
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1 text-left">Current Password</label>
-                <input 
-                  type="password"
-                  required
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  placeholder="Enter current password"
-                  className="input-control w-full text-slate-900 bg-white"
-                />
-              </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1 text-left">Confirm New Password</label>
+                  <input 
+                    type="password"
+                    required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Re-type new password"
+                    className="input-control w-full text-slate-900 bg-white"
+                  />
+                </div>
 
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1 text-left">New Password</label>
-                <input 
-                  type="password"
-                  required
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Enter new password (min. 6 characters)"
-                  className="input-control w-full text-slate-900 bg-white"
-                />
-              </div>
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={isChangingPw}
+                    className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-extrabold rounded-xl transition-all shadow-sm disabled:opacity-50"
+                  >
+                    {isChangingPw ? 'Verifying Password...' : 'Send Verification OTP'}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <form onSubmit={handlePasswordChangeConfirm} className="glass-panel p-6 bg-white border-slate-200 shadow-sm flex flex-col gap-4 animate-fadein">
+                {pwError && (
+                  <div className="bg-red-50 border border-red-200 text-red-600 rounded-lg p-3 text-xs font-bold text-left animate-shake">
+                    {pwError}
+                  </div>
+                )}
+                {pwSuccess && (
+                  <div className="bg-emerald-50 border border-emerald-200 text-emerald-600 rounded-lg p-3 text-xs font-bold text-left font-semibold">
+                    {pwSuccess}
+                  </div>
+                )}
 
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1 text-left">Confirm New Password</label>
-                <input 
-                  type="password"
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Re-type new password"
-                  className="input-control w-full text-slate-900 bg-white"
-                />
-              </div>
+                <div className="bg-amber-50/70 border border-amber-200 p-4 rounded-xl flex flex-col gap-1.5 text-xs text-amber-900 text-left font-semibold">
+                  <span>📨 6-Digit Code Dispatched</span>
+                  <p className="text-[11px] font-normal leading-relaxed text-slate-600">
+                    We have dispatched a 6-digit one-time password (OTP) verification code to your email. Please check your spam/junk folder if it doesn't arrive within a minute.
+                  </p>
+                </div>
 
-              <div className="pt-2">
-                <button
-                  type="submit"
-                  disabled={isChangingPw}
-                  className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-extrabold rounded-xl transition-all shadow-sm disabled:opacity-50"
-                >
-                  {isChangingPw ? 'Updating Password...' : 'Change Password'}
-                </button>
-              </div>
-            </form>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1 text-left">Enter 6-Digit OTP Code</label>
+                  <input 
+                    type="text"
+                    required
+                    maxLength="6"
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                    placeholder="e.g. 123456"
+                    className="input-control w-full text-slate-900 bg-white text-center font-bold font-mono tracking-[0.4em] text-lg p-2.5"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2 pt-2">
+                  <button
+                    type="submit"
+                    disabled={isVerifyingOtp}
+                    className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold rounded-xl transition-all shadow-sm disabled:opacity-50"
+                  >
+                    {isVerifyingOtp ? 'Confirming OTP...' : 'Authorize Password Change'}
+                  </button>
+                  
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsOtpSent(false);
+                      setOtpCode('');
+                      setPwSuccess('');
+                      setPwError('');
+                    }}
+                    className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-xl transition-all"
+                  >
+                    Cancel & Start Over
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         )}
       </div>
