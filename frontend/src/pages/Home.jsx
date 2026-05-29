@@ -87,7 +87,7 @@ const Home = () => {
               </h2>
             </div>
             
-            <VideoPlayer video={latestSermon} autoplay={false} maxWidthClass="max-w-2xl" />
+            <VideoPlayer video={latestSermon} autoplay={false} />
             
             <div className="text-center mt-8">
               <Link to="/services" className="btn-secondary gap-2">

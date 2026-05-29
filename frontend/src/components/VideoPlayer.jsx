@@ -2,13 +2,13 @@ import React from 'react';
 import { Calendar, User, Eye, Play } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
-const VideoPlayer = ({ video, onClose, autoplay = true, maxWidthClass = 'max-w-4xl' }) => {
+const VideoPlayer = ({ video, onClose, autoplay = true }) => {
   const { theme } = useTheme();
   const isLight = theme === 'light';
   if (!video) return null;
 
   return (
-    <div className={`overflow-hidden border shadow-2xl rounded-2xl mx-auto w-full animate-slideup ${maxWidthClass} ${isLight ? 'bg-[#FAF7F0] border-[#D2C2A4]' : 'glass-panel-dark border-amber-500/30 bg-slate-950/85'}`}>
+    <div className={`overflow-hidden border shadow-2xl rounded-2xl max-w-4xl mx-auto w-full animate-slideup ${isLight ? 'bg-[#FAF7F0] border-[#D2C2A4]' : 'glass-panel-dark border-amber-500/30 bg-slate-950/85'}`}>
       {/* Title Bar */}
       <div className={`border-b px-6 py-4 flex justify-between items-center ${isLight ? 'bg-[#FAF7F0] border-[#D2C2A4] text-[#0A1128]' : 'bg-slate-950/95 border-amber-500/20 text-white'}`}>
         <div>
