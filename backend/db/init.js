@@ -300,9 +300,6 @@ async function seedDatabase() {
     await db.runAsync(`INSERT INTO schedule (name, time, location, category, recurrence) VALUES (?, ?, ?, ?, ?)`,
       ['Saturday Fasting Prayer', '10:00 AM - 12:45 PM', 'St. Martin\'s Anglican Church, Sharjah', 'Prayer Meeting', 'Weekly']
     );
-    await db.runAsync(`INSERT INTO schedule (name, time, location, category, recurrence) VALUES (?, ?, ?, ?, ?)`,
-      ['Umm Al Quwain Service', '08:30 PM - 10:00 PM', 'Umm Al Quwain Industrial District', 'Fellowship', 'Weekly']
-    );
     console.log('Schedules successfully updated and seeded.');
 
     // 4. Seed Ministries if empty
@@ -310,15 +307,7 @@ async function seedDatabase() {
     if (minCount.count === 0) {
       const defaultMinistries = [
         {
-          name: 'Ajman Ministry',
-          description: 'A thriving satellite cell fellowship and prayer network in the emirate of Ajman, supporting regional families with targeted pastoral care and regular home fellowships.',
-          leader: 'Bro. Selvakumar',
-          schedule: 'Saturdays at 7:30 PM',
-          category: 'Regional',
-          image_url: '/images/banner1.jpg'
-        },
-        {
-          name: 'Audio & Video Ministry',
+          name: 'IT & Media Ministry',
           description: 'Technical stewards orchestrating live streaming broadcasts, acoustics, video recording, and post-production logic to publish sermons on the YouTube channel.',
           leader: 'Bro. David Raj',
           schedule: 'Every service',
@@ -367,22 +356,14 @@ async function seedDatabase() {
         },
         {
           name: 'Transport Ministry',
-          description: 'Providing dedicated bus shuttle routes completely free of cost across Sharjah, Ajman, and nearby centers, ensuring every member has safe, reliable transit to services.',
+          description: 'Providing dedicated bus shuttle routes completely free of cost across Sharjah and nearby centers, ensuring every member has safe, reliable transit to services.',
           leader: 'Bro. Stephen Raj',
           schedule: 'Every service transit',
           category: 'Logistics',
           image_url: '/images/banner13.jpg'
         },
         {
-          name: 'UMM-AL-QUWAIN Ministry',
-          description: 'Active outreach prayer groups and weekly fellowships serving the Tamil community residing in the emirate of Umm Al Quwain, ensuring they are plugged in.',
-          leader: 'Bro. Joshua George',
-          schedule: 'Thursdays at 8:00 PM',
-          category: 'Regional',
-          image_url: '/images/banner2.jpg'
-        },
-        {
-          name: 'Women’s Ministry',
+          name: 'Women\'s Ministry',
           description: 'Empowering sisters through intense prayer circles, home-to-home visitations, charitable outreach, and the weekly Tuesday Sisters Fellowship.',
           leader: 'Sis. Mary Immanuel',
           schedule: 'Tuesdays at 10:00 AM',
@@ -786,6 +767,34 @@ async function seedDatabase() {
         }
       }
     }
+
+    // RUN MIGRATIONS & CLEANUP ACTIONS FOR EXISTING DATABASES
+    console.log('Running startup cleanup & migration scripts...');
+    
+    // 1. Purge regional cell services and ministries
+    await db.runAsync(`DELETE FROM schedule WHERE name LIKE '%Ajman%' OR name LIKE '%Umm Al Quwain%' OR name LIKE '%UAQ%' OR location LIKE '%Ajman%' OR location LIKE '%Umm Al Quwain%'`);
+    await db.runAsync(`DELETE FROM ministries WHERE name LIKE '%Ajman%' OR name LIKE '%Umm Al Quwain%' OR name LIKE '%UMM-AL-QUWAIN%'`);
+    
+    // 2. Rename Audio & Video Ministry to IT & Media Ministry bilingually
+    await db.runAsync(`UPDATE ministries SET name = 'IT & Media Ministry', description = 'Technical stewards orchestrating live streaming broadcasts, acoustics, video recording, and post-production logic to publish sermons on the YouTube channel.' WHERE name = 'Audio & Video Ministry'`);
+    
+    // 3. Remove regional references from other ministry descriptions
+    await db.runAsync(`UPDATE ministries SET description = 'Providing dedicated bus shuttle routes completely free of cost across Sharjah and nearby centers, ensuring every member has safe, reliable transit to services.' WHERE name = 'Transport Ministry'`);
+    
+    // 4. Update Fasting Prayer and other events description regional mentions
+    await db.runAsync(`UPDATE events SET description = 'A combined regional intercession assembly gathering intercessors across Sharjah and neighboring emirates to stand in the gap for our communities.' WHERE title LIKE '%Jeremiah Fasting Prayer Crusade%'`);
+    
+    // 5. Update about content regional references
+    await db.runAsync(`UPDATE about_content SET en_val = 'Assemblies of God Sharjah Tamil Church (AGSTC) was founded with a divine burden to minister to the spiritual and social welfare of the Tamil expatriate workforce residing in Sharjah and nearby emirates.', ta_val = 'ஏஜி ஷார்ஜா தமிழ் சபையானது (AGSTC) ஷார்ஜா மற்றும் அருகில் உள்ள எமிரேட்களில் வசிக்கும் தமிழ் உழைப்பாளர் மக்களின் ஆவிக்குரிய மற்றும் சமூக நலனுக்காக ஊழியங்களைச் செய்ய வேண்டும் என்ற தாளாத பாரத்தோடு துவங்கப்பட்டது.' WHERE \`key\` = 'aboutPara1'`);
+    
+    const updatedMilestonesJson = JSON.stringify([
+      {"year": "1996", "titleEn": "Humble Beginnings", "titleTa": "எளிய ஆரம்பம்", "descEn": "Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.", "descTa": "ஷார்ஜாவில் ஒரு எளிய இல்ல ஜேபக் கூட்டமாகத் தொடங்கப்பட்டு, தூரதேசத்தில் வாழும் உழைப்பாளர்களை ஆவிக்குரிய ரீதியில் ஆதரிப்பதை நோக்கமாகக் கொண்டு ஆரம்பிக்கப்பட்டது."},
+      {"year": "2005", "titleEn": "Transport fleet launched", "titleTa": "போக்குவரத்து சேவை துவக்கம்", "descEn": "Purchased our first shuttle bus to fetch Tamil laborers completely free of charge from far-flung industrial camps.", "descTa": "தொழிலாளர்கள் எவ்வித சிரமமுமின்றி ஆராதனையில் கலந்து கொள்ள தூர முகாம்களில் இருந்து முற்றிலும் இலவசமாக அழைத்து வர முதல் பேருந்து வாங்கப்பட்டது."},
+      {"year": "2016", "titleEn": "Expanded Cell Fellowships", "titleTa": "வீட்டு ஐக்கியங்கள் விரிவாக்கம்", "descEn": "Formally established regional cell fellowships to expand weekly home ministries across neighboring communities.", "descTa": "அண்டை பகுதிகளில் முறையான வாராந்திர வீட்டு ஐக்கியங்கள் மற்றும் ஜெபக் குழுக்கள் ஏற்படுத்தப்பட்டு ஊழியங்கள் விரிவுபடுத்தப்பட்டன."}
+    ]);
+    await db.runAsync(`UPDATE about_content SET en_val = ?, ta_val = ? WHERE \`key\` = 'milestones'`, [updatedMilestonesJson, updatedMilestonesJson]);
+    
+    await db.runAsync(`UPDATE about_content SET en_val = 'Join our regional prayer groups and weekly services in Sharjah. Safe transport shuttles are provided.', ta_val = 'ஷார்ஜாவில் நடைபெறும் எங்களது வாராந்திர ஆராதனைகள் மற்றும் ஜெபக் கூட்டங்களில் இணைந்து கொள்ளுங்கள். இலவச போக்குவரத்து வசதியுண்டு.' WHERE \`key\` = 'heroSub3'`);
 
     console.log('Database initialization and seeding completed successfully!');
   } catch (err) {

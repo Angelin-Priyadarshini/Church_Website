@@ -23,7 +23,17 @@ const Footer = () => {
               <img 
                 src="/images/logo.png" 
                 alt="AGSTC Logo"
-                className="w-20 h-20 object-contain"
+                className="w-16 h-16 object-contain transition-transform duration-300 hover:scale-105 shrink-0"
+              />
+              <img 
+                src="/images/ag-right-logo.png" 
+                alt="Assemblies of God Shield"
+                className="w-15 h-15 object-contain transition-transform duration-300 hover:scale-105 shrink-0"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  const isHostinger = window.location.pathname.startsWith('/new') || window.location.hostname.includes('agsharjah.org');
+                  e.target.src = isHostinger ? '/new/images/ag-right-logo.png' : '/images/ag-right-logo.png';
+                }}
               />
               <span className="font-serif font-bold text-lg text-white">AGSTC Sharjah</span>
             </div>
@@ -31,10 +41,15 @@ const Footer = () => {
               {t('footerSub')}
             </p>
             <div className="flex flex-col gap-2 mt-2 text-sm text-slate-300">
-              <span className="flex items-center gap-2">
+              <a 
+                href="https://www.google.com/maps/search/?api=1&query=St.+Martin's+Anglican+Church,+Yarmook,+Sharjah" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 hover:text-amber-400 transition-colors"
+              >
                 <MapPin className="w-4 h-4 text-amber-400 shrink-0" />
                 {t('agWorshipHallAddress') || "St. Martin's Anglican Church, Sharjah, UAE"}
-              </span>
+              </a>
               <span className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-amber-400 shrink-0" />
                 +971 50 764 6822
@@ -46,23 +61,23 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Column 2: Branches */}
+          {/* Column 2: Worship Timings */}
           <div>
             <h4 className="text-amber-400 text-base font-semibold mb-4 tracking-wider uppercase">
-              {t('branchesTitle')}
+              {t('Sharjah Main Assembly')}
             </h4>
             <ul className="flex flex-col gap-3 text-sm text-slate-300">
               <li>
-                <strong className="text-white block">{t('Sharjah Main Assembly')}:</strong>
-                {t('Sundays')}: 6:45 AM & 9:00 AM
+                <strong className="text-white block">{t('Sundays')}:</strong>
+                6:45 AM & 9:00 AM (Tamil Service)
               </li>
               <li>
-                <strong className="text-white block">{t('Ajman Worship Fellowship')}:</strong>
-                {t('Saturdays')}: 7:30 PM
+                <strong className="text-white block">{t('Saturdays')}:</strong>
+                10:00 AM - 12:45 PM (Fasting Prayer)
               </li>
               <li>
-                <strong className="text-white block">{t('Umm Al Quwain Assembly')}:</strong>
-                {t('Wednesdays')}: 8:30 PM - 10:00 PM
+                <strong className="text-white block">{t('Wednesdays')}:</strong>
+                8:30 PM - 9:55 PM (Midweek Service)
               </li>
             </ul>
           </div>
@@ -88,13 +103,18 @@ const Footer = () => {
             <h4 className="text-amber-400 text-base font-semibold tracking-wider uppercase">
               Worship Location
             </h4>
-            <div className="w-full h-32 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center p-4 text-center text-xs text-slate-300">
+            <a 
+              href="https://www.google.com/maps/search/?api=1&query=St.+Martin's+Anglican+Church,+Yarmook,+Sharjah" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="w-full h-32 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center p-4 text-center text-xs text-slate-300 hover:bg-slate-700/80 hover:border-amber-500/50 transition-all duration-300 group"
+            >
               <div>
-                <MapPin className="w-6 h-6 text-amber-400 mx-auto mb-2 animate-bounce" />
-                <span className="block font-semibold text-white">St. Martin's Anglican Church</span>
+                <MapPin className="w-6 h-6 text-amber-400 mx-auto mb-2 group-hover:scale-110 transition-transform duration-300 animate-bounce" />
+                <span className="block font-semibold text-white group-hover:text-amber-400 transition-colors">St. Martin's Anglican Church</span>
                 Sharjah, United Arab Emirates
               </div>
-            </div>
+            </a>
           </div>
         </div>
 

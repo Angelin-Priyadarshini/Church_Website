@@ -240,17 +240,22 @@ const Contact = () => {
             </h3>
 
             <div className="flex flex-col gap-4 text-sm">
-              <div className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" />
+              <a 
+                href="https://www.google.com/maps/search/?api=1&query=St.+Martin's+Anglican+Church,+Yarmook,+Sharjah" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="flex items-start gap-3 group hover:text-amber-500 transition-colors text-left"
+              >
+                <MapPin className="w-5 h-5 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5 group-hover:scale-110 transition-transform duration-300" />
                 <div>
-                  <strong className={`block ${theme === 'dark' ? 'text-white' : 'text-[#1A365D]'}`}>{t('physicalLocation')}:</strong>
-                  <span className={`font-semibold ${theme === 'dark' ? 'text-slate-300' : 'text-[#1E3A8A]'}`}>{t('agWorshipHallAddress')}</span>
+                  <strong className={`block ${theme === 'dark' ? 'text-white' : 'text-[#1A365D]'} group-hover:text-amber-500 transition-colors`}>{t('physicalLocation')}:</strong>
+                  <span className={`font-semibold ${theme === 'dark' ? 'text-slate-300' : 'text-[#1E3A8A]'} group-hover:text-amber-600 transition-colors`}>{t('agWorshipHallAddress')}</span>
                 </div>
-              </div>
+              </a>
 
               <div className="flex items-start gap-3">
                 <Phone className="w-5 h-5 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" />
-                <div>
+                <div className="text-left">
                   <strong className={`block ${theme === 'dark' ? 'text-white' : 'text-[#1A365D]'}`}>{t('counselingOfficeDials')}:</strong>
                   <span className={`font-semibold ${theme === 'dark' ? 'text-slate-300' : 'text-[#1E3A8A]'}`}>+971 50 764 6822</span>
                 </div>
@@ -258,31 +263,12 @@ const Contact = () => {
 
               <div className="flex items-start gap-3">
                 <Mail className="w-5 h-5 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" />
-                <div>
+                <div className="text-left">
                   <strong className={`block ${theme === 'dark' ? 'text-white' : 'text-[#1A365D]'}`}>{t('emailQueries')}:</strong>
                   <span className={`font-semibold ${theme === 'dark' ? 'text-slate-300' : 'text-[#1E3A8A]'}`}>admin@agsharjah.org</span>
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Regional Branches lists */}
-          <div className="glass-panel p-6">
-            <h3 className={`font-serif font-bold text-lg mb-4 flex items-center gap-2 ${theme === 'dark' ? 'text-white' : 'text-[#1E3A8A]'}`}>
-              <Globe className="w-5 h-5 text-amber-500 dark:text-amber-400" />
-              {t('northernEmiratesBranches')}
-            </h3>
-
-            <ul className="flex flex-col gap-4 text-sm font-semibold">
-              <li className={`pb-3 border-b border-amber-500/10 ${theme === 'dark' ? 'text-slate-300' : 'text-[#1E3A8A]'}`}>
-                <strong className={`block ${theme === 'dark' ? 'text-amber-400' : 'text-[#1A365D]'}`}>{t('ajmanFellowshipBranch')}</strong>
-                <span className={`${theme === 'dark' ? 'text-slate-300' : 'text-[#1E3A8A]'}`}>{t('ajmanFellowshipDesc')}</span>
-              </li>
-              <li className={theme === 'dark' ? 'text-slate-300' : 'text-[#1E3A8A]'}>
-                <strong className={`block ${theme === 'dark' ? 'text-amber-400' : 'text-[#1A365D]'}`}>{t('uaqCellBranch')}</strong>
-                <span className={`${theme === 'dark' ? 'text-slate-300' : 'text-[#1E3A8A]'}`}>{t('uaqCellDesc')}</span>
-              </li>
-            </ul>
           </div>
         </div>
       </section>

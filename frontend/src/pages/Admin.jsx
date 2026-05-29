@@ -2968,7 +2968,7 @@ const Admin = () => {
     <div className="animate-slideup min-h-screen bg-slate-50 border-b border-slate-200">
       {/* 1. Header Banner */}
       <section className="bg-slate-900 text-white py-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="max-w-[95%] w-full mx-auto px-4 sm:px-8 lg:px-12 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div>
             <span className="text-xs uppercase font-extrabold text-amber-400 tracking-wider">
               Control Panel
@@ -3002,7 +3002,7 @@ const Admin = () => {
 
       {/* Sync Log overlays */}
       {(syncMessage || actionError) && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <div className="max-w-[95%] w-full mx-auto px-4 sm:px-8 lg:px-12 mt-6">
           <div className={`p-4 rounded-lg text-sm font-semibold border ${
             actionError 
               ? 'bg-red-50 text-red-800 border-red-200' 
@@ -3015,7 +3015,7 @@ const Admin = () => {
 
       {/* 2. KPI Metrics Grid */}
       {summary && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <section className="max-w-[95%] w-full mx-auto px-4 sm:px-8 lg:px-12 py-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="glass-panel p-5 bg-white border-slate-200 flex items-center gap-4 shadow-sm w-full overflow-hidden">
             <div className="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
               <Eye className="w-5 h-5" />
@@ -3061,7 +3061,7 @@ const Admin = () => {
       )}
 
       {/* Tabs list selector */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+      <section className="max-w-[95%] w-full mx-auto px-4 sm:px-8 lg:px-12 pb-8">
         <div className="flex flex-col lg:flex-row gap-8 items-start">
           {/* Left Sidebar Menu */}
           <aside className="hidden lg:flex w-full lg:w-72 shrink-0 bg-white border border-slate-200 rounded-2xl shadow-sm p-4 text-left flex flex-col gap-1.5 lg:sticky lg:top-24">
@@ -3097,18 +3097,20 @@ const Admin = () => {
               <span className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold ${activeTab === 'sermons' ? 'bg-slate-950/20 text-slate-955' : 'bg-slate-100 text-slate-600'}`}>{sermons.length}</span>
             </button>
 
-            <button
-              onClick={() => setActiveTab('events')}
-              className={`flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl font-bold text-xs transition-all border ${
-                activeTab === 'events'
-                  ? 'bg-amber-500 text-slate-950 border-amber-500 shadow-sm'
-                  : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-955 border-transparent'
-              }`}
-            >
-              <Calendar className="w-4 h-4 shrink-0" />
-              <span className="flex-1">Events Manager</span>
-              <span className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold ${activeTab === 'events' ? 'bg-slate-950/20 text-slate-955' : 'bg-slate-100 text-slate-600'}`}>{events.length}</span>
-            </button>
+            {user?.role === 'admin' && (
+              <button
+                onClick={() => setActiveTab('events')}
+                className={`flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl font-bold text-xs transition-all border ${
+                  activeTab === 'events'
+                    ? 'bg-amber-500 text-slate-950 border-amber-500 shadow-sm'
+                    : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-955 border-transparent'
+                }`}
+              >
+                <Calendar className="w-4 h-4 shrink-0" />
+                <span className="flex-1">Events Manager</span>
+                <span className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold ${activeTab === 'events' ? 'bg-slate-950/20 text-slate-955' : 'bg-slate-100 text-slate-600'}`}>{events.length}</span>
+              </button>
+            )}
 
             {/* NEW: Believers Database (admin / data_admin only) */}
             {(user && (user.role === 'admin' || user.role === 'data_admin')) && (
@@ -3268,7 +3270,7 @@ const Admin = () => {
           </aside>
 
           {/* Right Panels Container */}
-          <div className="flex-1 w-full max-w-4xl">
+          <div className="flex-1 w-full max-w-full">
             {/* Mobile Tab Dropdown Select */}
             <div className="lg:hidden w-full mb-6 glass-panel p-4 bg-white border-slate-200 shadow-sm flex flex-col gap-2">
               <label className="text-xs font-bold text-slate-700 block text-left">Select Control Panel Section</label>
@@ -3279,7 +3281,7 @@ const Admin = () => {
               >
                 <option value="summary">🙏 Prayers Queue ({prayers.length})</option>
                 <option value="sermons">🎥 Sermons Manager ({sermons.length})</option>
-                <option value="events">📅 Events Manager ({events.length})</option>
+                {user?.role === 'admin' && <option value="events">📅 Events Manager ({events.length})</option>}
                 {(user?.role === 'admin' || user?.role === 'data_admin') && <option value="believers">👥 Believers Database & Import</option>}
                 {(user?.role === 'admin' || user?.role === 'data_admin') && <option value="upload_test">📝 Upload Bible Tests</option>}
                 {user?.role !== 'data_admin' && (
@@ -3876,7 +3878,7 @@ const Admin = () => {
 
 
         {/* 3. SPECIAL EVENTS MANAGER PANEL */}
-        {activeTab === 'events' && (
+        {activeTab === 'events' && user?.role === 'admin' && (
           <div className="flex flex-col gap-8 animate-slideup">
             {/* Top row - Form & instructions */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

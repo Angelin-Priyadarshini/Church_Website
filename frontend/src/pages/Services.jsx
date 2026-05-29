@@ -170,10 +170,7 @@ const Services = () => {
       >
         <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--primary-gold))]" style={{ filter: 'blur(100px)' }} />
         <div className="container-box text-center relative z-10">
-          <span className="text-xs uppercase font-extrabold text-amber-400 tracking-[0.25em] block mb-3">
-            {t('digitalWorshipArchives')}
-          </span>
-          <h1 id="sermons-page-title" className="heading-primary font-serif font-bold text-white leading-tight">
+          <h1 id="sermons-page-title" className="heading-primary font-serif font-bold text-white leading-tight mt-6">
             {t('sermonsBroadcasts')}
           </h1>
           <p className="text-slate-300 text-sm md:text-base max-w-xl mx-auto mt-4 leading-relaxed font-semibold">

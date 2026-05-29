@@ -9,31 +9,23 @@ import { API_BASE, resolveImageUrl, isValidImagePath } from '../config';
 const Home = () => {
   const { t } = useLanguage();
   const [latestSermon, setLatestSermon] = useState(null);
-  const [testimonies, setTestimonies] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Fetch home data from backend APIs
     const fetchData = async () => {
       try {
-        const [servRes, testRes] = await Promise.all([
-          fetch(`${API_BASE}/api/services?category=${encodeURIComponent('Sunday Service')}&limit=1`),
-          fetch(`${API_BASE}/api/testimonies`)
-        ]);
-        
+        const servRes = await fetch(`${API_BASE}/api/services?category=${encodeURIComponent('Sunday Service')}&limit=1`);
         const servData = servRes.ok ? await servRes.json() : [];
-        const testData = testRes.ok ? await testRes.json() : [];
         
         if (Array.isArray(servData) && servData.length > 0) {
           setLatestSermon(servData[0]);
         } else {
           setLatestSermon(null);
         }
-        setTestimonies(Array.isArray(testData) ? testData.slice(0, 3) : []);
       } catch (err) {
         console.error('Error fetching landing page data:', err);
         setLatestSermon(null);
-        setTestimonies([]);
       } finally {
         setLoading(false);
       }
@@ -144,49 +136,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 6. Testimonies Grid */}
-      {testimonies.length > 0 && (
-        <section className="section-padding container-box">
-          <div className="text-center mb-12">
-            <span className="text-xs uppercase font-extrabold text-amber-400 tracking-widest block">
-              {t('testimoniesHeader')}
-            </span>
-            <h2 className="heading-secondary">
-              {t('testimoniesSub')}
-            </h2>
-          </div>
-
-          <div className="grid-three">
-            {testimonies.map((test) => (
-              <div
-                key={test.id}
-                className="glass-panel-static cream-card p-6 relative flex flex-col justify-between"
-              >
-                <div className="absolute top-4 right-4 text-amber-400">
-                  <Star className="w-5 h-5 fill-amber-400" />
-                </div>
-                <div className="mb-4">
-                  <span className="text-[10px] uppercase font-bold text-amber-400 block mb-2">
-                    {t(test.category) || 'Miracle'}
-                  </span>
-                  <p className="text-sm leading-relaxed italic" style={{color: 'var(--text-muted)'}}>
-                    "{t(test.story_text)}"
-                  </p>
-                </div>
-                <div className="border-t pt-4" style={{borderColor: 'var(--border-glass)'}}>
-                  <span className="font-bold text-sm" style={{color: 'var(--text-main)'}}>{test.author_name}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="text-center mt-10">
-            <Link to="/contact" className="btn-primary">
-              {t('submitYourStory')}
-            </Link>
-          </div>
-        </section>
-      )}
     </div>
   );
 };

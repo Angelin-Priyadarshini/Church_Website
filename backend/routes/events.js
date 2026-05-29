@@ -62,6 +62,9 @@ router.get('/:id', async (req, res) => {
 
 // POST /api/events (Admin create)
 router.post('/', authenticateToken, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Forbidden: Only administrators can create events.' });
+  }
   const { title, description, date, time, location, image_url, capacity } = req.body;
 
   if (!title || !date || !time || !location) {
@@ -119,6 +122,9 @@ router.post('/:id/register', async (req, res) => {
 
 // PUT /api/events/:id (Admin update event)
 router.put('/:id', authenticateToken, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Forbidden: Only administrators can update events.' });
+  }
   const { title, description, date, time, location, image_url, capacity } = req.body;
 
   if (!title || !date || !time || !location) {
@@ -145,6 +151,9 @@ router.put('/:id', authenticateToken, async (req, res) => {
 
 // DELETE /api/events/:id (Admin delete event)
 router.delete('/:id', authenticateToken, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Forbidden: Only administrators can delete events.' });
+  }
   try {
     const exists = await db.getAsync(`SELECT id FROM events WHERE id = ?`, [req.params.id]);
     if (!exists) {

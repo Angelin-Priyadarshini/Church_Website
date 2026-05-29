@@ -70,10 +70,10 @@ const About = () => {
       },
       {
         year: "2016",
-        titleEn: "Regional Branch Network",
-        titleTa: "கிளை சபைகள் விரிவாக்கம்",
-        descEn: "Formally established satellite cell fellowships in Ajman and Umm Al Quwain, expanding weekly ministries.",
-        descTa: "அண்டை எமிரேட்களான அஜ்மான் மற்றும் உம் அல் குவைனில் முறையான கிளை சபை ஐக்கியங்கள் ஏற்படுத்தப்பட்டு வாராந்திர ஊழியங்கள் விரிவுபடுத்தப்பட்டன."
+        titleEn: "Expanded Cell Fellowships",
+        titleTa: "வீட்டு ஐக்கியங்கள் விரிவாக்கம்",
+        descEn: "Formally established regional cell fellowships to expand weekly home ministries across neighboring communities.",
+        descTa: "அண்டை பகுதிகளில் முறையான வாராந்திர வீட்டு ஐக்கியங்கள் மற்றும் ஜெபக் குழுக்கள் ஏற்படுத்தப்பட்டு ஊழியங்கள் விரிவுபடுத்தப்பட்டன."
       }
     ];
   }

@@ -6,11 +6,11 @@ const LanguageContext = createContext();
 const translations = {
   en: {
     navHome: 'Home',
-    navAbout: 'About AGSTC',
+    navAbout: 'About Us',
     navServices: 'Sermons',
     navMinistries: 'Ministries',
     navEvents: 'Events',
-    navResources: 'Resources',
+    navResources: 'Devotionals',
     navContact: 'Contact Us',
     
     welcomeTitle: 'Welcome to AG Sharjah Tamil Church',
@@ -35,12 +35,12 @@ const translations = {
     submitYourStory: 'Share Your Testimony',
     
     ministriesTitle: 'Active Ministry Spheres',
-    ministriesSub: 'Explore our 10 distinct operational areas created to serve and grow our families.',
+    ministriesSub: 'Explore our 6 distinct operational areas created to serve and grow our families.',
     leaderLabel: 'Leader',
     scheduleLabel: 'Schedule',
     categoryLabel: 'Category',
     
-    eventsHeader: 'Upcoming Church Events',
+    eventsHeader: 'Special Events',
     eventsSub: 'Register to attend our special meetings, seminars, and calendar fellowships.',
     seatsRemaining: 'seats remaining',
     eventRegisterBtn: 'Register For Event',
@@ -100,8 +100,8 @@ const translations = {
     milestoneDesc1: 'Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.',
     milestoneTitle2: 'Transport fleet launched',
     milestoneDesc2: 'Purchased our first shuttle bus to fetch Tamil laborers completely free of charge from far-flung industrial camps.',
-    milestoneTitle3: 'Regional Branch Network',
-    milestoneDesc3: 'Formally established satellite cell fellowships in Ajman and Umm Al Quwain, expanding weekly ministries.',
+    milestoneTitle3: 'Expanded Cell Fellowships',
+    milestoneDesc3: 'Formally established regional cell fellowships to expand weekly home ministries across neighboring communities.',
 
     // Hero Banner
     heroTitle1: 'Experience Spiritual Sanctuary',
@@ -109,11 +109,11 @@ const translations = {
     heroTitle2: 'We Stand in Prayer With You',
     heroSub2: 'The Jeremiah Ministry and Sister circles are interceding daily. Submit your prayer points anonymously or publicly.',
     heroTitle3: 'Weekly Fellowship Assemblies',
-    heroSub3: 'Join our regional prayer groups and weekly services in Sharjah, Ajman, and Umm Al Quwain. Safe transport shuttles are provided.',
+    heroSub3: 'Join our regional prayer groups and weekly services in Sharjah. Safe transport shuttles are provided.',
 
     aboutHeaderSub: 'Established by grace as a spiritual refuge for Tamil families in the UAE since 1996.',
-    aboutTitle: 'Our Spiritual History',
-    aboutPara1: 'Assemblies of God Sharjah Tamil Church (AGSTC) was founded with a divine burden to minister to the spiritual and social welfare of the Tamil expatriate workforce residing in Sharjah, Ajman, and nearby emirates.',
+    aboutTitle: 'Our History',
+    aboutPara1: 'Assemblies of God Sharjah Tamil Church (AGSTC) was founded with a divine burden to minister to the spiritual and social welfare of the Tamil expatriate workforce residing in Sharjah and neighboring emirates.',
     aboutPara2: 'What started as a small home cell meeting has blossomed under the dedicated pastoral leadership of Pastor Immanuel into a thriving sanctuary where hundreds of brothers and sisters gather weekly. The church acts as a priestly bridge, providing active transport cells to bring remote labor camp residents into fellowship.',
     aboutMission: 'Our core mission is to establish peace, counsel, and gospel restoration for everyone walking through our doors.',
     'Sharjah Main Assembly': 'Sharjah Main Assembly',
@@ -146,7 +146,7 @@ const translations = {
     whatWeBelieve: 'What We Believe',
     statementsOfFaith: 'Our Statements of Faith',
     digitalWorshipArchives: 'Digital Worship Archives',
-    sermonsBroadcasts: 'Sermons & Broadcasts',
+    sermonsBroadcasts: 'Sermons',
     watchRecentBroadcasts: 'Watch recent broadcasts and explore the entire historic sermons catalog of ',
     searchSermonsPlaceholder: 'Search sermons by topic, keyword, title...',
     allCategories: 'All Categories',
@@ -264,11 +264,11 @@ const translations = {
   },
   ta: {
     navHome: 'முதற்பக்கம்',
-    navAbout: 'ஆலயத்தைப்பற்றி',
+    navAbout: 'எங்களைப்பற்றி',
     navServices: 'ஒளிபடம்',
     navMinistries: 'ஊழியங்கள்',
     navEvents: 'நிகழ்வுகள்',
-    navResources: 'வரைபடம்',
+    navResources: 'தியானங்கள்',
     navContact: 'தொடர்புக்கு',
     
     welcomeTitle: 'ஆலயத்தைப்பற்றி - ஏஜி ஷார்ஜா தமிழ் சபை',
@@ -278,12 +278,12 @@ const translations = {
     requestPrayer: 'ஜெபங்கள்',
     
     pastorMessageTitle: 'போதகரின் செய்தி',
-    pastorMessageText: 'நம்முடைய கர்த்தரும் இரட்சகருமாகிய இயேசு கிறிஸ்துவின் மகா பிரசன்னமுள்ள நாமத்தில் உங்களை இந்த இணையதளத்திற்கு அன்போடு வரவேற்கிறோம். நமது கர்த்தர் தமது ஆச்சரியமான கிருபையினால் ஏஜி ஷார்ஜா தமிழ் சபையை குடும்பங்களையும் நண்பர்களையும் பிரிந்து வாழும் தேவ பிள்ளைகளுக்கு ஒரு புகலிடமாகவும் சமாதானத்தின் இடமாகவும் ஏற்படுத்தியுள்ளார். கர்த்தர் இந்த சபையை குறிப்பாக தமிழ் மக்கள் மத்தியில் கிறிஸ்துவின் அன்பை பரப்புவதற்கான ஒரு கருவியாக ஆசீர்வதித்துள்ளார். கிறிஸ்துவின் அறிவிலும், அவரோடு ஐக்கியப்படுவதிலும், உத்தம இருதயத்தோடு அவரை ஆராதிப்பதிலும் நமது ஆவிக்குரிய வாழ்க்கையில் நாம் முன்னேற ஏஜிஎஸ்டிசி ஒரு ஏணியாக செயல்படுகிறது.',
+    pastorMessageText: 'நம்முடைய கர்த்தரும் இரட்சகருமகிய இயேசு கிறிஸ்துவின் மகா பிரசன்னமுள்ள நாமத்தில் உங்களை இந்த இணையதளத்திற்கு அன்போடு வரவேற்கிறோம். நமது கர்த்தர் தமது ஆச்சரியமான கிருபையினால் ஏஜி ஷார்ஜா தமிழ் சபையை குடும்பங்களையும் நண்பர்களையும் பிரிந்து வாழும் தேவ பிள்ளைகளுக்கு ஒரு புகலிடமாகவும் சமாதானத்தின் இடமாகவும் ஏற்படுத்தியுள்ளார். கர்த்தர் இந்த சபையை குறிப்பாக தமிழ் மக்கள் மத்தியில் கிறிஸ்துவின் அன்பை பரப்புவதற்கான ஒரு கருவியாக ஆசீர்வதித்துள்ளார். கிறிஸ்துவின் அறிவிலும், அவரோடு ஐக்கியப்படுவதிலும், உத்தம இருதயத்தோடு அவரை ஆராதிப்பதிலும் நமது ஆவிக்குரிய வாழ்க்கையில் நாம் முன்னேற ஏஜிஎஸ்டிசி ஒரு ஏணியாக செயல்படுகிறது.',
     pastorName: 'தலைமை போதகர் இம்மானுவேல்',
     
     aboutHeaderSub: '1996 முதல் ஐக்கிய அரபு அமீரகத்தில் வாழும் தமிழ் குடும்பங்களின் ஆவிக்குரிய புகலிடமாக தேவ கிருபையால் நிறுவப்பட்டது.',
-    aboutTitle: 'எமது ஆவிக்குரிய சரித்திரம்',
-    aboutPara1: 'ஏஜி ஷார்ஜா தமிழ் சபையானது (AGSTC) ஷார்ஜா, அஜ்மான் மற்றும் அருகில் உள்ள எமிரேட்களில் வசிக்கும் தமிழ் உழைப்பாளர் மக்களின் ஆவிக்குரிய மற்றும் சமூக நலனுக்காக ஊழியங்களைச் செய்ய வேண்டும் என்ற தாளாத பாரத்தோடு துவங்கப்பட்டது.',
+    aboutTitle: 'எமது சரித்திரம்',
+    aboutPara1: 'ஏஜி ஷார்ஜா தமிழ் சபையானது (AGSTC) ஷார்ஜா மற்றும் அருகில் உள்ள எமிரேட்களில் வசிக்கும் தமிழ் உழைப்பாளர் மக்களின் ஆவிக்குரிய மற்றும் சமூக நலனுக்காக ஊழியங்களைச் செய்ய வேண்டும் என்ற தாளாத பாரத்தோடு துவங்கப்பட்டது.',
     aboutPara2: 'ஒரு எளிய இல்ல ஜெபக் கூட்டமாகத் துவங்கப்பட்ட இந்த ஐக்கியம், தலைமை போதகர் இம்மானுவேல் அவர்களின் அர்ப்பணிப்புள்ள போதக பராமரிப்பின் கீழ், நூற்றுக்கணக்கான சகோதர சகோதரிகள் கூடி ஆராதிக்கும் ஒரு ஆசீர்வாதமான ஆலயமாக வளர்ந்துள்ளது. தூர முகாம்களில் வசிக்கும் தமிழ் தொழிலாளர்களை ஆராதனைக்கு அழைத்து வர பேருந்து ஊழியத்தின் மூலம் சபை ஒரு பாலமாக செயல்படுகிறது.',
     aboutMission: 'எங்கள் ஆலயத்தின் பிரதான நோக்கம் எமது கதவுகளைத் தட்டும் ஒவ்வொரு ஆத்துமாவிற்கும் சமாதானம், ஆவிக்குரிய ஆலோசனை மற்றும் கிறிஸ்துவின் அன்பினால் உண்டாகும் மறுவாழ்வை அளிப்பதே ஆகும்.',
     
@@ -299,7 +299,7 @@ const translations = {
     submitYourStory: 'உங்கள் சாட்சியைப் பகிரவும்',
     
     ministriesTitle: 'சபையின் ஊழியங்கள்',
-    ministriesSub: 'சபையின் குடும்பங்களை ஆவிக்குரிய விதத்தில் வளர்க்கும் 10 ஊழியப் பிரிவுகள்.',
+    ministriesSub: 'சபையின் குடும்பங்களை ஆவிக்குரிய விதத்தில் வளர்க்கும் 6 ஊழியப் பிரிவுகள்.',
     leaderLabel: 'தலைவர்',
     scheduleLabel: 'நேரம்',
     categoryLabel: 'பிரிவு',
@@ -364,8 +364,8 @@ const translations = {
     milestoneDesc1: 'ஷார்ஜாவில் ஒரு எளிய இல்ல ஜெபக் கூட்டமாகத் தொடங்கப்பட்டு, தூரதேசத்தில் வாழும் உழைப்பாளர்களை ஆவிக்குரிய ரீதியில் ஆதரிப்பதை நோக்கமாகக் கொண்டு ஆரம்பிக்கப்பட்டது.',
     milestoneTitle2: 'போக்குவரத்து சேவை துவக்கம்',
     milestoneDesc2: 'தொழிலாளர்கள் எவ்வித சிரமமுமின்றி ஆராதனையில் கலந்து கொள்ள தூர முகாம்களில் இருந்து முற்றிலும் இலவசமாக அழைத்து வர முதல் பேருந்து வாங்கப்பட்டது.',
-    milestoneTitle3: 'கிளை சபைகள் விரிவாக்கம்',
-    milestoneDesc3: 'அண்டை எமிரேட்களான அஜ்மான் மற்றும் உம் அல் குவைனில் முறையான கிளை சபை ஐக்கியங்கள் ஏற்படுத்தப்பட்டு வாராந்திர ஊழியங்கள் விரிவுபடுத்தப்பட்டன.',
+    milestoneTitle3: 'வீட்டு ஐக்கியங்கள் விரிவாக்கம்',
+    milestoneDesc3: 'அண்டை பகுதிகளில் முறையான வாராந்திர வீட்டு ஐக்கியங்கள் மற்றும் ஜெபக் குழுக்கள் ஏற்படுத்தப்பட்டு ஊழியங்கள் விரிவுபடுத்தப்பட்டன.',
 
     // Hero Banner
     heroTitle1: 'ஆவிக்குரிய புகலிடத்தை அனுபவியுங்கள்',
@@ -373,7 +373,7 @@ const translations = {
     heroTitle2: 'நாங்கள் உங்களுக்காக ஜெபிக்கிறோம்',
     heroSub2: 'எரேமியா ஜெபக்குழுவும் சகோதரிகள் ஐக்கியமும் உங்களுக்காக தினசரி ஜெபிக்கிறது. உங்கள் ஜெப விண்ணப்பங்களை பகிர்ந்து கொள்ளுங்கள்.',
     heroTitle3: 'வாராந்திர ஆராதனை கூட்டங்கள்',
-    heroSub3: 'ஷார்ஜா, அஜ்மான் மற்றும் உம் அல் குவைனில் நடைபெறும் எங்களது வாராந்திர ஆராதனைகளில் இணையுங்கள். இலவச போக்குவரத்து வசதி உள்ளது.',
+    heroSub3: 'ஷார்ஜாவில் நடைபெறும் எங்களது வாராந்திர ஆராதனைகள் மற்றும் ஜெபக் கூட்டங்களில் இணைந்து கொள்ளுங்கள். இலவச போக்குவரத்து வசதியுண்டு.',
 
     // Database seeded schedules translation mappings
     'Sunday First Service': 'ஞாயிறு முதலாம் ஆராதனை',
@@ -431,7 +431,7 @@ const translations = {
     'Saturdays at 7:30 PM': 'சனிக்கிழமை மாலை 7:30 மணி',
     'Regional': 'பிராந்தியம்',
     
-    'Audio & Video Ministry': 'ஒலி மற்றும் ஒளி ஊழியம்',
+    'IT & Media Ministry': 'தகவல் தொழில்நுட்பம் & ஊடக ஊழியம்',
     'Technical stewards orchestrating live streaming broadcasts, acoustics, video recording, and post-production logic to publish sermons on the YouTube channel.': 'ஞாயிறு மற்றும் வாராந்திர ஆராதனைகளை நேரடி ஒளிபரப்பு செய்தல், ஒலி அமைப்புகள், வீடியோ பதிவு மற்றும் போஸ்ட் புரொடக்ஷன் பணிகளை வழிநடத்தும் தொழில்நுட்பக் குழு.',
     'Bro. David Raj': 'சகோ. டேவிட் ராஜ்',
     'Every service': 'அனைத்து ஆராதனை நேரங்களிலும்',

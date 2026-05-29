@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 import { Calendar, Clock, MapPin, Users, Ticket, CheckCircle, X } from 'lucide-react';
 import { API_BASE, resolveImageUrl } from '../config';
 
 const Events = () => {
   const { t, language } = useLanguage();
+  const { theme } = useTheme();
   const [events, setEvents] = useState([]);
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -39,7 +41,13 @@ const Events = () => {
     try {
       const res = await fetch(`${API_BASE}/api/schedule`);
       const data = res.ok ? await res.json() : [];
-      setSchedules(Array.isArray(data) ? data : []);
+      const filtered = (Array.isArray(data) ? data : []).filter(sched => {
+        const name = (sched.name || '').toLowerCase();
+        const loc = (sched.location || '').toLowerCase();
+        return !name.includes('ajman') && !name.includes('umm al quwain') && !name.includes('uaq') &&
+               !loc.includes('ajman') && !loc.includes('umm al quwain') && !loc.includes('uaq');
+      });
+      setSchedules(filtered);
     } catch (err) {
       console.error('Error fetching weekly schedules:', err);
       setSchedules([]);
@@ -148,75 +156,101 @@ const Events = () => {
             {t('noSpecialEvents')}
           </div>
         ) : (
-          <div className="grid-three">
+          <div className="flex flex-col gap-8 max-w-5xl mx-auto">
             {events.map((evt) => {
               const seatsLeft = Math.max(0, evt.capacity - (evt.registeredCount || 0));
               const isFull = seatsLeft === 0;
+              const isCompleted = evt.title.includes('RETREAT 2026') || new Date(evt.date) < new Date();
 
               return (
                 <div 
                   key={evt.id}
-                  className="glass-panel overflow-hidden flex flex-col justify-between"
+                  className="glass-panel overflow-hidden flex flex-col md:flex-row gap-6 p-6 items-stretch"
                 >
-                  {/* Image cover */}
-                  <div className="relative aspect-video overflow-hidden bg-slate-900 shrink-0">
+                  {/* Image cover (Left Side) */}
+                  <div className="w-full md:w-2/5 shrink-0 flex items-center justify-center bg-slate-950/60 rounded-xl p-2 relative min-h-[300px]">
                     <img 
                       src={resolveImageUrl(evt.image_url)} 
                       alt={evt.title}
-                      className="w-full h-full object-cover"
+                      className="max-h-[500px] object-contain rounded-lg w-full transition-transform duration-300 hover:scale-[1.02]"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = '/images/default-event.jpg';
+                      }}
                     />
-                    <div className="absolute top-4 left-4 px-3 py-1 bg-amber-500 text-slate-950 font-bold rounded-full text-xs uppercase tracking-wider">
+                    <div className="absolute top-4 left-4 px-3 py-1 bg-amber-500 text-slate-950 font-bold rounded-full text-xs uppercase tracking-wider shadow">
                       {evt.date}
                     </div>
                   </div>
 
-                  {/* Details body */}
-                  <div className="p-6 flex-1 flex flex-col justify-between">
+                  {/* Details body (Right Side) */}
+                  <div className="flex-1 flex flex-col justify-between py-2 text-left">
                     <div>
-                      <h3 className="font-serif font-bold text-lg text-white mb-2">
+                      <h3 className="font-serif font-bold text-2xl md:text-3xl text-white mb-4 leading-tight">
                         {t(evt.title)}
                       </h3>
-                      <p className="text-slate-300 text-xs mb-4 line-clamp-3">
-                        {t(evt.description)}
-                      </p>
                       
-                      <div className="flex flex-col gap-2 text-xs font-semibold text-slate-400 mb-6">
+                      {/* Event Details Badges (Large text) */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm font-semibold text-slate-300 mb-6 bg-white/5 p-4 rounded-xl border border-white/5">
                         <span className="flex items-center gap-2">
-                          <Clock className="w-4 h-4 text-amber-400 shrink-0" />
-                          {t('evtTime')}: <strong className="text-white font-bold pl-0.5">{t(evt.time)}</strong>
+                          <Clock className="w-5 h-5 text-amber-400 shrink-0" />
+                          <div className="flex flex-col">
+                            <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Time</span>
+                            <strong className="text-white text-base font-bold">{t(evt.time)}</strong>
+                          </div>
                         </span>
                         <span className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4 text-amber-400 shrink-0" />
-                          {t('evtVenue')}: <strong className="text-white font-bold pl-0.5">{t(evt.location)}</strong>
+                          <MapPin className="w-5 h-5 text-amber-400 shrink-0" />
+                          <div className="flex flex-col">
+                            <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Venue</span>
+                            <strong className="text-white text-base font-bold">{t(evt.location)}</strong>
+                          </div>
                         </span>
                         <span className="flex items-center gap-2">
-                          <Users className="w-4 h-4 text-amber-400 shrink-0" />
-                          {t('evtLimit')}: <strong className="text-white font-bold pl-0.5">{evt.capacity} {t('evtCapacity')}</strong>
+                          <Users className="w-5 h-5 text-amber-400 shrink-0" />
+                          <div className="flex flex-col">
+                            <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Capacity</span>
+                            <strong className="text-white text-base font-bold">{evt.capacity} {t('evtCapacity')}</strong>
+                          </div>
                         </span>
                       </div>
+
+                      {/* Description text - Enlarged as requested */}
+                      <p className="text-slate-200 text-sm md:text-base leading-relaxed mb-6 whitespace-pre-line bg-white/5 p-4 rounded-xl border border-white/5 font-medium">
+                        {t(evt.description)}
+                      </p>
                     </div>
 
                     {/* Booking button */}
-                    <div className="border-t border-amber-500/10 pt-4 flex items-center justify-between">
-                      <span className={`text-xs font-extrabold ${isFull ? 'text-red-400' : 'text-emerald-400'}`}>
-                        {isFull ? t('eventFull') : `${seatsLeft} ${t('seatsRemaining')}`}
-                      </span>
+                    <div className="border-t border-amber-500/15 pt-4 flex items-center justify-between gap-4 mt-auto">
+                      {isCompleted ? (
+                        <span className="px-4 py-2 rounded-full bg-amber-500/20 text-amber-400 text-sm font-extrabold border border-amber-500/30 flex items-center gap-2">
+                          <CheckCircle className="w-4.5 h-4.5 text-amber-400" />
+                          Event Completed (450 Attended)
+                        </span>
+                      ) : (
+                        <>
+                          <span className={`text-xs md:text-sm font-extrabold ${isFull ? 'text-red-400' : 'text-emerald-400'}`}>
+                            {isFull ? t('eventFull') : `${seatsLeft} ${t('seatsRemaining')}`}
+                          </span>
 
-                      <button 
-                        onClick={() => {
-                          setActiveBookingEvent(evt);
-                          setBookingSuccess('');
-                          setBookingError('');
-                        }}
-                        disabled={isFull}
-                        className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
-                          isFull 
-                            ? 'bg-slate-900/60 text-slate-500 border border-slate-800 cursor-not-allowed'
-                            : 'bg-amber-500 text-slate-950 hover:bg-amber-400 hover:scale-105 shadow-md'
-                        }`}
-                      >
-                        {t('eventRegisterBtn')}
-                      </button>
+                          <button 
+                            onClick={() => {
+                              setActiveBookingEvent(evt);
+                              setBookingSuccess('');
+                              setBookingError('');
+                            }}
+                            disabled={isFull}
+                            className={`px-6 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all ${
+                              isFull 
+                                ? 'bg-slate-900/60 text-slate-500 border border-slate-800 cursor-not-allowed'
+                                : 'bg-amber-500 text-slate-950 hover:bg-amber-400 hover:scale-105 shadow-md font-bold'
+                            }`}
+                          >
+                            {t('eventRegisterBtn')}
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -253,59 +287,78 @@ const Events = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {schedules.map((sched, idx) => (
-              <div 
-                key={sched.id || idx}
-                className="bg-slate-900/45 hover:bg-slate-900/65 backdrop-blur-md border border-white/5 hover:border-amber-500/25 transition-all duration-300 rounded-2xl p-6 relative overflow-hidden group shadow-lg flex flex-col justify-between gap-4 transform hover:-translate-y-1"
-              >
-                {/* Visual Glow Ornament */}
-                <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 rounded-bl-full pointer-events-none group-hover:bg-amber-500/10 transition-all duration-300" />
-                
-                <div>
-                  {/* Service Badge Header */}
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider">
-                      {t(sched.category) || (language === 'ta' ? 'ஆராதனை' : 'Worship')}
-                    </span>
-                    <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">
-                      {t(sched.recurrence) || (language === 'ta' ? 'வாராந்திரம்' : 'Weekly')}
-                    </span>
-                  </div>
+            {schedules.map((sched, idx) => {
+              const isLight = theme === 'light';
+              const cardClass = isLight 
+                ? 'bg-white hover:bg-slate-50 border-2 border-amber-500/80 shadow-[0_0_15px_rgba(245,158,11,0.12)] hover:shadow-[0_0_25px_rgba(245,158,11,0.22)]'
+                : 'bg-slate-900/45 hover:bg-slate-900/65 border border-white/5 hover:border-amber-500/25 shadow-lg';
+              
+              const titleColor = isLight ? 'text-[#0A1931] group-hover:text-amber-600' : 'text-white group-hover:text-amber-400';
+              const labelColor = isLight ? 'text-[#1F4068]/65 font-extrabold' : 'text-slate-500';
+              const mainTextColor = isLight ? 'text-[#0A1931] font-extrabold' : 'text-white font-bold';
+              const subTextColor = isLight ? 'text-[#15305B] font-semibold' : 'text-slate-300';
+              const badgeClass = isLight 
+                ? 'bg-amber-500/15 border border-amber-500/35 text-amber-700 font-extrabold' 
+                : 'bg-amber-500/10 border border-amber-500/20 text-amber-400';
+              
+              const recurrenceClass = isLight ? 'text-[#1F4068]/60 font-bold' : 'text-slate-500';
+              const visualGlowClass = isLight ? 'bg-amber-500/8' : 'bg-amber-500/5';
+              const dividerClass = isLight ? 'border-amber-500/10' : 'border-white/5';
 
-                  {/* Service Name */}
-                  <h3 className="font-serif font-bold text-lg sm:text-xl text-white group-hover:text-amber-400 transition-colors duration-300 mb-4 pr-6 leading-tight">
-                    {t(sched.name)}
-                  </h3>
-                </div>
-
-                {/* Logistics */}
-                <div className="flex flex-col gap-3 text-xs sm:text-sm font-semibold text-slate-300 mt-2">
-                  <div className="flex items-start gap-2.5">
-                    <Clock className="w-4.5 h-4.5 text-amber-400 shrink-0 mt-0.5" />
-                    <div className="flex flex-col">
-                      <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
-                        {language === 'ta' ? 'நேரம்' : 'Timing'}
+              return (
+                <div 
+                  key={sched.id || idx}
+                  className={`backdrop-blur-md transition-all duration-300 rounded-2xl p-6 relative overflow-hidden group flex flex-col justify-between gap-4 transform hover:-translate-y-1 ${cardClass}`}
+                >
+                  {/* Visual Glow Ornament */}
+                  <div className={`absolute top-0 right-0 w-24 h-24 rounded-bl-full pointer-events-none group-hover:bg-amber-500/15 transition-all duration-300 ${visualGlowClass}`} />
+                  
+                  <div>
+                    {/* Service Badge Header */}
+                    <div className="flex justify-between items-center mb-4">
+                      <span className={`px-3 py-1 rounded-full text-[10px] sm:text-xs font-extrabold uppercase tracking-wider ${badgeClass}`}>
+                        {t(sched.category) || (language === 'ta' ? 'ஆராதனை' : 'Worship')}
                       </span>
-                      <strong className="text-white font-bold text-sm tracking-tight mt-0.5">
-                        {t(sched.time)}
-                      </strong>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-2.5 border-t border-white/5 pt-3 mt-1">
-                    <MapPin className="w-4.5 h-4.5 text-amber-400 shrink-0 mt-0.5" />
-                    <div className="flex flex-col">
-                      <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
-                        {language === 'ta' ? 'இடம்' : 'Venue'}
-                      </span>
-                      <span className="text-slate-300 font-medium text-xs sm:text-sm mt-0.5 leading-relaxed">
-                        {t(sched.location)}
+                      <span className={`text-[10px] font-bold uppercase tracking-wider ${recurrenceClass}`}>
+                        {t(sched.recurrence) || (language === 'ta' ? 'வாராந்திரம்' : 'Weekly')}
                       </span>
                     </div>
+
+                    {/* Service Name */}
+                    <h3 className={`font-serif font-bold text-lg sm:text-xl transition-colors duration-300 mb-4 pr-6 leading-tight text-left ${titleColor}`}>
+                      {t(sched.name)}
+                    </h3>
+                  </div>
+
+                  {/* Logistics */}
+                  <div className={`flex flex-col gap-3 text-xs sm:text-sm font-semibold mt-2 text-left`}>
+                    <div className="flex items-start gap-2.5">
+                      <Clock className="w-4.5 h-4.5 text-amber-500 shrink-0 mt-0.5" />
+                      <div className="flex flex-col">
+                        <span className={`text-[10px] uppercase font-bold tracking-wider ${labelColor}`}>
+                          {language === 'ta' ? 'நேரம்' : 'Timing'}
+                        </span>
+                        <strong className={`text-sm tracking-tight mt-0.5 ${mainTextColor}`}>
+                          {t(sched.time)}
+                        </strong>
+                      </div>
+                    </div>
+
+                    <div className={`flex items-start gap-2.5 border-t pt-3 mt-1 ${dividerClass}`}>
+                      <MapPin className="w-4.5 h-4.5 text-amber-500 shrink-0 mt-0.5" />
+                      <div className="flex flex-col">
+                        <span className={`text-[10px] uppercase font-bold tracking-wider ${labelColor}`}>
+                          {language === 'ta' ? 'இடம்' : 'Venue'}
+                        </span>
+                        <span className={`text-xs sm:text-sm mt-0.5 leading-relaxed ${subTextColor}`}>
+                          {t(sched.location)}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>

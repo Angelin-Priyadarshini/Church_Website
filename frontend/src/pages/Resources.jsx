@@ -93,46 +93,13 @@ const Resources = () => {
         </div>
       </section>
 
-      {/* Tabs Selector Bar */}
-      <section className="container-box pt-12">
-        <div className="mx-auto flex w-full max-w-2xl rounded-lg border border-amber-500/20 bg-white/5 p-1.5 shadow-sm">
-          <button 
-            onClick={() => setActiveTab('devotionals')}
-            className={`flex-1 rounded-md px-4 py-3 text-sm font-bold transition-all ${
-              activeTab === 'devotionals' 
-                ? 'bg-amber-500 text-slate-950 shadow'
-                : 'text-slate-400 hover:bg-white/10 hover:text-amber-400'
-            }`}
-          >
-            <span className="flex items-center justify-center gap-2">
-              <BookOpen className="w-5 h-5" />
-              {t('devotionalsTitle')}
-            </span>
-          </button>
-
-          <button 
-            onClick={() => setActiveTab('files')}
-            className={`flex-1 rounded-md px-4 py-3 text-sm font-bold transition-all ${
-              activeTab === 'files' 
-                ? 'bg-amber-500 text-slate-950 shadow'
-                : 'text-slate-400 hover:bg-white/10 hover:text-amber-400'
-            }`}
-          >
-            <span className="flex items-center justify-center gap-2">
-              <FileText className="w-5 h-5" />
-              {t('downloadGuides')}
-            </span>
-          </button>
-        </div>
-      </section>
-
-      {/* Dynamic Tab Panels */}
+      {/* Devotionals Feed */}
       <section className="container-box py-12 md:py-16">
         {loading ? (
           <div className="text-center py-16 text-slate-300 font-semibold">
             {t('fetchingResources')}
           </div>
-        ) : activeTab === 'devotionals' ? (
+        ) : (
           /* DEVOTIONALS PANEL */
           <div className="flex flex-col gap-8 max-w-5xl mx-auto">
             {devotionals.map((post) => (
@@ -151,12 +118,12 @@ const Resources = () => {
                     </span>
                   </div>
                   
-                  <h3 className="font-serif font-bold text-2xl md:text-3xl text-white leading-snug">
+                  <h3 className="font-serif font-bold text-2xl md:text-3xl text-white leading-snug text-left">
                     {t(post.title)}
                   </h3>
                 </div>
 
-                <p className="text-slate-300 text-base leading-8" style={{ whiteSpace: 'pre-line' }}>
+                <p className="text-slate-300 text-base leading-8 text-left" style={{ whiteSpace: 'pre-line' }}>
                   {t(post.content)}
                 </p>
 
@@ -171,45 +138,6 @@ const Resources = () => {
                   </span>
                 </div>
               </article>
-            ))}
-          </div>
-        ) : (
-          /* FILES CATALOG PANEL */
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
-            {resources.map((file) => (
-              <div 
-                key={file.id}
-                className="glass-panel p-7 flex flex-col justify-between min-h-[260px]"
-              >
-                <div>
-                  <div className="w-12 h-12 rounded-lg bg-red-950/40 text-red-400 flex items-center justify-center mb-5 border border-red-900/30 font-bold text-xs shrink-0">
-                    PDF
-                  </div>
-                  <span className="text-[11px] uppercase font-extrabold text-amber-400 tracking-wider block mb-2">
-                    {t(file.category)}
-                  </span>
-                  <h3 className="font-serif font-bold text-xl text-white mb-3 leading-snug">
-                    {t(file.title)}
-                  </h3>
-                  <p className="text-slate-300 text-sm leading-6 mb-8">
-                    {t(file.description)}
-                  </p>
-                </div>
-
-                <div className="border-t border-amber-500/10 pt-5 flex items-center justify-between gap-4">
-                  <span className="text-xs text-slate-400 font-semibold">
-                    {file.download_count || 0} {t('downloadsCount')}
-                  </span>
-
-                  <button 
-                    onClick={() => handleDownload(file)}
-                    className="btn-primary py-2 px-4 gap-2 text-xs"
-                  >
-                    <Download className="w-4 h-4" />
-                    {t('downloadBtn')}
-                  </button>
-                </div>
-              </div>
             ))}
           </div>
         )}

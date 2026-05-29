@@ -40,9 +40,11 @@ const Header = () => {
   const navHoverColor = 'hover:text-amber-500';
   const iconColor = isDark ? 'text-slate-200' : 'text-slate-600';
 
+  const isAdminPath = window.location.pathname.includes('/admin');
+
   return (
     <nav className="glass-nav sticky top-0 z-50 w-full" style={{ position: 'sticky' }}>
-      <div className="container-box">
+      <div className={isAdminPath ? "max-w-[95%] w-full mx-auto px-4 sm:px-8 lg:px-12" : "container-box"}>
         <div className="flex items-center justify-between py-3 sm:py-4">
 
           {/* Logo */}
