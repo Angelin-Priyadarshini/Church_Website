@@ -301,4 +301,37 @@ router.put('/users/:id/role', authenticateToken, async (req, res) => {
   }
 });
 
+// POST /api/auth/change-password (allows logged-in admins/users to securely update their password)
+router.post('/change-password', authenticateToken, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ error: 'Current password and new password are required.' });
+  }
+
+  if (newPassword.length < 6) {
+    return res.status(400).json({ error: 'New password must be at least 6 characters long.' });
+  }
+
+  try {
+    const user = await db.getAsync(`SELECT * FROM users WHERE id = ?`, [req.user.id]);
+    if (!user) {
+      return res.status(404).json({ error: 'User account not found.' });
+    }
+
+    const isMatch = bcrypt.compareSync(currentPassword, user.password_hash);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Current password is incorrect.' });
+    }
+
+    const newHash = bcrypt.hashSync(newPassword, 10);
+    await db.runAsync(`UPDATE users SET password_hash = ? WHERE id = ?`, [newHash, req.user.id]);
+
+    res.json({ message: 'Password updated successfully.' });
+  } catch (err) {
+    console.error('Password change error:', err);
+    res.status(500).json({ error: 'Server error during password update.' });
+  }
+});
+
 module.exports = router;

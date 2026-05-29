@@ -247,6 +247,14 @@ const Admin = () => {
   const [rosterLocationFilter, setRosterLocationFilter] = useState('');
   const [rosterBirthdayWeekFilter, setRosterBirthdayWeekFilter] = useState('');
 
+  // Change Password State
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [pwSuccess, setPwSuccess] = useState('');
+  const [pwError, setPwError] = useState('');
+  const [isChangingPw, setIsChangingPw] = useState(false);
+
   // --- PORTAL PORTING API METHODS ---
 
   // 1. Quizzes API
@@ -1487,6 +1495,48 @@ const Admin = () => {
       setAuthError(err.message || 'Error resending verification code.');
     } finally {
       setIsResending(false);
+    }
+  };
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    setPwSuccess('');
+    setPwError('');
+
+    if (newPassword !== confirmPassword) {
+      setPwError('New password and confirm password do not match.');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setPwError('New password must be at least 6 characters long.');
+      return;
+    }
+
+    setIsChangingPw(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/change-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ currentPassword, newPassword })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to update password.');
+      }
+
+      setPwSuccess('Password changed successfully!');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err) {
+      setPwError(err.message || 'Error changing password.');
+    } finally {
+      setIsChangingPw(false);
     }
   };
 
@@ -3263,8 +3313,22 @@ const Admin = () => {
                 }`}
               >
                 <Mail className="w-4 h-4 shrink-0" />
-                <span className="flex-1">Contact Inquiries</span>
+                <span className="flex-1 text-left">Contact Inquiries</span>
                 <span className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold ${activeTab === 'inquiries' ? 'bg-slate-950/20 text-slate-955' : 'bg-slate-100 text-slate-600'}`}>{inquiries.length}</span>
+              </button>
+            )}
+
+            {user && (
+              <button
+                onClick={() => setActiveTab('security')}
+                className={`flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl font-bold text-xs transition-all border ${
+                  activeTab === 'security'
+                    ? 'bg-amber-500 text-slate-950 border-amber-500 shadow-sm'
+                    : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-955 border-transparent'
+                }`}
+              >
+                <Lock className="w-4 h-4 shrink-0" />
+                <span className="flex-1 text-left">Change Password</span>
               </button>
             )}
           </aside>
@@ -3297,6 +3361,7 @@ const Admin = () => {
                 )}
                 {user?.role === 'admin' && <option value="users">👤 Registered Believers ({users.length})</option>}
                 {(user?.role === 'admin' || user?.role === 'moderator') && <option value="inquiries">✉️ Contact Inquiries ({inquiries.length})</option>}
+                <option value="security">🔒 Change Password</option>
               </select>
             </div>
             {/* NEW: BELIEVERS DATABASE & import ANALYSIS PANEL */}
@@ -6421,6 +6486,77 @@ const Admin = () => {
                 ))
               )}
             </div>
+          </div>
+        )}
+
+        {/* 11. SECURITY SETTINGS (CHANGE PASSWORD) PANEL */}
+        {activeTab === 'security' && user && (
+          <div className="flex flex-col gap-6 animate-slideup text-left max-w-md mx-auto lg:mx-0">
+            <div className="glass-panel p-6 bg-slate-900 border-amber-500/20 text-white shadow-sm flex flex-col gap-2">
+              <h3 className="font-serif font-bold text-lg text-white">Security Settings</h3>
+              <p className="text-xs text-slate-400">
+                Securely update your admin or believer password here. Verified security validation is enforced.
+              </p>
+            </div>
+
+            <form onSubmit={handlePasswordChange} className="glass-panel p-6 bg-white border-slate-200 shadow-sm flex flex-col gap-4">
+              {pwError && (
+                <div className="bg-red-50 border border-red-200 text-red-600 rounded-lg p-3 text-xs font-bold text-left">
+                  {pwError}
+                </div>
+              )}
+              {pwSuccess && (
+                <div className="bg-emerald-50 border border-emerald-200 text-emerald-600 rounded-lg p-3 text-xs font-bold text-left font-semibold">
+                  {pwSuccess}
+                </div>
+              )}
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1 text-left">Current Password</label>
+                <input 
+                  type="password"
+                  required
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="Enter current password"
+                  className="input-control w-full text-slate-900 bg-white"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1 text-left">New Password</label>
+                <input 
+                  type="password"
+                  required
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter new password (min. 6 characters)"
+                  className="input-control w-full text-slate-900 bg-white"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1 text-left">Confirm New Password</label>
+                <input 
+                  type="password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Re-type new password"
+                  className="input-control w-full text-slate-900 bg-white"
+                />
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={isChangingPw}
+                  className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-extrabold rounded-xl transition-all shadow-sm disabled:opacity-50"
+                >
+                  {isChangingPw ? 'Updating Password...' : 'Change Password'}
+                </button>
+              </div>
+            </form>
           </div>
         )}
       </div>
