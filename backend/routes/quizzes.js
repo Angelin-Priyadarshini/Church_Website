@@ -90,7 +90,7 @@ router.post('/', authenticateToken, async (req, res) => {
       `INSERT INTO quizzes (title, duration_seconds, created_by) VALUES (?, ?, ?)`,
       [title, duration_seconds, req.user.id]
     );
-    const quizId = quizResult.insertId;
+    const quizId = quizResult.lastID;
 
     // 2. Create question entries
     for (const q of questions) {
