@@ -2280,7 +2280,7 @@ const Admin = () => {
                 Welcome to your Believer Portal
               </span>
               <h1 className="font-serif font-bold text-3xl text-white tracking-tight">
-                Shalom, {user.name}
+                Praise The Lord, {user.name}
               </h1>
               <p className="text-sm text-slate-400 mt-1">
                 Submit prayer requests, take biblical quizzes, and track your devotional milestones.
@@ -2662,7 +2662,7 @@ const Admin = () => {
                 Welcome to your Usher Portal
               </span>
               <h1 className="font-serif font-bold text-3xl text-white tracking-tight">
-                Shalom, {user.name}
+                Praise The Lord, {user.name}
               </h1>
               <p className="text-sm text-slate-400 mt-1">
                 Register newcomers, coordinate bible study quizzes, and monitor intercessory prayers.
@@ -2710,7 +2710,7 @@ const Admin = () => {
                   : 'border-transparent text-slate-400 hover:text-slate-200'
               }`}
             >
-              🙏 Prayer Requests
+              🙏 Ushers Prayer Request
             </button>
           </div>
 
@@ -3002,10 +3002,10 @@ const Admin = () => {
           {usherTab === 'prayers' && (
             <div className={`glass-panel p-6 rounded-xl shadow-xl min-h-[400px] border ${isLight ? 'bg-[#FAF7F0] border-[#D2C2A4]' : 'bg-slate-950/80 border-slate-800'}`}>
               <h3 className={`font-serif font-bold text-xl mb-1 ${isLight ? 'text-[#0A1128]' : 'text-white'}`}>
-                Submit a Prayer Request
+                Ushers Prayer Request
               </h3>
               <p className={`text-xs mb-6 pb-3 border-b ${isLight ? 'text-slate-700 border-[#D2C2A4]/60' : 'text-slate-400 border-slate-800'}`}>
-                Fill in the details below to submit a prayer request on behalf of a believer or visitor. Our intercessors will pray.
+                Fill in the details below to submit a prayer request from the ushers. Our intercessors will pray.
               </p>
 
               {prayerSuccess && (
@@ -3110,7 +3110,7 @@ const Admin = () => {
               Control Panel
             </span>
             <h1 className="font-serif font-bold text-2xl text-white mt-1 leading-tight">
-              Welcome, {user.name}
+              Praise The Lord, {user.name}
             </h1>
             <span className="text-xs text-slate-400 block mt-0.5">
               Authorized Access Tier: <strong className="text-amber-500 uppercase">{user.role}</strong>
@@ -3220,18 +3220,20 @@ const Admin = () => {
               <span className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold ${activeTab === 'summary' ? 'bg-slate-950/20 text-slate-955' : 'bg-slate-100 text-slate-600'}`}>{prayers.length}</span>
             </button>
 
-            <button
-              onClick={() => setActiveTab('sermons')}
-              className={`flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl font-bold text-xs transition-all border ${
-                activeTab === 'sermons'
-                  ? 'bg-amber-500 text-slate-950 border-amber-500 shadow-sm'
-                  : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-955 border-transparent'
-              }`}
-            >
-              <Video className="w-4 h-4 shrink-0" />
-              <span className="flex-1">Sermons Manager</span>
-              <span className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold ${activeTab === 'sermons' ? 'bg-slate-950/20 text-slate-955' : 'bg-slate-100 text-slate-600'}`}>{sermons.length}</span>
-            </button>
+            {user?.role !== 'data_admin' && (
+              <button
+                onClick={() => setActiveTab('sermons')}
+                className={`flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl font-bold text-xs transition-all border ${
+                  activeTab === 'sermons'
+                    ? 'bg-amber-500 text-slate-950 border-amber-500 shadow-sm'
+                    : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-955 border-transparent'
+                }`}
+              >
+                <Video className="w-4 h-4 shrink-0" />
+                <span className="flex-1">Sermons Manager</span>
+                <span className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold ${activeTab === 'sermons' ? 'bg-slate-950/20 text-slate-955' : 'bg-slate-100 text-slate-600'}`}>{sermons.length}</span>
+              </button>
+            )}
 
             {user?.role === 'admin' && (
               <button
@@ -3430,7 +3432,7 @@ const Admin = () => {
                 className="input-control w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-bold focus:outline-none focus:border-amber-500"
               >
                 <option value="summary">🙏 Prayers Queue ({prayers.length})</option>
-                <option value="sermons">🎥 Sermons Manager ({sermons.length})</option>
+                {user?.role !== 'data_admin' && <option value="sermons">🎥 Sermons Manager ({sermons.length})</option>}
                 {user?.role === 'admin' && <option value="events">📅 Events Manager ({events.length})</option>}
                 {(user?.role === 'admin' || user?.role === 'data_admin') && <option value="believers">👥 Believers Database & Import</option>}
                 {(user?.role === 'admin' || user?.role === 'data_admin') && <option value="upload_test">📝 Upload Bible Tests</option>}
@@ -4261,7 +4263,7 @@ const Admin = () => {
         )}
 
         {/* 4. SERMONS MANAGER PANEL */}
-        {activeTab === 'sermons' && (
+        {activeTab === 'sermons' && user?.role !== 'data_admin' && (
           <div className="flex flex-col gap-8 animate-slideup">
             {/* Top row - Form */}
             <div className="grid grid-cols-1 gap-6">
