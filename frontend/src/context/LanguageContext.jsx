@@ -195,8 +195,8 @@ const translations = {
     uaqCellDesc: 'Weekly fellowships at UAQ Industrial District on Thursdays, 8:00 PM. Pastoral care covered.',
     
     digitalAltarOutlines: 'Digital Altar Outlines',
-    libraryDevotionals: 'Library & Devotionals',
-    equipFamilyAltar: 'Equip your family altar fellowships and children bible studies with standard scripture devotionals and workbook guides.',
+    libraryDevotionals: 'Devotionals',
+    equipFamilyAltar: 'Daily promises and spiritual reflections to strengthen your walk with God.',
     downloadGuides: 'Download Guides',
     fetchingResources: 'Fetching resources library...',
     writtenBy: 'Written by',
@@ -537,8 +537,8 @@ const translations = {
     uaqCellDesc: 'உம்-அல்-குவைன் தொழில்துறை பகுதியில் வியாழக்கிழமை இரவு 8:00 மணிக்கு நடைபெறும் வீட்டு ஐக்கியம். போதக பராமரிப்பு உண்டு.',
     
     digitalAltarOutlines: 'குடும்ப ஜெப பீட குறிப்புகள்',
-    libraryDevotionals: 'வேத புத்தகங்கள் மற்றும் வாக்குத்தத்தங்கள்',
-    equipFamilyAltar: 'உங்கள் குடும்ப ஜெபங்கள் மற்றும் சிறுவர் ஞாயிறு பள்ளிகளுக்குத் தேவையான வேத குறிப்புகள் மற்றும் புதிர் புத்தகங்கள்.',
+    libraryDevotionals: 'தியானங்கள்',
+    equipFamilyAltar: 'தினசரி வாக்குத்தத்தங்கள் மற்றும் ஆவிக்குரிய தியானங்கள் மூலம் உங்கள் அன்றாட விசுவாச வாழ்க்கையை பலப்படுத்துங்கள்.',
     downloadGuides: 'வளங்களைப் பதிவிறக்கு',
     fetchingResources: 'வளங்கள் விவரங்களை ஏற்றுகிறது...',
     writtenBy: 'எழுதியவர்',
