@@ -4,6 +4,7 @@ import * as XLSX from 'xlsx';
 import {
   useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 import { API_BASE } from '../config';
 import { 
   Lock,
@@ -47,6 +48,8 @@ const YoutubeIcon = (props) => (
 const Admin = () => {
   const { user, token, login, logout, isModerator } = useAuth();
   const { fetchDynamicAbout, language, t } = useLanguage();
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
   
   // Auth Form State
   const [email, setEmail] = useState('');
@@ -2524,33 +2527,33 @@ const Admin = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Scorecard Dashboard */}
               <div className="lg:col-span-1 flex flex-col gap-6">
-                <div className="glass-panel p-6 bg-slate-950/80 border border-slate-800 rounded-xl shadow-xl">
-                  <div className="w-10 h-10 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center mb-4">
+                <div className={`glass-panel p-6 rounded-xl shadow-xl border ${isLight ? 'bg-[#FAF7F0] border-[#D2C2A4]' : 'bg-slate-950/80 border-slate-800'}`}>
+                  <div className="w-10 h-10 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center mb-4 text-xl">
                     🏆
                   </div>
-                  <h3 className="font-serif font-bold text-lg text-white mb-1">
+                  <h3 className={`font-serif font-bold text-lg mb-1 ${isLight ? 'text-[#0A1128]' : 'text-white'}`}>
                     Your Bible Test Ledger
                   </h3>
-                  <p className="text-xs text-slate-400 mb-4">
+                  <p className={`text-xs mb-4 ${isLight ? 'text-slate-700' : 'text-slate-400'}`}>
                     Monitor your scores and track your study progression history.
                   </p>
 
                   <div className="flex flex-col gap-3">
                     {scoresList.length === 0 ? (
-                      <div className="p-4 bg-slate-900 border border-slate-850 rounded-lg text-center text-xs text-slate-500">
+                      <div className={`p-4 border rounded-lg text-center text-xs ${isLight ? 'bg-white border-[#D2C2A4]/60 text-slate-500' : 'bg-slate-900 border-slate-850 text-slate-500'}`}>
                         No scores recorded yet. Complete an active test to view milestones.
                       </div>
                     ) : (
                       scoresList.map(score => (
-                        <div key={score.id} className="p-3.5 bg-slate-900/60 border border-slate-850 rounded-lg flex justify-between items-center gap-2 text-xs">
+                        <div key={score.id} className={`p-3.5 border rounded-lg flex justify-between items-center gap-2 text-xs ${isLight ? 'bg-white border-[#D2C2A4]/60 text-slate-700' : 'bg-slate-900/60 border-slate-850 text-slate-300'}`}>
                           <div>
-                            <span className="font-bold text-white block truncate max-w-[140px]">{score.quiz_title}</span>
+                            <span className={`font-bold block truncate max-w-[140px] ${isLight ? 'text-[#0A1128]' : 'text-white'}`}>{score.quiz_title}</span>
                             <span className="text-[10px] text-slate-500 block mt-0.5">
                               {new Date(score.completed_at).toLocaleDateString()}
                             </span>
                           </div>
                           <div className="text-right">
-                            <span className="text-sm font-black text-amber-400 block">
+                            <span className="text-sm font-black text-amber-500 block">
                               {score.score} / {score.total}
                             </span>
                             <span className="text-[9px] font-extrabold uppercase text-slate-400">
@@ -2566,11 +2569,11 @@ const Admin = () => {
 
               {/* Active quizzes listings grid */}
               <div className="lg:col-span-2 flex flex-col gap-6">
-                <div className="glass-panel p-6 bg-slate-950/80 border border-slate-800 rounded-xl shadow-xl min-h-[400px]">
-                  <h3 className="font-serif font-bold text-xl text-white mb-1">
+                <div className={`glass-panel p-6 rounded-xl shadow-xl min-h-[400px] border ${isLight ? 'bg-[#FAF7F0] border-[#D2C2A4]' : 'bg-slate-950/80 border-slate-800'}`}>
+                  <h3 className={`font-serif font-bold text-xl mb-1 ${isLight ? 'text-[#0A1128]' : 'text-white'}`}>
                     Available Bible Quizzes & Tests
                   </h3>
-                  <p className="text-xs text-slate-400 mb-6">
+                  <p className={`text-xs mb-6 ${isLight ? 'text-slate-700' : 'text-slate-400'}`}>
                     Assess your biblical insights and scripture knowledge. Timer starts instantly upon launching a test.
                   </p>
 
@@ -2580,39 +2583,39 @@ const Admin = () => {
                       <span className="text-xs text-slate-400">Syncing available quizzes...</span>
                     </div>
                   ) : quizzesList.length === 0 ? (
-                    <div className="text-center py-20 border border-dashed border-slate-800 rounded-xl">
+                    <div className={`text-center py-20 border border-dashed rounded-xl ${isLight ? 'border-[#D2C2A4] bg-white' : 'border-slate-800'}`}>
                       <BookOpen className="w-12 h-12 text-slate-700 mx-auto mb-3" />
-                      <p className="text-slate-300 text-sm font-semibold">No tests published currently</p>
-                      <p className="text-slate-500 text-xs mt-1">Our Data Admin will publish new tests shortly.</p>
+                      <p className={`text-sm font-semibold ${isLight ? 'text-[#0A1128]' : 'text-slate-300'}`}>No tests published currently</p>
+                      <p className={`text-xs mt-1 ${isLight ? 'text-slate-600' : 'text-slate-500'}`}>Our Data Admin will publish new tests shortly.</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {quizzesList.map(quiz => (
-                        <div key={quiz.id} className="p-5 bg-slate-900/40 border border-slate-800 rounded-xl flex flex-col justify-between gap-4">
+                        <div key={quiz.id} className={`p-5 border rounded-xl flex flex-col justify-between gap-4 ${isLight ? 'bg-white border-[#D2C2A4]/60' : 'bg-slate-900/40 border-slate-800'}`}>
                           <div>
                             <div className="flex justify-between items-start gap-2">
-                              <span className="px-2 py-0.5 rounded text-[9px] font-extrabold uppercase bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                              <span className="px-2 py-0.5 rounded text-[9px] font-extrabold uppercase bg-amber-500/10 text-amber-500 border border-amber-500/20">
                                 {quiz.question_count} MCQs
                               </span>
                               <span className="text-[10px] font-mono text-slate-500">
                                 {Math.round(quiz.duration_seconds / 60)} min limit
                               </span>
                             </div>
-                            <h4 className="font-serif font-bold text-white text-md mt-3 leading-tight">
+                            <h4 className={`font-serif font-bold text-md mt-3 leading-tight ${isLight ? 'text-[#0A1128]' : 'text-white'}`}>
                               {quiz.title}
                             </h4>
                           </div>
 
-                          <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between">
+                          <div className={`pt-2 border-t flex items-center justify-between ${isLight ? 'border-[#D2C2A4]/60' : 'border-slate-800/80'}`}>
                             {quiz.taken ? (
                               <>
-                                <span className="text-[11px] text-emerald-400 font-bold flex items-center gap-1">
+                                <span className="text-[11px] text-emerald-500 font-bold flex items-center gap-1">
                                   ✅ Grade: {quiz.score} / {quiz.total}
                                 </span>
                                 <button
                                   type="button"
                                   onClick={() => handleTakeQuiz(quiz.id)}
-                                  className="px-3 py-1.5 bg-slate-800 text-slate-300 hover:bg-slate-700 rounded-lg text-[10px] font-extrabold uppercase transition-all"
+                                  className={`px-3 py-1.5 rounded-lg text-[10px] font-extrabold uppercase transition-all cursor-pointer ${isLight ? 'bg-slate-200 hover:bg-slate-300 text-slate-800' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}
                                 >
                                   Review Test
                                 </button>
@@ -2625,7 +2628,7 @@ const Admin = () => {
                                 <button
                                   type="button"
                                   onClick={() => handleTakeQuiz(quiz.id)}
-                                  className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-lg text-xs font-bold transition-all shadow-md"
+                                  className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-lg text-xs font-bold transition-all shadow-md cursor-pointer"
                                 >
                                   Take Test
                                 </button>
@@ -2716,18 +2719,18 @@ const Admin = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Left Side (2 cols): Registration Form */}
               <div className="lg:col-span-2 flex flex-col gap-6">
-                <div className="glass-panel p-8 bg-slate-950/80 border border-slate-800 rounded-xl shadow-xl">
-                  <h3 className="font-serif font-bold text-xl text-white mb-2">
+                <div className={`glass-panel p-8 rounded-xl shadow-xl border ${isLight ? 'bg-[#FAF7F0] border-[#D2C2A4]' : 'bg-slate-950/80 border-slate-800'}`}>
+                  <h3 className={`font-serif font-bold text-xl mb-2 ${isLight ? 'text-[#0A1128]' : 'text-white'}`}>
                     Newcomer Roster Registration
                   </h3>
-                  <p className="text-xs text-slate-400 mb-6 border-b border-slate-800 pb-3">
+                  <p className={`text-xs mb-6 border-b pb-3 ${isLight ? 'text-slate-700 border-[#D2C2A4]/60' : 'text-slate-400 border-slate-800'}`}>
                     Submit the information for new families and members visiting our assemblies.
                   </p>
 
                   <form onSubmit={handleNewcomerSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     {/* Full Name */}
                     <div className="sm:col-span-2">
-                      <label className="text-xs font-bold text-slate-300 block mb-1">
+                      <label className={`text-xs font-bold block mb-1 ${isLight ? 'text-[#0A1128]' : 'text-slate-300'}`}>
                         Full Name *
                       </label>
                       <input
@@ -2735,34 +2738,34 @@ const Admin = () => {
                         value={newcomerForm.full_name}
                         onChange={(e) => setNewcomerForm(prev => ({ ...prev, full_name: e.target.value }))}
                         placeholder="Brother/Sister Name"
-                        className="w-full bg-slate-900 border border-slate-800 text-white rounded-lg p-2.5 text-sm focus:border-amber-500 focus:outline-none transition-colors"
+                        className={`w-full rounded-lg p-2.5 text-sm focus:outline-none transition-colors ${isLight ? 'bg-white border border-[#D2C2A4] text-[#0A1128] focus:border-amber-600' : 'bg-slate-900 border border-slate-800 text-white focus:border-amber-500'}`}
                         required
                       />
                     </div>
 
                     {/* Birthdate */}
                     <div>
-                      <label className="text-xs font-bold text-slate-300 block mb-1">
+                      <label className={`text-xs font-bold block mb-1 ${isLight ? 'text-[#0A1128]' : 'text-slate-300'}`}>
                         Birthdate *
                       </label>
                       <input
                         type="date"
                         value={newcomerForm.birthdate}
                         onChange={(e) => setNewcomerForm(prev => ({ ...prev, birthdate: e.target.value }))}
-                        className="w-full bg-slate-900 border border-slate-800 text-white rounded-lg p-2.5 text-sm focus:border-amber-500 focus:outline-none transition-colors"
+                        className={`w-full rounded-lg p-2.5 text-sm focus:outline-none transition-colors ${isLight ? 'bg-white border border-[#D2C2A4] text-[#0A1128] focus:border-amber-600' : 'bg-slate-900 border border-slate-800 text-white focus:border-amber-500'}`}
                         required
                       />
                     </div>
 
                     {/* Gender */}
                     <div>
-                      <label className="text-xs font-bold text-slate-300 block mb-1">
+                      <label className={`text-xs font-bold block mb-1 ${isLight ? 'text-[#0A1128]' : 'text-slate-300'}`}>
                         Gender *
                       </label>
                       <select
                         value={newcomerForm.gender}
                         onChange={(e) => setNewcomerForm(prev => ({ ...prev, gender: e.target.value }))}
-                        className="w-full bg-slate-900 border border-slate-800 text-white rounded-lg p-2.5 text-sm focus:border-amber-500 focus:outline-none transition-colors"
+                        className={`w-full rounded-lg p-2.5 text-sm focus:outline-none transition-colors ${isLight ? 'bg-white border border-[#D2C2A4] text-[#0A1128] focus:border-amber-600' : 'bg-slate-900 border border-slate-800 text-white focus:border-amber-500'}`}
                         required
                       >
                         <option value="Male">Male</option>
@@ -2773,13 +2776,13 @@ const Admin = () => {
 
                     {/* Relationship status */}
                     <div>
-                      <label className="text-xs font-bold text-slate-300 block mb-1">
+                      <label className={`text-xs font-bold block mb-1 ${isLight ? 'text-[#0A1128]' : 'text-slate-300'}`}>
                         Relationship Status *
                       </label>
                       <select
                         value={newcomerForm.relationship_status}
                         onChange={(e) => setNewcomerForm(prev => ({ ...prev, relationship_status: e.target.value }))}
-                        className="w-full bg-slate-900 border border-slate-800 text-white rounded-lg p-2.5 text-sm focus:border-amber-500 focus:outline-none transition-colors"
+                        className={`w-full rounded-lg p-2.5 text-sm focus:outline-none transition-colors ${isLight ? 'bg-white border border-[#D2C2A4] text-[#0A1128] focus:border-amber-600' : 'bg-slate-900 border border-slate-800 text-white focus:border-amber-500'}`}
                         required
                       >
                         <option value="Single">Single</option>
@@ -2790,14 +2793,14 @@ const Admin = () => {
                     {/* Wedding Anniversary Date (Conditionally displayed!) */}
                     {newcomerForm.relationship_status === 'Married' && (
                       <div className="animate-slideup">
-                        <label className="text-xs font-bold text-slate-300 block mb-1">
+                        <label className={`text-xs font-bold block mb-1 ${isLight ? 'text-[#0A1128]' : 'text-slate-300'}`}>
                           Wedding Anniversary Date *
                         </label>
                         <input
                           type="date"
                           value={newcomerForm.wedding_date}
                           onChange={(e) => setNewcomerForm(prev => ({ ...prev, wedding_date: e.target.value }))}
-                          className="w-full bg-slate-900 border border-slate-800 text-white rounded-lg p-2.5 text-sm border-amber-500/50 focus:border-amber-500 focus:outline-none transition-colors"
+                          className={`w-full rounded-lg p-2.5 text-sm focus:outline-none transition-colors ${isLight ? 'bg-white border border-[#D2C2A4] text-[#0A1128] focus:border-amber-600' : 'bg-slate-900 border border-slate-800 text-white focus:border-amber-500'}`}
                           required={newcomerForm.relationship_status === 'Married'}
                         />
                       </div>
@@ -2805,14 +2808,14 @@ const Admin = () => {
 
                     {/* Mobile with country code */}
                     <div>
-                      <label className="text-xs font-bold text-slate-300 block mb-1">
+                      <label className={`text-xs font-bold block mb-1 ${isLight ? 'text-[#0A1128]' : 'text-slate-300'}`}>
                         Mobile Number *
                       </label>
                       <div className="flex gap-2">
                         <select
                           value={newcomerForm.country_code}
                           onChange={(e) => setNewcomerForm(prev => ({ ...prev, country_code: e.target.value }))}
-                          className="w-24 bg-slate-900 border border-slate-800 text-white rounded-lg p-2.5 text-sm focus:border-amber-500 focus:outline-none transition-colors"
+                          className={`w-24 rounded-lg p-2.5 text-sm focus:outline-none transition-colors ${isLight ? 'bg-white border border-[#D2C2A4] text-[#0A1128] focus:border-amber-600' : 'bg-slate-900 border border-slate-800 text-white focus:border-amber-500'}`}
                         >
                           <option value="+971">+971 (UAE)</option>
                           <option value="+91">+91 (IN)</option>
@@ -2828,7 +2831,7 @@ const Admin = () => {
                           value={newcomerForm.mobile}
                           onChange={(e) => setNewcomerForm(prev => ({ ...prev, mobile: e.target.value }))}
                           placeholder="50XXXXXXX"
-                          className="flex-grow bg-slate-900 border border-slate-800 text-white rounded-lg p-2.5 text-sm focus:border-amber-500 focus:outline-none transition-colors"
+                          className={`flex-grow rounded-lg p-2.5 text-sm focus:outline-none transition-colors ${isLight ? 'bg-white border border-[#D2C2A4] text-[#0A1128] focus:border-amber-600' : 'bg-slate-900 border border-slate-800 text-white focus:border-amber-500'}`}
                           required
                         />
                       </div>
@@ -2836,7 +2839,7 @@ const Admin = () => {
 
                     {/* Location */}
                     <div>
-                      <label className="text-xs font-bold text-slate-300 block mb-1">
+                      <label className={`text-xs font-bold block mb-1 ${isLight ? 'text-[#0A1128]' : 'text-slate-300'}`}>
                         Area / Location *
                       </label>
                       <input
@@ -2844,20 +2847,20 @@ const Admin = () => {
                         value={newcomerForm.location}
                         onChange={(e) => setNewcomerForm(prev => ({ ...prev, location: e.target.value }))}
                         placeholder="Sharjah, Rolla / Ajman"
-                        className="w-full bg-slate-900 border border-slate-800 text-white rounded-lg p-2.5 text-sm focus:border-amber-500 focus:outline-none transition-colors"
+                        className={`w-full rounded-lg p-2.5 text-sm focus:outline-none transition-colors ${isLight ? 'bg-white border border-[#D2C2A4] text-[#0A1128] focus:border-amber-600' : 'bg-slate-900 border border-slate-800 text-white focus:border-amber-500'}`}
                         required
                       />
                     </div>
 
                     {/* Preferred language */}
                     <div>
-                      <label className="text-xs font-bold text-slate-300 block mb-1">
+                      <label className={`text-xs font-bold block mb-1 ${isLight ? 'text-[#0A1128]' : 'text-slate-300'}`}>
                         Preferred Language *
                       </label>
                       <select
                         value={newcomerForm.preferred_language}
                         onChange={(e) => setNewcomerForm(prev => ({ ...prev, preferred_language: e.target.value }))}
-                        className="w-full bg-slate-900 border border-slate-800 text-white rounded-lg p-2.5 text-sm focus:border-amber-500 focus:outline-none transition-colors"
+                        className={`w-full rounded-lg p-2.5 text-sm focus:outline-none transition-colors ${isLight ? 'bg-white border border-[#D2C2A4] text-[#0A1128] focus:border-amber-600' : 'bg-slate-900 border border-slate-800 text-white focus:border-amber-500'}`}
                         required
                       >
                         <option value="English">English</option>
@@ -2867,7 +2870,7 @@ const Admin = () => {
 
                     {/* Prayer needs */}
                     <div className="sm:col-span-2">
-                      <label className="text-xs font-bold text-slate-300 block mb-1">
+                      <label className={`text-xs font-bold block mb-1 ${isLight ? 'text-[#0A1128]' : 'text-slate-300'}`}>
                         Prayer Needs & Personal Requests
                       </label>
                       <textarea
@@ -2875,7 +2878,7 @@ const Admin = () => {
                         onChange={(e) => setNewcomerForm(prev => ({ ...prev, prayer_needs: e.target.value }))}
                         placeholder="Share any special needs or spiritual intercessions required..."
                         rows="3"
-                        className="w-full bg-slate-900 border border-slate-800 text-white rounded-lg p-2.5 text-sm focus:border-amber-500 focus:outline-none transition-colors resize-none"
+                        className={`w-full rounded-lg p-2.5 text-sm focus:outline-none transition-colors resize-none ${isLight ? 'bg-white border border-[#D2C2A4] text-[#0A1128] focus:border-amber-600' : 'bg-slate-900 border border-slate-800 text-white focus:border-amber-500'}`}
                       ></textarea>
                     </div>
 
@@ -2897,7 +2900,7 @@ const Admin = () => {
                       <button
                         type="submit"
                         disabled={isSubmittingNewcomer}
-                        className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 rounded-lg text-xs uppercase tracking-wider transition-colors shadow-lg flex items-center justify-center gap-1"
+                        className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 rounded-lg text-xs uppercase tracking-wider transition-colors shadow-lg flex items-center justify-center gap-1 cursor-pointer"
                       >
                         {isSubmittingNewcomer ? 'Saving...' : 'Submit Newcomer Registration'}
                       </button>
@@ -2908,40 +2911,40 @@ const Admin = () => {
 
               {/* Right Side (1 col): Recent registrations list */}
               <div className="lg:col-span-1 flex flex-col gap-6">
-                <div className="glass-panel p-6 bg-slate-950/80 border border-slate-800 rounded-xl shadow-xl">
-                  <h3 className="font-serif font-bold text-lg text-white mb-1">
+                <div className={`glass-panel p-6 rounded-xl shadow-xl border ${isLight ? 'bg-[#FAF7F0] border-[#D2C2A4]' : 'bg-slate-950/80 border-slate-800'}`}>
+                  <h3 className={`font-serif font-bold text-lg mb-1 ${isLight ? 'text-[#0A1128]' : 'text-white'}`}>
                     Visitor Registry Logs
                   </h3>
-                  <p className="text-xs text-slate-400 mb-6">
+                  <p className={`text-xs mb-6 ${isLight ? 'text-slate-700' : 'text-slate-400'}`}>
                     Roster database of recently cataloged newcomers.
                   </p>
 
                   <div className="flex flex-col gap-3 max-h-[480px] overflow-y-auto pr-1">
                     {newcomersList.length === 0 ? (
-                      <div className="p-4 border border-slate-850 rounded bg-slate-900/60 text-center text-xs text-slate-500">
+                      <div className={`p-4 border rounded text-center text-xs ${isLight ? 'bg-white border-[#D2C2A4]/60 text-slate-500' : 'bg-slate-900/60 border-slate-850 text-slate-500'}`}>
                         No visitor logs logged currently.
                       </div>
                     ) : (
                       newcomersList.map(n => (
-                        <div key={n.id} className="p-4 bg-slate-900 border border-slate-850 rounded-xl text-xs flex flex-col gap-1.5 hover:border-slate-700 transition-all">
+                        <div key={n.id} className={`p-4 border rounded-xl text-xs flex flex-col gap-1.5 transition-all ${isLight ? 'bg-white border-[#D2C2A4]/60 hover:border-amber-600/55' : 'bg-slate-900 border-slate-850 hover:border-slate-700'}`}>
                           <div className="flex justify-between items-start gap-1">
-                            <span className="font-bold text-white text-sm">{n.full_name}</span>
-                            <span className="px-2 py-0.5 rounded text-[8px] font-extrabold uppercase bg-slate-800 text-slate-400 border border-slate-700">
+                            <span className={`font-bold text-sm ${isLight ? 'text-[#0A1128]' : 'text-white'}`}>{n.full_name}</span>
+                            <span className={`px-2 py-0.5 rounded text-[8px] font-extrabold uppercase border ${isLight ? 'bg-amber-500/10 text-amber-800 border-amber-500/20' : 'bg-slate-800 text-slate-400 border-slate-700'}`}>
                               {n.preferred_language}
                             </span>
                           </div>
-                          <div className="text-slate-400 flex flex-wrap gap-x-4 gap-y-1">
+                          <div className={`flex flex-wrap gap-x-4 gap-y-1 ${isLight ? 'text-slate-700' : 'text-slate-400'}`}>
                             <span>📱 {n.country_code} {n.mobile}</span>
                             <span>📍 {n.location}</span>
                             <span>🎂 {new Date(n.birthdate).toLocaleDateString()}</span>
                           </div>
                           {n.relationship_status === 'Married' && n.wedding_date && (
-                            <div className="text-[10px] text-amber-500 font-medium">
+                            <div className="text-[10px] text-amber-600 font-bold">
                               💍 Anniversary: {new Date(n.wedding_date).toLocaleDateString()}
                             </div>
                           )}
                           {n.prayer_needs && (
-                            <p className="mt-1 text-[11px] text-slate-300 italic border-l-2 border-slate-800 pl-2">
+                            <p className={`mt-1 text-[11px] italic border-l-2 pl-2 ${isLight ? 'text-slate-800 border-[#D2C2A4]' : 'text-slate-300 border-slate-800'}`}>
                               " {n.prayer_needs} "
                             </p>
                           )}
@@ -2955,23 +2958,23 @@ const Admin = () => {
           )}
 
           {usherTab === 'quizzes' && (
-            <div className="glass-panel p-6 bg-slate-950/80 border border-slate-800 rounded-xl shadow-xl min-h-[400px]">
-              <h3 className="font-serif font-bold text-xl text-white mb-1">
+            <div className={`glass-panel p-6 rounded-xl shadow-xl min-h-[400px] border ${isLight ? 'bg-[#FAF7F0] border-[#D2C2A4]' : 'bg-slate-950/80 border-slate-800'}`}>
+              <h3 className={`font-serif font-bold text-xl mb-1 ${isLight ? 'text-[#0A1128]' : 'text-white'}`}>
                 Active Church Quizzes & Bible Tests
               </h3>
-              <p className="text-xs text-slate-400 mb-6">
+              <p className={`text-xs mb-6 ${isLight ? 'text-slate-700' : 'text-slate-400'}`}>
                 Bible study quizzes uploaded by the Data Admin. (Ushers view is read-only)
               </p>
 
               {quizzesList.length === 0 ? (
-                <div className="text-center py-20 border border-dashed border-slate-850 rounded-xl">
+                <div className={`text-center py-20 border border-dashed rounded-xl ${isLight ? 'border-[#D2C2A4] bg-white' : 'border-slate-850'}`}>
                   <BookOpen className="w-12 h-12 text-slate-700 mx-auto mb-3" />
-                  <p className="text-slate-300 text-sm font-semibold">No tests available</p>
+                  <p className={`text-sm font-semibold ${isLight ? 'text-[#0A1128]' : 'text-slate-300'}`}>No tests available</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {quizzesList.map(quiz => (
-                    <div key={quiz.id} className="p-5 bg-slate-900/40 border border-slate-850 rounded-xl flex flex-col justify-between gap-4">
+                    <div key={quiz.id} className={`p-5 border rounded-xl flex flex-col justify-between gap-4 ${isLight ? 'bg-white border-[#D2C2A4]/60' : 'bg-slate-900/40 border-slate-850'}`}>
                       <div>
                         <div className="flex justify-between items-center gap-2">
                           <span className="px-2 py-0.5 rounded text-[9px] font-extrabold uppercase bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
@@ -2981,11 +2984,11 @@ const Admin = () => {
                             {Math.round(quiz.duration_seconds / 60)} min limit
                           </span>
                         </div>
-                        <h4 className="font-serif font-bold text-white text-md mt-4">
+                        <h4 className={`font-serif font-bold text-md mt-4 ${isLight ? 'text-[#0A1128]' : 'text-white'}`}>
                           {quiz.title}
                         </h4>
                       </div>
-                      <div className="text-[10px] text-slate-500 border-t border-slate-850 pt-2 flex justify-between">
+                      <div className={`text-[10px] text-slate-500 border-t pt-2 flex justify-between ${isLight ? 'border-[#D2C2A4]/60' : 'border-slate-850'}`}>
                         <span>Created: {new Date(quiz.created_at).toLocaleDateString()}</span>
                         <span>Quiz ID: {quiz.id}</span>
                       </div>
@@ -2997,54 +3000,97 @@ const Admin = () => {
           )}
 
           {usherTab === 'prayers' && (
-            <div className="glass-panel p-6 bg-slate-950/80 border border-slate-800 rounded-xl shadow-xl min-h-[400px]">
-              <h3 className="font-serif font-bold text-xl text-white mb-1">
-                Congregation Prayer Request Tracker
+            <div className={`glass-panel p-6 rounded-xl shadow-xl min-h-[400px] border ${isLight ? 'bg-[#FAF7F0] border-[#D2C2A4]' : 'bg-slate-950/80 border-slate-800'}`}>
+              <h3 className={`font-serif font-bold text-xl mb-1 ${isLight ? 'text-[#0A1128]' : 'text-white'}`}>
+                Submit a Prayer Request
               </h3>
-              <p className="text-xs text-slate-400 mb-6">
-                Active requests submitted by our believers and guests. Join with them in agreement and intercession.
+              <p className={`text-xs mb-6 pb-3 border-b ${isLight ? 'text-slate-700 border-[#D2C2A4]/60' : 'text-slate-400 border-slate-800'}`}>
+                Fill in the details below to submit a prayer request on behalf of a believer or visitor. Our intercessors will pray.
               </p>
 
-              {prayers.length === 0 ? (
-                <div className="text-center py-20 border border-dashed border-slate-850 rounded-xl">
-                  <HeartHandshake className="w-12 h-12 text-slate-700 mx-auto mb-3" />
-                  <p className="text-slate-300 text-sm font-semibold">No prayer requests active</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {prayers.map(pray => {
-                    const isAnswered = pray.is_answered === 1 || pray.status === 'Answered';
-                    return (
-                      <div 
-                        key={pray.id} 
-                        className={`p-5 rounded-xl border transition-all ${
-                          isAnswered 
-                            ? 'border-emerald-500/20 bg-emerald-950/10' 
-                            : 'border-slate-800 bg-slate-900/40'
-                        }`}
-                      >
-                        <div className="flex justify-between items-start gap-2 mb-3">
-                          <div>
-                            <span className="font-bold text-white text-sm block">{pray.name}</span>
-                            <span className="text-[10px] text-slate-500">{new Date(pray.created_at).toLocaleDateString()}</span>
-                          </div>
-                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
-                            isAnswered ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'
-                          }`}>
-                            {pray.status}
-                          </span>
-                        </div>
-                        <p className="text-xs text-slate-200 leading-relaxed italic whitespace-pre-line mb-3">
-                          " {pray.request_text} "
-                        </p>
-                        <div className="text-[9px] font-extrabold uppercase text-slate-400 border-t border-slate-850 pt-2">
-                          Category: {pray.category}
-                        </div>
-                      </div>
-                    );
-                  })}
+              {prayerSuccess && (
+                <div className="p-4 mb-6 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-sm font-semibold">
+                  {prayerSuccess}
                 </div>
               )}
+              {actionError && (
+                <div className="p-4 mb-6 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-sm font-semibold">
+                  {actionError}
+                </div>
+              )}
+
+              <form onSubmit={handleBelieverPrayerSubmit} className="space-y-4 max-w-xl">
+                <div>
+                  <label className={`text-xs font-bold block mb-1 ${isLight ? 'text-[#0A1128]' : 'text-slate-300'}`}>
+                    Prayer Request Text *
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={newPrayerText}
+                    onChange={(e) => setNewPrayerText(e.target.value)}
+                    placeholder="Enter the prayer request details..."
+                    className={`w-full rounded-lg p-2.5 text-sm focus:outline-none transition-colors ${isLight ? 'bg-white border border-[#D2C2A4] text-[#0A1128] focus:border-amber-600' : 'bg-slate-900 border border-slate-800 text-white focus:border-amber-500'}`}
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className={`text-xs font-bold block mb-1 ${isLight ? 'text-[#0A1128]' : 'text-slate-300'}`}>
+                      Category *
+                    </label>
+                    <select
+                      value={newPrayerCategory}
+                      onChange={(e) => setNewPrayerCategory(e.target.value)}
+                      className={`w-full rounded-lg p-2.5 text-sm focus:outline-none transition-colors ${isLight ? 'bg-white border border-[#D2C2A4] text-[#0A1128] focus:border-amber-600' : 'bg-slate-900 border border-slate-800 text-white focus:border-amber-500'}`}
+                    >
+                      <option value="General">General</option>
+                      <option value="Healing">Healing</option>
+                      <option value="Family">Family</option>
+                      <option value="Deliverance">Deliverance</option>
+                      <option value="Financial">Financial</option>
+                      <option value="Spiritual Growth">Spiritual Growth</option>
+                      <option value="Salvation">Salvation</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className={`text-xs font-bold block mb-1 ${isLight ? 'text-[#0A1128]' : 'text-slate-300'}`}>
+                      Contact Phone (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={newPrayerPhone}
+                      onChange={(e) => setNewPrayerPhone(e.target.value)}
+                      placeholder="e.g. +971 50 XXXXXXX"
+                      className={`w-full rounded-lg p-2.5 text-sm focus:outline-none transition-colors ${isLight ? 'bg-white border border-[#D2C2A4] text-[#0A1128] focus:border-amber-600' : 'bg-slate-900 border border-slate-800 text-white focus:border-amber-500'}`}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 pt-2">
+                  <input
+                    type="checkbox"
+                    id="usher-prayer-anon"
+                    checked={newPrayerAnonymous}
+                    onChange={(e) => setNewPrayerAnonymous(e.target.checked)}
+                    className="rounded border-slate-850 bg-slate-900 text-amber-500 focus:ring-amber-500"
+                  />
+                  <label htmlFor="usher-prayer-anon" className={`text-xs font-semibold cursor-pointer select-none ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>
+                    Submit anonymously (hide requester's name)
+                  </label>
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={submittingPrayer}
+                    className="btn-primary py-2.5 px-6 font-bold text-xs cursor-pointer"
+                  >
+                    {submittingPrayer ? 'Submitting request...' : 'Submit Prayer Request'}
+                  </button>
+                </div>
+              </form>
             </div>
           )}
 
