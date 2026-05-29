@@ -25,16 +25,6 @@ const Footer = () => {
                 alt="AGSTC Logo"
                 className="w-16 h-16 object-contain transition-transform duration-300 hover:scale-105 shrink-0"
               />
-              <img 
-                src="/images/ag-right-logo.png" 
-                alt="Assemblies of God Shield"
-                className="w-15 h-15 object-contain transition-transform duration-300 hover:scale-105 shrink-0"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  const isHostinger = window.location.pathname.startsWith('/new') || window.location.hostname.includes('agsharjah.org');
-                  e.target.src = isHostinger ? '/new/images/ag-right-logo.png' : '/images/ag-right-logo.png';
-                }}
-              />
               <span className="font-serif font-bold text-lg text-white">AGSTC Sharjah</span>
             </div>
             <p className="text-sm text-slate-300 leading-relaxed">
@@ -121,13 +111,23 @@ const Footer = () => {
         {/* Divider */}
         <div className="border-t border-slate-700 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-slate-400 gap-4">
           <span>© {new Date().getFullYear()} {t('allRightsReserved')}</span>
-          <div className="flex gap-6">
+          <div className="flex items-center gap-6">
             <a href="https://www.youtube.com/@AGSHARJAHTAMILCHURCH" target="_blank" rel="noreferrer" className="hover:text-amber-400 transition-colors">
               YouTube Channel
             </a>
             <Link to="/admin" className="hover:text-slate-200 transition-colors">
               Login
             </Link>
+            <img 
+              src="/images/ag-right-logo.png" 
+              alt="Assemblies of God Shield"
+              className="w-8 h-8 object-contain transition-transform duration-300 hover:scale-105 shrink-0"
+              onError={(e) => {
+                e.target.onerror = null;
+                const isHostinger = window.location.pathname.startsWith('/new') || window.location.hostname.includes('agsharjah.org');
+                e.target.src = isHostinger ? '/new/images/ag-right-logo.png' : '/images/ag-right-logo.png';
+              }}
+            />
           </div>
         </div>
       </div>

@@ -287,13 +287,13 @@ const Events = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {schedules.map((sched, idx) => {
+             {schedules.map((sched, idx) => {
               const isLight = theme === 'light';
               const cardClass = isLight 
-                ? 'bg-white hover:bg-slate-50 border-2 border-amber-500/80 shadow-[0_0_15px_rgba(245,158,11,0.12)] hover:shadow-[0_0_25px_rgba(245,158,11,0.22)]'
-                : 'bg-slate-900/45 hover:bg-slate-900/65 border border-white/5 hover:border-amber-500/25 shadow-lg';
+                ? 'bg-white border-2 border-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.12)]'
+                : 'bg-slate-900/45 border-2 border-amber-500/70 shadow-lg';
               
-              const titleColor = isLight ? 'text-[#0A1931] group-hover:text-amber-600' : 'text-white group-hover:text-amber-400';
+              const titleColor = isLight ? 'text-[#0A1931]' : 'text-white';
               const labelColor = isLight ? 'text-[#1F4068]/65 font-extrabold' : 'text-slate-500';
               const mainTextColor = isLight ? 'text-[#0A1931] font-extrabold' : 'text-white font-bold';
               const subTextColor = isLight ? 'text-[#15305B] font-semibold' : 'text-slate-300';
@@ -308,10 +308,10 @@ const Events = () => {
               return (
                 <div 
                   key={sched.id || idx}
-                  className={`backdrop-blur-md transition-all duration-300 rounded-2xl p-6 relative overflow-hidden group flex flex-col justify-between gap-4 transform hover:-translate-y-1 ${cardClass}`}
+                  className={`backdrop-blur-md rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between gap-4 ${cardClass}`}
                 >
                   {/* Visual Glow Ornament */}
-                  <div className={`absolute top-0 right-0 w-24 h-24 rounded-bl-full pointer-events-none group-hover:bg-amber-500/15 transition-all duration-300 ${visualGlowClass}`} />
+                  <div className={`absolute top-0 right-0 w-24 h-24 rounded-bl-full pointer-events-none ${visualGlowClass}`} />
                   
                   <div>
                     {/* Service Badge Header */}
@@ -325,7 +325,7 @@ const Events = () => {
                     </div>
 
                     {/* Service Name */}
-                    <h3 className={`font-serif font-bold text-lg sm:text-xl transition-colors duration-300 mb-4 pr-6 leading-tight text-left ${titleColor}`}>
+                    <h3 className={`font-serif font-bold text-lg sm:text-xl mb-4 pr-6 leading-tight text-left ${titleColor}`}>
                       {t(sched.name)}
                     </h3>
                   </div>

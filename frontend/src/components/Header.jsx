@@ -65,7 +65,7 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className={`hidden xl:flex items-center ${language === 'ta' ? 'gap-2 xl:gap-2.5 2xl:gap-6' : 'gap-4 xl:gap-5 2xl:gap-8'} shrink-0`}>
+          <div className="hidden xl:flex items-center gap-3 xl:gap-4 2xl:gap-6 shrink-0">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
@@ -76,70 +76,73 @@ const Header = () => {
               </Link>
             ))}
 
-            {/* Language Toggle */}
-            <button
-              onClick={toggleLanguage}
-              className={`flex items-center gap-1.5 p-1.5 rounded-full hover:bg-amber-500/10 transition-colors ${iconColor} shrink-0`}
-              title="Toggle Language / மொழி மாற்று"
-            >
-              <Globe className="w-4 h-4 xl:w-5 xl:h-5" />
-              <span className={`text-xs xl:text-sm font-bold uppercase transition-colors ${navTextColor} ${navHoverColor}`}>
-                {language === 'en' ? 'தமிழ்' : 'EN'}
-              </span>
-            </button>
+            {/* Right Utilities Container with tight spacing */}
+            <div className="flex items-center gap-1.5 xl:gap-2 shrink-0">
+              {/* Language Toggle */}
+              <button
+                onClick={toggleLanguage}
+                className={`flex items-center gap-1 p-1 rounded-full hover:bg-amber-500/10 transition-colors ${iconColor} shrink-0`}
+                title="Toggle Language / மொழி மாற்று"
+              >
+                <Globe className="w-4 h-4 xl:w-5 xl:h-5" />
+                <span className={`text-xs xl:text-sm font-bold uppercase transition-colors ${navTextColor} ${navHoverColor}`}>
+                  {language === 'en' ? 'தமிழ்' : 'EN'}
+                </span>
+              </button>
 
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              className={`p-2 rounded-full hover:bg-amber-500/10 transition-colors ${iconColor} shrink-0`}
-              title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-              id="theme-toggle-btn"
-            >
-              {isDark
-                ? <Sun className="w-4 h-4 xl:w-5 xl:h-5 text-amber-400" />
-                : <Moon className="w-4 h-4 xl:w-5 xl:h-5 text-slate-500" />
-              }
-            </button>
+              {/* Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                className={`p-1.5 rounded-full hover:bg-amber-500/10 transition-colors ${iconColor} shrink-0`}
+                title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                id="theme-toggle-btn"
+              >
+                {isDark
+                  ? <Sun className="w-4 h-4 xl:w-5 xl:h-5 text-amber-400" />
+                  : <Moon className="w-4 h-4 xl:w-5 xl:h-5 text-slate-500" />
+                }
+              </button>
 
-            {/* Auth */}
-            {user ? (
-              <div className={`flex items-center gap-2 xl:gap-3 pl-3 xl:pl-4 border-l ${isDark ? 'border-slate-700' : 'border-slate-300'} shrink-0`}>
+              {/* Auth with minimal padding to avoid excessive whitespace */}
+              {user ? (
+                <div className={`flex items-center gap-1 pl-1.5 border-l ${isDark ? 'border-slate-700' : 'border-slate-300'} shrink-0`}>
+                  <Link
+                    to="/admin"
+                    className={`flex items-center gap-0.5 text-xs xl:text-sm font-semibold ${navTextColor} ${navHoverColor} px-1`}
+                  >
+                    <User className="w-3.5 h-3.5 mr-0.5" />
+                    {dashboardLabel}
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="p-1 rounded-full hover:bg-red-950/50 text-red-400 transition-colors"
+                    title="Logout"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ) : (
                 <Link
                   to="/admin"
-                  className={`flex items-center gap-1.5 text-xs xl:text-sm font-semibold ${navTextColor} ${navHoverColor}`}
+                  className={`text-[12px] xl:text-xs font-semibold transition-colors pl-1.5 border-l ${isDark ? 'border-slate-700 text-slate-400 hover:text-slate-200' : 'border-slate-300 text-slate-500 hover:text-slate-800'} shrink-0`}
                 >
-                  <User className="w-4 h-4" />
-                  {dashboardLabel}
+                  {language === 'ta' ? 'உள்நுழை' : 'Login'}
                 </Link>
-                <button
-                  onClick={handleLogout}
-                  className="p-1.5 rounded-full hover:bg-red-950/50 text-red-400 transition-colors"
-                  title="Logout"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </div>
-            ) : (
-              <Link
-                to="/admin"
-                className={`text-[12px] xl:text-xs font-semibold transition-colors pl-3 xl:pl-4 border-l ${isDark ? 'border-slate-700 text-slate-400 hover:text-slate-200' : 'border-slate-300 text-slate-500 hover:text-slate-800'} shrink-0`}
-              >
-                {language === 'ta' ? 'உள்நுழை' : 'Login'}
-              </Link>
-            )}
+              )}
 
-            {/* Assemblies of God Shield Logo (Far Right) */}
-            <div className={`flex items-center shrink-0 pl-3 xl:pl-4 border-l ${isDark ? 'border-slate-700' : 'border-slate-300'}`}>
-              <img 
-                src="/images/ag-right-logo.png" 
-                alt="Assemblies of God Logo" 
-                className="w-11 h-11 object-contain transition-transform duration-300 hover:scale-105 shrink-0"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  const isHostinger = window.location.pathname.startsWith('/new') || window.location.hostname.includes('agsharjah.org');
-                  e.target.src = isHostinger ? '/new/images/ag-right-logo.png' : '/images/ag-right-logo.png';
-                }}
-              />
+              {/* Assemblies of God Shield Logo (Far Right) with negative margin to push to absolute end */}
+              <div className="flex items-center shrink-0 -mr-3 sm:-mr-6 lg:-mr-9 xl:-mr-12 pl-1.5">
+                <img 
+                  src="/images/ag-right-logo.png" 
+                  alt="Assemblies of God Logo" 
+                  className="w-11 h-11 object-contain transition-transform duration-300 hover:scale-105 shrink-0"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    const isHostinger = window.location.pathname.startsWith('/new') || window.location.hostname.includes('agsharjah.org');
+                    e.target.src = isHostinger ? '/new/images/ag-right-logo.png' : '/images/ag-right-logo.png';
+                  }}
+                />
+              </div>
             </div>
           </div>
 
@@ -176,7 +179,7 @@ const Header = () => {
             <img 
               src="/images/ag-right-logo.png" 
               alt="Assemblies of God Logo" 
-              className="w-9 h-9 object-contain ml-1 transition-transform duration-300 hover:scale-105 shrink-0"
+              className="w-9 h-9 object-contain ml-1 -mr-3 sm:-mr-6 transition-transform duration-300 hover:scale-105 shrink-0"
               onError={(e) => {
                 e.target.onerror = null;
                 const isHostinger = window.location.pathname.startsWith('/new') || window.location.hostname.includes('agsharjah.org');
