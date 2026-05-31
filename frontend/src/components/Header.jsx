@@ -4,6 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Menu, X, Globe, LogOut, User, Sun, Moon } from 'lucide-react';
+import { resolveImageUrl } from '../config';
 
 const Header = () => {
   const { language, toggleLanguage, t } = useLanguage();
@@ -50,7 +51,7 @@ const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-1.5 sm:gap-2 shrink-0 -ml-3 sm:-ml-6 lg:-ml-9 xl:-ml-12">
             <img
-              src="/images/logo.png"
+              src={resolveImageUrl('/images/logo.png')}
               alt="AGSTC Logo"
               className="w-12 h-12 sm:w-15 sm:h-15 object-contain transition-transform duration-300 hover:scale-105 shrink-0"
             />
@@ -131,14 +132,9 @@ const Header = () => {
             {/* Assemblies of God Shield Logo (Far Right) with negative margin to align perfectly to the right end */}
             <div className="flex items-center shrink-0 -mr-3 sm:-mr-6 lg:-mr-9 xl:-mr-12 pl-1.5">
               <img 
-                src="/images/ag-right-logo.png" 
+                src={resolveImageUrl('/images/ag-right-logo.png')} 
                 alt="Assemblies of God Logo" 
                 className="w-11 h-11 object-contain transition-transform duration-300 hover:scale-105 shrink-0"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  const isHostinger = window.location.pathname.startsWith('/new') || window.location.hostname.includes('agsharjah.org');
-                  e.target.src = isHostinger ? '/new/images/ag-right-logo.png' : '/images/ag-right-logo.png';
-                }}
               />
             </div>
           </div>
@@ -174,14 +170,9 @@ const Header = () => {
 
             {/* Assemblies of God Shield Logo (Far Right Mobile) */}
             <img 
-              src="/images/ag-right-logo.png" 
+              src={resolveImageUrl('/images/ag-right-logo.png')} 
               alt="Assemblies of God Logo" 
               className="w-9 h-9 object-contain ml-1 -mr-3 sm:-mr-6 transition-transform duration-300 hover:scale-105 shrink-0"
-              onError={(e) => {
-                e.target.onerror = null;
-                const isHostinger = window.location.pathname.startsWith('/new') || window.location.hostname.includes('agsharjah.org');
-                e.target.src = isHostinger ? '/new/images/ag-right-logo.png' : '/images/ag-right-logo.png';
-              }}
             />
           </div>
         </div>

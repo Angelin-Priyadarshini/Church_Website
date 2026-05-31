@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { Phone, Mail, MapPin } from 'lucide-react';
+import { resolveImageUrl } from '../config';
 
 const Footer = () => {
   const { t } = useLanguage();
@@ -21,7 +22,7 @@ const Footer = () => {
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3">
               <img 
-                src="/images/logo.png" 
+                src={resolveImageUrl('/images/logo.png')} 
                 alt="AGSTC Logo"
                 className="w-16 h-16 object-contain transition-transform duration-300 hover:scale-105 shrink-0"
               />
@@ -59,7 +60,8 @@ const Footer = () => {
             <ul className="flex flex-col gap-3 text-sm text-slate-300">
               <li>
                 <strong className="text-white block">{t('Sundays')}:</strong>
-                {t('sundayTimings')}
+                <span className="block text-slate-300 mt-1">{t('sundayFirstServiceTiming')}</span>
+                <span className="block text-slate-300 mt-0.5">{t('sundaySecondServiceTiming')}</span>
               </li>
               <li>
                 <strong className="text-white block">{t('Saturdays')}:</strong>

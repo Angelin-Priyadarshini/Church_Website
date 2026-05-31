@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { ChevronLeft, ChevronRight, Play, HeartHandshake, HelpCircle } from 'lucide-react';
+import { resolveImageUrl } from '../config';
 
 const HeroBanner = () => {
   const { t } = useLanguage();
@@ -81,7 +82,7 @@ const HeroBanner = () => {
           <div
             className="absolute inset-0 bg-cover bg-center"
             style={{
-              backgroundImage: `url(${slide.image})`,
+              backgroundImage: `url(${resolveImageUrl(slide.image)})`,
               filter: 'brightness(0.4) contrast(1.1)'
             }}
           />

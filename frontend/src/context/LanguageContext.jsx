@@ -254,7 +254,8 @@ const translations = {
     bg_events: '/images/home-banner1.JPG',
     bg_resources: '/images/home-banner1.JPG',
     bg_contact: '/images/home-banner1.JPG',
-    sundayTimings: '6:00am to 8:30 am (1st service) and 9:00am to 10:45am, second service'
+    sundayFirstServiceTiming: '6:00 AM to 8:30 AM (First Service)',
+    sundaySecondServiceTiming: '9:00 AM to 10:45 AM (Second Service)'
   },
   ta: {
     navHome: 'முதற்பக்கம்',
@@ -591,7 +592,8 @@ const translations = {
     bg_events: '/images/home-banner1.JPG',
     bg_resources: '/images/home-banner1.JPG',
     bg_contact: '/images/home-banner1.JPG',
-    sundayTimings: 'காலை 6:00 முதல் 8:30 வரை (1-வது ஆராதனை) மற்றும் காலை 9:00 முதல் 10:45 வரை, 2-வது ஆராதனை'
+    sundayFirstServiceTiming: 'காலை 6:00 முதல் 8:30 வரை (முதல் ஆராதனை)',
+    sundaySecondServiceTiming: 'காலை 9:00 முதல் 10:45 வரை (இரண்டாம் ஆராதனை)'
   }
 };
 
