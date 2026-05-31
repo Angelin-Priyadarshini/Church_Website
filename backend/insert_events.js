@@ -42,7 +42,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
         
         stmt.run(
           'Jeremiah Fasting Prayer Crusade',
-          'A combined regional intercession assembly gathering intercessors from Sharjah, Ajman, and Umm Al Quwain to stand in the gap for our communities.',
+          'A combined regional intercession assembly gathering intercessors across Sharjah and neighboring emirates to stand in the gap for our communities.',
           '2026-06-12',
           '08:00 PM - 10:30 PM',
           'Main Sanctuary Hall B, Sharjah',

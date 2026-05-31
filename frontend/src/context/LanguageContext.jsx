@@ -68,7 +68,7 @@ const translations = {
     floatingPray: 'Prayer Request',
     
     footerHeader: 'Assemblies of God Sharjah Tamil Church',
-    footerSub: 'Established by grace as a spiritual home away from home since 1996.',
+    footerSub: 'Established by grace as a spiritual home away from home since 1982.',
     branchesTitle: 'Our Branch Networks',
     quickLinks: 'Quick Navigation',
     allRightsReserved: 'agsharjah.org - All rights reserved.',
@@ -84,7 +84,7 @@ const translations = {
     valSanctuaryTitle: 'Spiritual Sanctuary',
     valSanctuaryDesc: 'Serving as a spiritual shelter for the expatriate Tamil workforce, reinforcing their faith away from home.',
     valOutreachTitle: 'Outreach & Transport',
-    valOutreachDesc: 'Extending love through active weekly shuttles across neighboring northern emirates Ajman and Umm Al Quwain.',
+    valOutreachDesc: 'Extending love through active weekly shuttles across Sharjah and neighboring centers.',
     
     // Faith & History timeline in About Us
     faithTitle1: 'The Scriptures Inspired',
@@ -98,10 +98,10 @@ const translations = {
     
     milestoneTitle1: 'Humble Beginnings',
     milestoneDesc1: 'Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.',
-    milestoneTitle2: 'Transport fleet launched',
-    milestoneDesc2: 'Purchased our first shuttle bus to fetch Tamil laborers completely free of charge from far-flung industrial camps.',
-    milestoneTitle3: 'Expanded Cell Fellowships',
-    milestoneDesc3: 'Formally established regional cell fellowships to expand weekly home ministries across neighboring communities.',
+    milestoneTitle2: 'Regional Branch Network',
+    milestoneDesc2: 'Formally established regional cell fellowships to expand weekly home ministries across neighboring communities.',
+    milestoneTitle3: 'Transport fleet launched',
+    milestoneDesc3: 'Launched our transport service by renting vans to fetch Tamil laborers completely free of charge from far-flung industrial camps.',
 
     // Hero Banner
     heroTitle1: 'Experience Spiritual Sanctuary',
@@ -111,14 +111,12 @@ const translations = {
     heroTitle3: 'Weekly Fellowship Assemblies',
     heroSub3: 'Join our regional prayer groups and weekly services in Sharjah. Safe transport shuttles are provided.',
 
-    aboutHeaderSub: 'Established by grace as a spiritual refuge for Tamil families in the UAE since 1996.',
+    aboutHeaderSub: 'Established by grace as a spiritual refuge for Tamil families in the UAE since 1982.',
     aboutTitle: 'Our History',
     aboutPara1: 'Assemblies of God Sharjah Tamil Church (AGSTC) was founded with a divine burden to minister to the spiritual and social welfare of the Tamil expatriate workforce residing in Sharjah and neighboring emirates.',
     aboutPara2: 'What started as a small home cell meeting has blossomed under the dedicated pastoral leadership of Pastor Immanuel into a thriving sanctuary where hundreds of brothers and sisters gather weekly. The church acts as a priestly bridge, providing active transport cells to bring remote labor camp residents into fellowship.',
     aboutMission: 'Our core mission is to establish peace, counsel, and gospel restoration for everyone walking through our doors.',
     'Sharjah Main Assembly': 'Sharjah Main Assembly',
-    'Ajman Worship Fellowship': 'Ajman Worship Fellowship',
-    'Umm Al Quwain Assembly': 'Umm Al Quwain Assembly',
     'Sundays': 'Sundays',
     'Saturdays': 'Saturdays',
     'Wednesdays': 'Wednesdays',
@@ -188,12 +186,6 @@ const translations = {
     agWorshipHallAddress: "St. Martin's Anglican Church, Sharjah, United Arab Emirates",
     counselingOfficeDials: 'Counseling Office / Dials',
     emailQueries: 'Email Queries',
-    northernEmiratesBranches: 'Northern Emirates Branches',
-    ajmanFellowshipBranch: 'Ajman Fellowship Branch',
-    ajmanFellowshipDesc: 'Weekly cells gathering in Al Nuaimia center at Saturdays, 7:30 PM. Active transport shuttles operated.',
-    uaqCellBranch: 'Umm Al Quwain Cell Branch',
-    uaqCellDesc: 'Weekly fellowships at UAQ Industrial District on Thursdays, 8:00 PM. Pastoral care covered.',
-    
     digitalAltarOutlines: 'Digital Altar Outlines',
     libraryDevotionals: 'Devotionals',
     equipFamilyAltar: 'Daily promises and spiritual reflections to strengthen your walk with God.',
@@ -282,7 +274,7 @@ const translations = {
     pastorMessageText: 'நம்முடைய கர்த்தரும் இரட்சகருமகிய இயேசு கிறிஸ்துவின் மகா பிரசன்னமுள்ள நாமத்தில் உங்களை இந்த இணையதளத்திற்கு அன்போடு வரவேற்கிறோம். நமது கர்த்தர் தமது ஆச்சரியமான கிருபையினால் ஏஜி ஷார்ஜா தமிழ் சபையை குடும்பங்களையும் நண்பர்களையும் பிரிந்து வாழும் தேவ பிள்ளைகளுக்கு ஒரு புகலிடமாகவும் சமாதானத்தின் இடமாகவும் ஏற்படுத்தியுள்ளார். கர்த்தர் இந்த சபையை குறிப்பாக தமிழ் மக்கள் மத்தியில் கிறிஸ்துவின் அன்பை பரப்புவதற்கான ஒரு கருவியாக ஆசீர்வதித்துள்ளார். கிறிஸ்துவின் அறிவிலும், அவரோடு ஐக்கியப்படுவதிலும், உத்தம இருதயத்தோடு அவரை ஆராதிப்பதிலும் நமது ஆவிக்குரிய வாழ்க்கையில் நாம் முன்னேற ஏஜிஎஸ்டிசி ஒரு ஏணியாக செயல்படுகிறது.',
     pastorName: 'தலைமை போதகர் இம்மானுவேல்',
     
-    aboutHeaderSub: '1996 முதல் ஐக்கிய அரபு அமீரகத்தில் வாழும் தமிழ் குடும்பங்களின் ஆவிக்குரிய புகலிடமாக தேவ கிருபையால் நிறுவப்பட்டது.',
+    aboutHeaderSub: '1982 முதல் ஐக்கிய அரபு அமீரகத்தில் வாழும் தமிழ் குடும்பங்களின் ஆவிக்குரிய புகலிடமாக தேவ கிருபையால் நிறுவப்பட்டது.',
     aboutTitle: 'எமது சரித்திரம்',
     aboutPara1: 'ஏஜி ஷார்ஜா தமிழ் சபையானது (AGSTC) ஷார்ஜா மற்றும் அருகில் உள்ள எமிரேட்களில் வசிக்கும் தமிழ் உழைப்பாளர் மக்களின் ஆவிக்குரிய மற்றும் சமூக நலனுக்காக ஊழியங்களைச் செய்ய வேண்டும் என்ற தாளாத பாரத்தோடு துவங்கப்பட்டது.',
     aboutPara2: 'ஒரு எளிய இல்ல ஜெபக் கூட்டமாகத் துவங்கப்பட்ட இந்த ஐக்கியம், தலைமை போதகர் இம்மானுவேல் அவர்களின் அர்ப்பணிப்புள்ள போதக பராமரிப்பின் கீழ், நூற்றுக்கணக்கான சகோதர சகோதரிகள் கூடி ஆராதிக்கும் ஒரு ஆசீர்வாதமான ஆலயமாக வளர்ந்துள்ளது. தூர முகாம்களில் வசிக்கும் தமிழ் தொழிலாளர்களை ஆராதனைக்கு அழைத்து வர பேருந்து ஊழியத்தின் மூலம் சபை ஒரு பாலமாக செயல்படுகிறது.',
@@ -333,7 +325,7 @@ const translations = {
     floatingPray: 'ஜெபங்கள்',
     
     footerHeader: 'Assemblies of God ஷார்ஜா தமிழ் சபை',
-    footerSub: '1996 முதல் கிருபையால் தூரதேசத்தில் அமைக்கப்பட்ட ஆவிக்குரிய இல்லம்.',
+    footerSub: '1982 முதல் கிருபையால் தூரதேசத்தில் அமைக்கப்பட்ட ஆவிக்குரிய இல்லம்.',
     branchesTitle: 'எங்கள் கிளை சபைகள்',
     quickLinks: 'வரைபடம்',
     allRightsReserved: 'agsharjah.org - அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.',
@@ -349,7 +341,7 @@ const translations = {
     valSanctuaryTitle: 'ஆவிக்குரிய புகலிடம்',
     valSanctuaryDesc: 'தூரதேசத்தில் வாழும் தமிழ் உழைப்பாளர்களுக்கு ஒரு ஆவிக்குரிய புகலிடமாக இருந்து, அவர்களின் விசுவாசத்தை பலப்படுத்துகிறது.',
     valOutreachTitle: 'வெளிப்புற ஊழியம் & போக்குவரத்து',
-    valOutreachDesc: 'அண்டை எமிரேட்களான அஜ்மான் மற்றும் உம் அல் குவைன் முழுவதும் இலவச பேருந்து சேவைகள் மூலம் கிறிஸ்துவின் அன்பை பகிர்ந்து கொள்கிறோம்.',
+    valOutreachDesc: 'ஷார்ஜா மற்றும் அண்டை பகுதிகளில் இலவச வாகன சேவைகள் மூலம் கிறிஸ்துவின் அன்பை பகிர்ந்து கொள்கிறோம்.',
     
     // Faith & History timeline in About Us
     faithTitle1: 'வேதவசனங்களின் தெய்வீக உத்வேகம்',
@@ -363,10 +355,10 @@ const translations = {
     
     milestoneTitle1: 'எளிய ஆரம்பம்',
     milestoneDesc1: 'ஷார்ஜாவில் ஒரு எளிய இல்ல ஜெபக் கூட்டமாகத் தொடங்கப்பட்டு, தூரதேசத்தில் வாழும் உழைப்பாளர்களை ஆவிக்குரிய ரீதியில் ஆதரிப்பதை நோக்கமாகக் கொண்டு ஆரம்பிக்கப்பட்டது.',
-    milestoneTitle2: 'போக்குவரத்து சேவை துவக்கம்',
-    milestoneDesc2: 'தொழிலாளர்கள் எவ்வித சிரமமுமின்றி ஆராதனையில் கலந்து கொள்ள தூர முகாம்களில் இருந்து முற்றிலும் இலவசமாக அழைத்து வர முதல் பேருந்து வாங்கப்பட்டது.',
-    milestoneTitle3: 'வீட்டு ஐக்கியங்கள் விரிவாக்கம்',
-    milestoneDesc3: 'அண்டை பகுதிகளில் முறையான வாராந்திர வீட்டு ஐக்கியங்கள் மற்றும் ஜெபக் குழுக்கள் ஏற்படுத்தப்பட்டு ஊழியங்கள் விரிவுபடுத்தப்பட்டன.',
+    milestoneTitle2: 'கிளை சபைகள் விரிவாக்கம்',
+    milestoneDesc2: 'அண்டை பகுதிகளில் முறையான வாராந்திர வீட்டு ஐக்கியங்கள் மற்றும் ஜெபக் குழுக்கள் ஏற்படுத்தப்பட்டு ஊழியங்கள் விரிவுபடுத்தப்பட்டன.',
+    milestoneTitle3: 'போக்குவரத்து சேவை துவக்கம்',
+    milestoneDesc3: 'தொளிலாளர்கள் எவ்வித சிரமமுமின்றி ஆராதனையில் கலந்து கொள்ள தூர முகாம்களில் இருந்து முற்றிலும் இலவசமாக அழைத்து வர வாடகை வேன்கள் மூலம் போக்குவரத்து சேவை தொடங்கப்பட்டது.',
 
     // Hero Banner
     heroTitle1: 'ஆவிக்குரிய புகலிடத்தை அனுபவியுங்கள்',
@@ -420,8 +412,6 @@ const translations = {
     'Sis. Mary Immanuel': 'சகோதரி. மேரி இம்மானுவேல்',
     'Bro. Gunaseelan': 'சகோ. குணசீலன்',
     'Sharjah Main Assembly': 'ஷார்ஜா முதன்மை சபை',
-    'Ajman Worship Fellowship': 'அஜ்மான் ஆராதனை ஐக்கியம்',
-    'Umm Al Quwain Assembly': 'உம்-அல்-குவைன் சபை',
     'Sundays': 'ஞாயிற்றுக்கிழமைகள்',
     'Saturdays': 'சனிக்கிழமைகள்',
     'Wednesdays': 'புதன்கிழமைகள்',
@@ -530,11 +520,7 @@ const translations = {
     agWorshipHallAddress: 'செயிண்ட் மார்ட்டின் ஆங்கிலிகன் சர்ச், ஷார்ஜா, ஐக்கிய அரபு அமீரகம்',
     counselingOfficeDials: 'போதக ஆலோசனை / தொடர்புக்கு',
     emailQueries: 'மின்னஞ்சல் முகவரி',
-    northernEmiratesBranches: 'அண்டை மாநில கிளை ஊழியங்கள்',
-    ajmanFellowshipBranch: 'அஜ்மான் கிளை சபை ஊழியம்',
-    ajmanFellowshipDesc: 'அல் நுஐமியா பகுதியில் சனிக்கிழமை மாலை 7:30 மணிக்கு நடைபெறும் கிளை சபை கூடம். இலவச போக்குவரத்து வசதியுண்டு.',
-    uaqCellBranch: 'உம்-அல்-குவைன் கிளை சபை ஊழியம்',
-    uaqCellDesc: 'உம்-அல்-குவைன் தொழில்துறை பகுதியில் வியாழக்கிழமை இரவு 8:00 மணிக்கு நடைபெறும் வீட்டு ஐக்கியம். போதக பராமரிப்பு உண்டு.',
+    digitalAltarOutlines: 'குடும்ப ஜெப பீட குறிப்புகள்',
     
     digitalAltarOutlines: 'குடும்ப ஜெப பீட குறிப்புகள்',
     libraryDevotionals: 'தியானங்கள்',

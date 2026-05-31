@@ -529,7 +529,7 @@ async function seedDatabase() {
       await db.runAsync(`INSERT INTO events (title, description, date, time, location, image_url, capacity) VALUES (?, ?, ?, ?, ?, ?, ?)`,
         [
           'Jeremiah Fasting Prayer Crusade',
-          'A combined regional intercession assembly gathering intercessors from Sharjah, Ajman, and Umm Al Quwain to stand in the gap for our communities.',
+          'A combined regional intercession assembly gathering intercessors across Sharjah and neighboring emirates to stand in the gap for our communities.',
           '2026-06-12',
           '08:00 PM - 10:30 PM',
           'Main Sanctuary Hall B, Sharjah',
@@ -563,8 +563,8 @@ async function seedDatabase() {
       const defaultAbout = [
         {
           key: 'aboutHeaderSub',
-          en: 'Established by grace as a spiritual refuge for Tamil families in the UAE since 1996.',
-          ta: '1996 முதல் ஐக்கிய அரபு அமீரகத்தில் வாழும் தமிழ் குடும்பங்களின் ஆவிக்குரிய புகலிடமாக தேவ கிருபையால் நிறுவப்பட்டது.'
+          en: 'Established by grace as a spiritual refuge for Tamil families in the UAE since 1982.',
+          ta: '1982 முதல் ஐக்கிய அரபு அமீரகத்தில் வாழும் தமிழ் குடும்பங்களின் ஆவிக்குரிய புகலிடமாக தேவ கிருபையால் நிறுவப்பட்டது.'
         },
         {
           key: 'aboutTitle',
@@ -573,8 +573,8 @@ async function seedDatabase() {
         },
         {
           key: 'aboutPara1',
-          en: 'Assemblies of God Sharjah Tamil Church (AGSTC) was founded with a divine burden to minister to the spiritual and social welfare of the Tamil expatriate workforce residing in Sharjah, Ajman, and nearby emirates.',
-          ta: 'ஏஜி ஷார்ஜா தமிழ் சபையானது (AGSTC) ஷார்ஜா, அஜ்மான் மற்றும் அருகில் உள்ள எமிரேட்களில் வசிக்கும் தமிழ் உழைப்பாளர் மக்களின் ஆவிக்குரிய மற்றும் சமூக நலனுக்காக ஊழியங்களைச் செய்ய வேண்டும் என்ற தாளாத பாரத்தோடு துவங்கப்பட்டது.'
+          en: 'Assemblies of God Sharjah Tamil Church (AGSTC) was founded with a divine burden to minister to the spiritual and social welfare of the Tamil expatriate workforce residing in Sharjah and neighboring emirates.',
+          ta: 'ஏஜி ஷார்ஜா தமிழ் சபையானது (AGSTC) ஷார்ஜா மற்றும் அருகில் உள்ள எமிரேட்களில் வசிக்கும் தமிழ் உழைப்பாளர் மக்களின் ஆவிக்குரிய மற்றும் சமூக நலனுக்காக ஊழியங்களைச் செய்ய வேண்டும் என்ற தாளாத பாரத்தோடு துவங்கப்பட்டது.'
         },
         {
           key: 'aboutPara2',
@@ -599,14 +599,14 @@ async function seedDatabase() {
         {
           key: 'milestones',
           en: JSON.stringify([
-            {"year": "1996", "titleEn": "Humble Beginnings", "titleTa": "எளிய ஆரம்பம்", "descEn": "Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.", "descTa": "ஷார்ஜாவில் ஒரு எளிய இல்ல ஜெபக் கூட்டமாகத் தொடங்கப்பட்டு, தூரதேசத்தில் வாழும் உழைப்பாளர்களை ஆவிக்குரிய ரீதியில் ஆதரிப்பதை நோக்கமாகக் கொண்டு ஆரம்பிக்கப்பட்டது."},
-            {"year": "2005", "titleEn": "Transport fleet launched", "titleTa": "போக்குவரத்து சேவை துவக்கம்", "descEn": "Purchased our first shuttle bus to fetch Tamil laborers completely free of charge from far-flung industrial camps.", "descTa": "தொழிலாளர்கள் எவ்வித சிரமமுமின்றி ஆராதனையில் கலந்து கொள்ள தூர முகாம்களில் இருந்து முற்றிலும் இலவசமாக அழைத்து வர முதல் பேருந்து வாங்கப்பட்டது."},
-            {"year": "2016", "titleEn": "Regional Branch Network", "titleTa": "கிளை சபைகள் விரிவாக்கம்", "descEn": "Formally established satellite cell fellowships in Ajman and Umm Al Quwain, expanding weekly ministries.", "descTa": "அண்டை எமிரேட்களான அஜ்மான் மற்றும் உம் அல் குவைனில் முறையான கிளை சபை ஐக்கியங்கள் ஏற்படுத்தப்பட்டு வாராந்திர ஊழியங்கள் விரிவுபடுத்தப்பட்டன."}
+            {"year": "1982", "titleEn": "Humble Beginnings", "titleTa": "எளிய ஆரம்பம்", "descEn": "Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.", "descTa": "ஷார்ஜாவில் ஒரு எளிய இல்ல ஜெபக் கூட்டமாகத் தொடங்கப்பட்டு, தூரதேசத்தில் வாழும் உழைப்பாளர்களை ஆவிக்குரிய ரீதியில் ஆதரிப்பதை நோக்கமாகக் கொண்டு ஆரம்பிக்கப்பட்டது."},
+            {"year": "1986", "titleEn": "Regional Branch Network", "titleTa": "கிளை சபைகள் விரிவாக்கம்", "descEn": "Formally established regional cell fellowships to expand weekly home ministries across neighboring communities.", "descTa": "அண்டை பகுதிகளில் முறையான வாராந்திர வீட்டு ஐக்கியங்கள் மற்றும் ஜெபக் குழுக்கள் ஏற்படுத்தப்பட்டு ஊழியங்கள் விரிவுபடுத்தப்பட்டன."},
+            {"year": "1995", "titleEn": "Transport fleet launched", "titleTa": "போக்குவரத்து சேவை துவக்கம்", "descEn": "Launched our transport service by renting vans to fetch Tamil laborers completely free of charge from far-flung industrial camps.", "descTa": "தொழிலாளர்கள் எவ்வித சிரமமுமின்றி ஆராதனையில் கலந்து கொள்ள தூர முகாம்களில் இருந்து முற்றிலும் இலவசமாக அழைத்து வர வாடகை வேன்கள் மூலம் போக்குவரத்து சேவை தொடங்கப்பட்டது."}
           ]),
           ta: JSON.stringify([
-            {"year": "1996", "titleEn": "Humble Beginnings", "titleTa": "எளிய ஆரம்பம்", "descEn": "Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.", "descTa": "ஷார்ஜாவில் ஒரு எளிய இல்ல ஜெபக் கூட்டமாகத் தொடங்கப்பட்டு, தூரதேசத்தில் வாழும் உழைப்பாளர்களை ஆவிக்குரிய ரீதியில் ஆதரிப்பதை நோக்கமாகக் கொண்டு ஆரம்பிக்கப்பட்டது."},
-            {"year": "2005", "titleEn": "Transport fleet launched", "titleTa": "போக்குவரத்து சேவை துவக்கம்", "descEn": "Purchased our first shuttle bus to fetch Tamil laborers completely free of charge from far-flung industrial camps.", "descTa": "தொழிலாளர்கள் எவ்வித சிரமமுமின்றி ஆராதனையில் கலந்து கொள்ள தூர முகாம்களில் இருந்து முற்றிலும் இலவசமாக அழைத்து வர முதல் பேருந்து வாங்கப்பட்டது."},
-            {"year": "2016", "titleEn": "Regional Branch Network", "titleTa": "கிளை சபைகள் விரிவாக்கம்", "descEn": "Formally established satellite cell fellowships in Ajman and Umm Al Quwain, expanding weekly ministries.", "descTa": "அண்டை எமிரேட்களான அஜ்மான் மற்றும் உம் அல் குவைனில் முறையான கிளை சபை ஐக்கியங்கள் ஏற்படுத்தப்பட்டு வாராந்திர ஊழியங்கள் விரிவுபடுத்தப்பட்டன."}
+            {"year": "1982", "titleEn": "Humble Beginnings", "titleTa": "எளிய ஆரம்பம்", "descEn": "Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.", "descTa": "ஷார்ஜாவில் ஒரு எளிய இல்ல ஜெபக் கூட்டமாகத் தொடங்கப்பட்டு, தூரதேசத்தில் வாழும் உழைப்பாளர்களை ஆவிக்குரிய ரீதியில் ஆதரிப்பதை நோக்கமாகக் கொண்டு ஆரம்பிக்கப்பட்டது."},
+            {"year": "1986", "titleEn": "Regional Branch Network", "titleTa": "கிளை சபைகள் விரிவாக்கம்", "descEn": "Formally established regional cell fellowships to expand weekly home ministries across neighboring communities.", "descTa": "அண்டை பகுதிகளில் முறையான வாராந்திர வீட்டு ஐக்கியங்கள் மற்றும் ஜெபக் குழுக்கள் ஏற்படுத்தப்பட்டு ஊழியங்கள் விரிவுபடுத்தப்பட்டன."},
+            {"year": "1995", "titleEn": "Transport fleet launched", "titleTa": "போக்குவரத்து சேவை துவக்கம்", "descEn": "Launched our transport service by renting vans to fetch Tamil laborers completely free of charge from far-flung industrial camps.", "descTa": "தொழிலாளர்கள் எவ்வித சிரமமுமின்றி ஆராதனையில் கலந்து கொள்ள தூர முகாம்களில் இருந்து முற்றிலும் இலவசமாக அழைத்து வர வாடகை வேன்கள் மூலம் போக்குவரத்து சேவை தொடங்கப்பட்டது."}
           ])
         },
         {
@@ -676,8 +676,8 @@ async function seedDatabase() {
         },
         {
           key: 'heroSub3',
-          en: 'Join our regional prayer groups and weekly services in Sharjah, Ajman, and Umm Al Quwain. Safe transport shuttles are provided.',
-          ta: 'ஒவ்வொரு வயதினரையும் ஆவிக்குரிய ரீதியில் வளர்க்கும் எங்களின் துடிப்பான ஊழியங்களை கண்டறியுங்கள்.'
+          en: 'Join our regional prayer groups and weekly services in Sharjah. Safe transport shuttles are provided.',
+          ta: 'ஷார்ஜாவில் நடைபெறும் எங்களது வாராந்திர ஆராதனைகள் மற்றும் ஜெபக் கூட்டங்களில் இணைந்து கொள்ளுங்கள். இலவச போக்குவரத்து வசதியுண்டு.'
         },
         {
           key: 'aboutImages',
@@ -713,9 +713,9 @@ async function seedDatabase() {
             taVal = '/images/pastor-immanuel.png';
           } else if (key === 'milestones') {
             enVal = JSON.stringify([
-              {"year": "1996", "titleEn": "Humble Beginnings", "titleTa": "எளிய ஆரம்பம்", "descEn": "Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.", "descTa": "ஷார்ஜாவில் ஒரு எளிய இல்ல ஜபக் கூட்டமாகத் தொடங்கப்பட்டு, தூரதேசத்தில் வாழும் உழைப்பாளர்களை ஆவிக்குரிய ரீதியில் ஆதரிப்பதை நோக்கமாகக் கொண்டு ஆரம்பிக்கப்பட்டது."},
-              {"year": "2005", "titleEn": "Transport fleet launched", "titleTa": "போக்குவரத்து சேவை துவக்கம்", "descEn": "Purchased our first shuttle bus to fetch Tamil laborers completely free of charge from far-flung industrial camps.", "descTa": "தொழிலாளர்கள் எவ்வித சிரமமுமின்றி ஆராதனையில் கலந்து கொள்ள தூர முகாம்களில் இருந்து முற்றிலும் இலவசமாக அழைத்து வர முதல் பேருந்து வாங்கப்பட்டது."},
-              {"year": "2016", "titleEn": "Regional Branch Network", "titleTa": "கிளை சபைகள் விரிவாக்கம்", "descEn": "Formally established satellite cell fellowships in Ajman and Umm Al Quwain, expanding weekly ministries.", "descTa": "அண்டை எமிரேட்களான அஜ்மான் மற்றும் உம் அல் குவைனில் முறையான கிளை சபை ஐக்கியங்கள் ஏற்படுத்தப்பட்டு வாராந்திர ஊழியங்கள் விரிவுபடுத்தப்பட்டன."}
+              {"year": "1982", "titleEn": "Humble Beginnings", "titleTa": "எளிய ஆரம்பம்", "descEn": "Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.", "descTa": "ஷார்ஜாவில் ஒரு எளிய இல்ல ஜெபக் கூட்டமாகத் தொடங்கப்பட்டு, தூரதேசத்தில் வாழும் உழைப்பாளர்களை ஆவிக்குரிய ரீதியில் ஆதரிப்பதை நோக்கமாகக் கொண்டு ஆரம்பிக்கப்பட்டது."},
+              {"year": "1986", "titleEn": "Regional Branch Network", "titleTa": "கிளை சபைகள் விரிவாக்கம்", "descEn": "Formally established regional cell fellowships to expand weekly home ministries across neighboring communities.", "descTa": "அண்டை பகுதிகளில் முறையான வாராந்திர வீட்டு ஐக்கியங்கள் மற்றும் ஜெபக் குழுக்கள் ஏற்படுத்தப்பட்டு ஊழியங்கள் விரிவுபடுத்தப்பட்டன."},
+              {"year": "1995", "titleEn": "Transport fleet launched", "titleTa": "போக்குவரத்து சேவை துவக்கம்", "descEn": "Launched our transport service by renting vans to fetch Tamil laborers completely free of charge from far-flung industrial camps.", "descTa": "தொழிலாளர்கள் எவ்வித சிரமமுமின்றி ஆராதனையில் கலந்து கொள்ள தூர முகாம்களில் இருந்து முற்றிலும் இலவசமாக அழைத்து வர வாடகை வேன்கள் மூலம் போக்குவரத்து சேவை தொடங்கப்பட்டது."}
             ]);
             taVal = enVal;
           } else if (key === 'faithStatements') {
@@ -757,8 +757,8 @@ async function seedDatabase() {
             enVal = 'Weekly Fellowship Assemblies';
             taVal = 'செழித்தோங்க நாட்டப்பட்டவர்கள்';
           } else if (key === 'heroSub3') {
-            enVal = 'Join our regional prayer groups and weekly services in Sharjah, Ajman, and Umm Al Quwain. Safe transport shuttles are provided.';
-            taVal = 'ஒவ்வொரு வயதினரையும் ஆவிக்குரிய ரீதியில் வளர்க்கும் எங்களின் துடிப்பான ஊழியங்களை கண்டறியுங்கள்.';
+            enVal = 'Join our regional prayer groups and weekly services in Sharjah. Safe transport shuttles are provided.';
+            taVal = 'ஷார்ஜாவில் நடைபெறும் எங்களது வாராந்திர ஆராதனைகள் மற்றும் ஜெபக் கூட்டங்களில் இணைந்து கொள்ளுங்கள். இலவச போக்குவரத்து வசதியுண்டு.';
           } else if (key === 'aboutImages') {
             enVal = JSON.stringify(['/images/home-banner1.JPG', '/images/prayer.jpg', '/images/banner1.jpg']);
             taVal = enVal;
@@ -784,13 +784,14 @@ async function seedDatabase() {
     // 4. Update Fasting Prayer and other events description regional mentions
     await db.runAsync(`UPDATE events SET description = 'A combined regional intercession assembly gathering intercessors across Sharjah and neighboring emirates to stand in the gap for our communities.' WHERE title LIKE '%Jeremiah Fasting Prayer Crusade%'`);
     
-    // 5. Update about content regional references
-    await db.runAsync(`UPDATE about_content SET en_val = 'Assemblies of God Sharjah Tamil Church (AGSTC) was founded with a divine burden to minister to the spiritual and social welfare of the Tamil expatriate workforce residing in Sharjah and nearby emirates.', ta_val = 'ஏஜி ஷார்ஜா தமிழ் சபையானது (AGSTC) ஷார்ஜா மற்றும் அருகில் உள்ள எமிரேட்களில் வசிக்கும் தமிழ் உழைப்பாளர் மக்களின் ஆவிக்குரிய மற்றும் சமூக நலனுக்காக ஊழியங்களைச் செய்ய வேண்டும் என்ற தாளாத பாரத்தோடு துவங்கப்பட்டது.' WHERE \`key\` = 'aboutPara1'`);
+    // 5. Update about content regional references and starting year
+    await db.runAsync(`UPDATE about_content SET en_val = 'Assemblies of God Sharjah Tamil Church (AGSTC) was founded with a divine burden to minister to the spiritual and social welfare of the Tamil expatriate workforce residing in Sharjah and neighboring emirates.', ta_val = 'ஏஜி ஷார்ஜா தமிழ் சபையானது (AGSTC) ஷார்ஜா மற்றும் அருகில் உள்ள எமிரேட்களில் வசிக்கும் தமிழ் உழைப்பாளர் மக்களின் ஆவிக்குரிய மற்றும் சமூக நலனுக்காக ஊழியங்களைச் செய்ய வேண்டும் என்ற தாளாத பாரத்தோடு துவங்கப்பட்டது.' WHERE \`key\` = 'aboutPara1'`);
+    await db.runAsync(`UPDATE about_content SET en_val = 'Established by grace as a spiritual refuge for Tamil families in the UAE since 1982.', ta_val = '1982 முதல் ஐக்கிய அரபு அமீரகத்தில் வாழும் தமிழ் குடும்பங்களின் ஆவிக்குரிய புகலிடமாக தேவ கிருபையால் நிறுவப்பட்டது.' WHERE \`key\` = 'aboutHeaderSub'`);
     
     const updatedMilestonesJson = JSON.stringify([
-      {"year": "1996", "titleEn": "Humble Beginnings", "titleTa": "எளிய ஆரம்பம்", "descEn": "Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.", "descTa": "ஷார்ஜாவில் ஒரு எளிய இல்ல ஜேபக் கூட்டமாகத் தொடங்கப்பட்டு, தூரதேசத்தில் வாழும் உழைப்பாளர்களை ஆவிக்குரிய ரீதியில் ஆதரிப்பதை நோக்கமாகக் கொண்டு ஆரம்பிக்கப்பட்டது."},
-      {"year": "2005", "titleEn": "Transport fleet launched", "titleTa": "போக்குவரத்து சேவை துவக்கம்", "descEn": "Purchased our first shuttle bus to fetch Tamil laborers completely free of charge from far-flung industrial camps.", "descTa": "தொழிலாளர்கள் எவ்வித சிரமமுமின்றி ஆராதனையில் கலந்து கொள்ள தூர முகாம்களில் இருந்து முற்றிலும் இலவசமாக அழைத்து வர முதல் பேருந்து வாங்கப்பட்டது."},
-      {"year": "2016", "titleEn": "Expanded Cell Fellowships", "titleTa": "வீட்டு ஐக்கியங்கள் விரிவாக்கம்", "descEn": "Formally established regional cell fellowships to expand weekly home ministries across neighboring communities.", "descTa": "அண்டை பகுதிகளில் முறையான வாராந்திர வீட்டு ஐக்கியங்கள் மற்றும் ஜெபக் குழுக்கள் ஏற்படுத்தப்பட்டு ஊழியங்கள் விரிவுபடுத்தப்பட்டன."}
+      {"year": "1982", "titleEn": "Humble Beginnings", "titleTa": "எளிய ஆரம்பம்", "descEn": "Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.", "descTa": "ஷார்ஜாவில் ஒரு எளிய இல்ல ஜேபக் கூட்டமாகத் தொடங்கப்பட்டு, தூரதேசத்தில் வாழும் உழைப்பாளர்களை ஆவிக்குரிய ரீதியில் ஆதரிப்பதை நோக்கமாகக் கொண்டு ஆரம்பிக்கப்பட்டது."},
+      {"year": "1986", "titleEn": "Regional Branch Network", "titleTa": "கிளை சபைகள் விரிவாக்கம்", "descEn": "Formally established regional cell fellowships to expand weekly home ministries across neighboring communities.", "descTa": "அண்டை பகுதிகளில் முறையான வாராந்திர வீட்டு ஐக்கியங்கள் மற்றும் ஜெபக் குழுக்கள் ஏற்படுத்தப்பட்டு ஊழியங்கள் விரிவுபடுத்தப்பட்டன."},
+      {"year": "1995", "titleEn": "Transport fleet launched", "titleTa": "போக்குவரத்து சேவை துவக்கம்", "descEn": "Launched our transport service by renting vans to fetch Tamil laborers completely free of charge from far-flung industrial camps.", "descTa": "தொழிலாளர்கள் எவ்வித சிரமமுமின்றி ஆராதனையில் கலந்து கொள்ள தூர முகாம்களில் இருந்து முற்றிலும் இலவசமாக அழைத்து வர வாடகை வேன்கள் மூலம் போக்குவரத்து சேவை தொடங்கப்பட்டது."}
     ]);
     await db.runAsync(`UPDATE about_content SET en_val = ?, ta_val = ? WHERE \`key\` = 'milestones'`, [updatedMilestonesJson, updatedMilestonesJson]);
     

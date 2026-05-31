@@ -2846,7 +2846,7 @@ const Admin = () => {
                         type="text"
                         value={newcomerForm.location}
                         onChange={(e) => setNewcomerForm(prev => ({ ...prev, location: e.target.value }))}
-                        placeholder="Sharjah, Rolla / Ajman"
+                        placeholder="Sharjah, Rolla / Muwaileh"
                         className={`w-full rounded-lg p-2.5 text-sm focus:outline-none transition-colors ${isLight ? 'bg-white border border-[#D2C2A4] text-[#0A1128] focus:border-amber-600' : 'bg-slate-900 border border-slate-800 text-white focus:border-amber-500'}`}
                         required
                       />
