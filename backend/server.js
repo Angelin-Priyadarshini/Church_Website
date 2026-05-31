@@ -213,7 +213,7 @@ if (fs.existsSync(frontendPath) && fs.existsSync(path.join(frontendPath, 'index.
   
   // Root fallback: do not load the website on the main domain root!
   app.get('/', (req, res) => {
-    res.json({ message: 'AGSTC Church REST API online and running! Please visit /new to access the website.' });
+    res.send('');
   });
 
   // Route wildcard: Route all non-API and non-resource requests to the React SPA index.html ONLY if under /new path
@@ -236,7 +236,7 @@ if (fs.existsSync(frontendPath) && fs.existsSync(path.join(frontendPath, 'index.
 
   // Root fallback endpoint
   app.get('/', (req, res) => {
-    res.json({ message: 'AGSTC Church REST API online and running! (Note: React frontend dist not built yet)' });
+    res.send('');
   });
 }
 
