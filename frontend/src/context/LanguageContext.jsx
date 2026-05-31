@@ -253,7 +253,8 @@ const translations = {
     bg_ministries: '/images/home-banner1.JPG',
     bg_events: '/images/home-banner1.JPG',
     bg_resources: '/images/home-banner1.JPG',
-    bg_contact: '/images/home-banner1.JPG'
+    bg_contact: '/images/home-banner1.JPG',
+    sundayTimings: '6:00am to 8:30 am (1st service) and 9:00am to 10:45am, second service'
   },
   ta: {
     navHome: 'முதற்பக்கம்',
@@ -377,7 +378,7 @@ const translations = {
     'Thursday Midweek Service': 'வியாழக்கிழமை வாராந்திர ஆராதனை',
     'Saturday Fasting Prayer': 'சனிக்கிழமை உபவாச ஜெபம்',
     'Umm Al Quwain Service': 'உம்-அல்-குவைன் கிளை ஆராதனை',
-    '06:45 AM - 08:30 AM': 'காலை 06:45 - 08:30 மணி',
+    '06:00 AM - 08:30 AM': 'காலை 06:00 - 08:30 மணி',
     '09:00 AM - 10:45 AM': 'காலை 09:00 - 10:45 மணி',
     '11:15 AM - 12:45 PM': 'மதியம் 11:15 - 12:45 மணி',
     '08:00 PM - 09:55 PM': 'இரவு 08:00 - 09:55 மணி',
@@ -589,7 +590,8 @@ const translations = {
     bg_ministries: '/images/home-banner1.JPG',
     bg_events: '/images/home-banner1.JPG',
     bg_resources: '/images/home-banner1.JPG',
-    bg_contact: '/images/home-banner1.JPG'
+    bg_contact: '/images/home-banner1.JPG',
+    sundayTimings: 'காலை 6:00 முதல் 8:30 வரை (1-வது ஆராதனை) மற்றும் காலை 9:00 முதல் 10:45 வரை, 2-வது ஆராதனை'
   }
 };
 

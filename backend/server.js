@@ -206,20 +206,27 @@ const frontendPath = frontendCandidates.find((candidate) => (
 
 if (fs.existsSync(frontendPath) && fs.existsSync(path.join(frontendPath, 'index.html'))) {
   // Explicit route handlers for index.html to ensure reliability under subdirectory reverse proxies
-  app.get('/', (req, res) => res.sendFile(path.join(frontendPath, 'index.html')));
   app.get('/new', (req, res) => res.sendFile(path.join(frontendPath, 'index.html')));
   app.get('/new/', (req, res) => res.sendFile(path.join(frontendPath, 'index.html')));
 
-  app.use(express.static(frontendPath));
   app.use('/new', express.static(frontendPath)); // Serve static files under /new prefix!
   
-  // Route wildcard: Route all non-API and non-resource requests to the React SPA index.html
+  // Root fallback: do not load the website on the main domain root!
+  app.get('/', (req, res) => {
+    res.json({ message: 'AGSTC Church REST API online and running! Please visit /new to access the website.' });
+  });
+
+  // Route wildcard: Route all non-API and non-resource requests to the React SPA index.html ONLY if under /new path
   app.get('*', (req, res) => {
     const isApi = req.path.startsWith('/api') || req.path.startsWith('/new/api');
     const isResource = req.path.startsWith('/resources') || req.path.startsWith('/new/resources') || req.path.startsWith('/images') || req.path.startsWith('/new/images');
     
     if (!isApi && !isResource) {
-      res.sendFile(path.join(frontendPath, 'index.html'));
+      if (req.path.startsWith('/new') || req.path === '/new/') {
+        res.sendFile(path.join(frontendPath, 'index.html'));
+      } else {
+        res.status(404).send('Not Found');
+      }
     } else {
       res.status(404).json({ error: 'Endpoint not found.' });
     }
