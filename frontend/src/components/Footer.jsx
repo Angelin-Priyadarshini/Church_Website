@@ -6,13 +6,23 @@ import { Phone, Mail, MapPin } from 'lucide-react';
 import { resolveImageUrl } from '../config';
 
 const Footer = () => {
-  const { t } = useLanguage();
+  const { t, language, dynamicAbout } = useLanguage();
   const { theme } = useTheme();
   const isLight = theme === 'light';
 
   const handleQuickLinkClick = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  let customLinks = [];
+  try {
+    const rawLinks = dynamicAbout && dynamicAbout[language] ? dynamicAbout[language].footerCustomLinks : null;
+    if (rawLinks) {
+      customLinks = typeof rawLinks === 'string' ? JSON.parse(rawLinks) : rawLinks;
+    }
+  } catch(e) {
+    console.error("Error parsing footer custom links:", e);
+  }
 
   return (
     <footer className={`pt-16 pb-8 border-t-4 border-amber-500 ${isLight ? 'bg-slate-900' : 'bg-slate-900'}`}>
@@ -33,7 +43,7 @@ const Footer = () => {
             </p>
             <div className="flex flex-col gap-2 mt-2 text-sm text-slate-300">
               <a 
-                href="https://www.google.com/maps/search/?api=1&query=St.+Martin's+Anglican+Church,+Yarmook,+Sharjah" 
+                href={t('footerMapLink') || "https://www.google.com/maps/search/?api=1&query=St.+Martin's+Anglican+Church,+Yarmook,+Sharjah"} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 hover:text-amber-400 transition-colors"
@@ -43,11 +53,11 @@ const Footer = () => {
               </a>
               <span className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-amber-400 shrink-0" />
-                +971 50 764 6822
+                {t('footerPhone') || "+971 50 764 6822"}
               </span>
               <span className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-amber-400 shrink-0" />
-                admin@agsharjah.org
+                {t('footerEmail') || "admin@agsharjah.org"}
               </span>
             </div>
           </div>
@@ -65,11 +75,11 @@ const Footer = () => {
               </li>
               <li>
                 <strong className="text-white block">{t('Saturdays')}:</strong>
-                10:00 AM - 12:45 PM (Fasting Prayer)
+                {t('saturdayFastingPrayerTiming')}
               </li>
               <li>
                 <strong className="text-white block">{t('Thursdays')}:</strong>
-                8:00 PM - 9:55 PM (Midweek Service)
+                {t('thursdayMidweekServiceTiming')}
               </li>
             </ul>
           </div>
@@ -87,6 +97,37 @@ const Footer = () => {
               <li><Link to="/events" onClick={handleQuickLinkClick} className="hover:text-amber-400 transition-colors">{t('navEvents')}</Link></li>
               <li><Link to="/resources" onClick={handleQuickLinkClick} className="hover:text-amber-400 transition-colors">{t('navResources')}</Link></li>
               <li><Link to="/contact" onClick={handleQuickLinkClick} className="hover:text-amber-400 transition-colors">{t('navContact')}</Link></li>
+              {customLinks.map((link, idx) => {
+                const label = language === 'ta' ? (link.labelTa || link.labelEn) : link.labelEn;
+                if (!label || !link.url) return null;
+                const isExternal = link.url.startsWith('http://') || link.url.startsWith('https://');
+                if (isExternal) {
+                  return (
+                    <li key={`custom-${idx}`}>
+                      <a 
+                        href={link.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="hover:text-amber-400 transition-colors"
+                      >
+                        {label}
+                      </a>
+                    </li>
+                  );
+                } else {
+                  return (
+                    <li key={`custom-${idx}`}>
+                      <Link 
+                        to={link.url} 
+                        onClick={handleQuickLinkClick} 
+                        className="hover:text-amber-400 transition-colors"
+                      >
+                        {label}
+                      </Link>
+                    </li>
+                  );
+                }
+              })}
             </ul>
           </div>
 
@@ -96,7 +137,7 @@ const Footer = () => {
               Worship Location
             </h4>
             <a 
-              href="https://www.google.com/maps/search/?api=1&query=St.+Martin's+Anglican+Church,+Yarmook,+Sharjah" 
+              href={t('footerMapLink') || "https://www.google.com/maps/search/?api=1&query=St.+Martin's+Anglican+Church,+Yarmook,+Sharjah"} 
               target="_blank" 
               rel="noopener noreferrer"
               className="w-full h-32 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center p-4 text-center text-xs text-slate-300 hover:bg-slate-700/80 hover:border-amber-500/50 transition-all duration-300 group"

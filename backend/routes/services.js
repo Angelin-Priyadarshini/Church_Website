@@ -343,7 +343,6 @@ function classifySermon(title) {
     { name: 'Bro. William', keywords: ['WILLIAM', 'வில்லியம்'] },
     { name: 'Asst. Past. Paulsamy', keywords: ['PAULSAMY', 'பால்சாமி'] },
     { name: 'Bro. Ruskin', keywords: ['RUSKIN', 'RASKIN', 'ரஸ்கின்'] },
-    { name: 'Sis. Mary Immanuel', keywords: ['MARY', 'மேரி'] },
     { name: 'Bro. Babu', keywords: ['BABU', 'பாபு'] },
     { name: 'Bro. Durai', keywords: ['DURAI', 'துரை'] },
     { name: 'Pastor Regilin', keywords: ['REGILIN', 'ரெஜிலின்'] },

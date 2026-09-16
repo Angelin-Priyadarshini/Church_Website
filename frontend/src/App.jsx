@@ -14,6 +14,7 @@ import Ministries from './pages/Ministries';
 import MinistryDetail from './pages/MinistryDetail';
 import Events from './pages/Events';
 import Resources from './pages/Resources';
+import Quiz from './pages/Quiz';
 import Contact from './pages/Contact';
 import Admin from './pages/Admin';
 
@@ -53,6 +54,7 @@ function App() {
                   <Route path="/ministries/:id" element={<MinistryDetail />} />
                   <Route path="/events" element={<Events />} />
                   <Route path="/resources" element={<Resources />} />
+                  <Route path="/resources/quiz" element={<Quiz />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/admin" element={<Admin />} />
                 </Routes>

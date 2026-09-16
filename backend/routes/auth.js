@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: 'agsharjahtamil@gmail.com',
+    user: process.env.EMAIL_USER || 'agsharjahtamil@gmail.com',
     pass: process.env.EMAIL_PASS
   },
   tls: {
@@ -32,8 +32,9 @@ async function sendVerificationEmail(email, name, verificationCode) {
     return true;
   }
 
+  const emailUser = process.env.EMAIL_USER || 'agsharjahtamil@gmail.com';
   const mailOptions = {
-    from: `"AG Sharjah Tamil Church" <agsharjahtamil@gmail.com>`,
+    from: `"AG Sharjah Tamil Church" <${emailUser}>`,
     to: email,
     subject: `${verificationCode} is your AGSTC Verification Code`,
     html: `
@@ -67,9 +68,9 @@ router.post('/login', async (req, res) => {
   }
 
   try {
-    const user = await db.getAsync(`SELECT * FROM users WHERE email = ?`, [email]);
+    const user = await db.getAsync(`SELECT * FROM users WHERE email = ? OR login_id = ?`, [email, email]);
     if (!user) {
-      return res.status(401).json({ error: 'Invalid email or password.' });
+      return res.status(401).json({ error: 'Invalid login credentials.' });
     }
 
     const isMatch = bcrypt.compareSync(password, user.password_hash);
@@ -109,8 +110,17 @@ router.post('/login', async (req, res) => {
 });
 
 // GET /api/auth/me (Get current logged in user details)
-router.get('/me', authenticateToken, (req, res) => {
-  res.json({ user: req.user });
+router.get('/me', authenticateToken, async (req, res) => {
+  try {
+    const user = await db.getAsync(`SELECT id, name, email, role FROM users WHERE id = ?`, [req.user.id]);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+    res.json({ user });
+  } catch (err) {
+    console.error('Error fetching current user:', err);
+    res.status(500).json({ error: 'Server error fetching profile.' });
+  }
 });
 
 // POST /api/auth/register (Handles both admin registrations and public registrations)
@@ -330,8 +340,9 @@ router.post('/request-password-change', authenticateToken, async (req, res) => {
 
     // Send OTP email
     if (process.env.EMAIL_PASS) {
+      const emailUser = process.env.EMAIL_USER || 'agsharjahtamil@gmail.com';
       const mailOptions = {
-        from: `"AG Sharjah Tamil Church" <agsharjahtamil@gmail.com>`,
+        from: `"AG Sharjah Tamil Church" <${emailUser}>`,
         to: user.email,
         subject: `${otp} is your AGSTC Password Change Verification Code`,
         html: `

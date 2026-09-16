@@ -3,14 +3,16 @@ import { API_BASE } from '../config';
 
 const LanguageContext = createContext();
 
-const translations = {
+export const translations = {
   en: {
     navHome: 'Home',
     navAbout: 'About Us',
     navServices: 'Sermons',
     navMinistries: 'Ministries',
     navEvents: 'Events',
-    navResources: 'Devotionals',
+    navResources: 'Resources',
+    navDailyPromises: 'Daily Promises',
+    navBibleQuiz: 'Bible Quiz',
     navContact: 'Contact Us',
     
     welcomeTitle: 'Welcome to AG Sharjah Tamil Church',
@@ -20,8 +22,9 @@ const translations = {
     requestPrayer: 'Submit Prayer Request',
     
     pastorMessageTitle: 'Pastoral Message',
-    pastorMessageText: 'We welcome you to this website in the most precious name of our Lord and savior Jesus Christ. Our Lord by His amazing grace has established AG Sharjah Tamil Church as a place of peace, comfort and harmony for His children who are residing away from their family and friends. Lord has blessed this Church as an instrument to spread the love of Christ amongst the people here, especially who belong to the Tamil community. AGSTC acts as a ladder through which we could reach greater heights in our spiritual life by growing in the knowledge of Christ, fellowshipping with Him and worshiping Him with an upright heart.',
+    pastorMessageText: "We welcome you, in the precious name of our Lord and Savior, Jesus Christ. By His amazing grace, He has made AG Sharjah Tamil Church a place of peace, comfort, and belonging — a spiritual home for His children living far from family and friends. God has blessed this church as an instrument to carry Christ's love to our community, and especially to our Tamil brothers and sisters here in the UAE. AGSTC exists to help each of us climb higher in our walk of faith: growing in the knowledge of Christ, walking closely with Him, and worshiping Him with an upright heart.",
     pastorName: 'Senior Pastor Immanuel',
+    pastorImage: '/images/pastor-immanuel.png',
     
     featuredSermon: 'Featured Sunday Sermon',
     weeklySchedule: 'Weekly Service Schedule',
@@ -41,7 +44,7 @@ const translations = {
     categoryLabel: 'Category',
     
     eventsHeader: 'Special Events',
-    eventsSub: 'Register to attend our special meetings, seminars, and calendar fellowships.',
+    eventsSub: 'Reserve your spot for our special meetings, seminars, and fellowship gatherings throughout the year.',
     seatsRemaining: 'seats remaining',
     eventRegisterBtn: 'Register For Event',
     eventFull: 'Full Capacity',
@@ -68,13 +71,13 @@ const translations = {
     floatingPray: 'Prayer Request',
     
     footerHeader: 'Assemblies of God Sharjah Tamil Church',
-    footerSub: 'Established by grace as a spiritual home away from home since 1982.',
+    footerSub: 'A spiritual home for Tamil families in the UAE, established by grace since 1982.',
     branchesTitle: 'Our Branch Networks',
     quickLinks: 'Quick Navigation',
     allRightsReserved: 'agsharjah.org - All rights reserved.',
 
     headerBrandSub: 'Sharjah Tamil Church',
-    learnHistory: 'Learn History',
+    learnHistory: 'Discover Our Story',
     joinUsTitle: 'Join Us in Word & Spirit',
     verifiedMember: 'Verified Member',
     
@@ -82,9 +85,9 @@ const translations = {
     valGospelTitle: 'Full Gospel Message',
     valGospelDesc: 'We preach the complete work of Christ—salvation, baptism of the Holy Spirit, healing, and His imminent return.',
     valSanctuaryTitle: 'Spiritual Sanctuary',
-    valSanctuaryDesc: 'Serving as a spiritual shelter for the expatriate Tamil workforce, reinforcing their faith away from home.',
+    valSanctuaryDesc: 'A spiritual shelter for the Tamil expatriate community, strengthening faith far from home.',
     valOutreachTitle: 'Outreach & Transport',
-    valOutreachDesc: 'Extending love through active weekly shuttles across Sharjah and neighboring centers.',
+    valOutreachDesc: "Extending Christ's love through free weekly shuttles across Sharjah and neighbouring communities.",
     
     // Faith & History timeline in About Us
     faithTitle1: 'The Scriptures Inspired',
@@ -97,24 +100,24 @@ const translations = {
     faithDesc4: 'All believers are entitled to and should ardently expect the promise of the Father, the baptism in the Holy Spirit, which gives power for life and service.',
     
     milestoneTitle1: 'Humble Beginnings',
-    milestoneDesc1: 'Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.',
+    milestoneDesc1: 'Started as a weekly bilingual home fellowship in Sharjah, with a focus on supporting regional expatriate workers.',
     milestoneTitle2: 'Regional Branch Network',
     milestoneDesc2: 'Formally established regional cell fellowships to expand weekly home ministries across neighboring communities.',
     milestoneTitle3: 'Transport fleet launched',
-    milestoneDesc3: 'Launched our transport service by renting vans to fetch Tamil laborers completely free of charge from far-flung industrial camps.',
+    milestoneDesc3: 'Launched our transport service by renting vans to bring Tamil brothers, free of charge, from far-flung industrial camps.',
 
     // Hero Banner
     heroTitle1: 'Experience Spiritual Sanctuary',
     heroSub1: 'A Tamil Assembly dedicated to deep spiritual grounding, active local cell fellowship, and sincere praise in Sharjah.',
     heroTitle2: 'We Stand in Prayer With You',
-    heroSub2: 'The Jeremiah Ministry and Sister circles are interceding daily. Submit your prayer points anonymously or publicly.',
+    heroSub2: "Whatever you're carrying, you don't carry it alone. Our Jeremiah Ministry and sister circles hold you in prayer every day of the week — share your request in confidence, or with the whole church family, and let us stand with you.",
     heroTitle3: 'Weekly Fellowship Assemblies',
     heroSub3: 'Join our regional prayer groups and weekly services in Sharjah. Safe transport shuttles are provided.',
 
-    aboutHeaderSub: 'Established by grace as a spiritual refuge for Tamil families in the UAE since 1982.',
+    aboutHeaderSub: 'A spiritual home for Tamil families in the UAE, established by grace since 1982.',
     aboutTitle: 'Our History',
-    aboutPara1: 'Assemblies of God Sharjah Tamil Church (AGSTC) was founded with a divine burden to minister to the spiritual and social welfare of the Tamil expatriate workforce residing in Sharjah and neighboring emirates.',
-    aboutPara2: 'What started as a small home cell meeting has blossomed under the dedicated pastoral leadership of Pastor Immanuel into a thriving sanctuary where hundreds of brothers and sisters gather weekly. The church acts as a priestly bridge, providing active transport cells to bring remote labor camp residents into fellowship.',
+    aboutPara1: 'Assembly of God Sharjah Tamil Church (AGSTC) was founded out of a God-given calling to care for the spiritual and social wellbeing of Tamil expatriates living and working in Sharjah and the neighbouring emirates.',
+    aboutPara2: 'What began as a small home cell meeting has grown, under the dedicated leadership of Pastor Immanuel, into a thriving church where hundreds of brothers and sisters gather every week. Our transport ministry carries that same spirit further still, bringing believers from remote labor camps into the fellowship of the church family.',
     aboutMission: 'Our core mission is to establish peace, counsel, and gospel restoration for everyone walking through our doors.',
     'Sharjah Main Assembly': 'Sharjah Main Assembly',
     'Sundays': 'Sundays',
@@ -138,7 +141,6 @@ const translations = {
     'Bro. Ruskin': 'Bro. Ruskin',
     'Br. Jeyaraj': 'Br. Jeyaraj',
     'Pastor Regilin': 'Pastor Regilin',
-    'Sis. Mary Immanuel': 'Sis. Mary Immanuel',
     'Bro. Gunaseelan': 'Bro. Gunaseelan',
 
     // Additional Page Translations
@@ -254,8 +256,13 @@ const translations = {
     bg_events: '/images/home-banner1.JPG',
     bg_resources: '/images/home-banner1.JPG',
     bg_contact: '/images/home-banner1.JPG',
-    sundayFirstServiceTiming: '6:00 AM to 8:30 AM (First Service)',
-    sundaySecondServiceTiming: '9:00 AM to 10:45 AM (Second Service)'
+    sundayFirstServiceTiming: '6:45 AM to 8:30 AM (First Service)',
+    sundaySecondServiceTiming: '9:00 AM to 10:45 AM (Second Service)',
+    saturdayFastingPrayerTiming: '10:00 AM - 12:45 PM (Fasting Prayer)',
+    thursdayMidweekServiceTiming: '8:30 PM - 10:00 PM (Midweek Service)',
+    footerPhone: '+971 50 764 6822',
+    footerEmail: 'admin@agsharjah.org',
+    footerMapLink: "https://www.google.com/maps/search/?api=1&query=St.+Martin's+Anglican+Church,+Yarmook,+Sharjah"
   },
   ta: {
     navHome: 'முதற்பக்கம்',
@@ -263,7 +270,9 @@ const translations = {
     navServices: 'ஒளிபடம்',
     navMinistries: 'ஊழியங்கள்',
     navEvents: 'நிகழ்வுகள்',
-    navResources: 'தியானங்கள்',
+    navResources: 'வளங்கள்',
+    navDailyPromises: 'தினசரி வாக்குத்தத்தங்கள்',
+    navBibleQuiz: 'வேதாகம வினாடி வினா',
     navContact: 'தொடர்புக்கு',
     
     welcomeTitle: 'ஆலயத்தைப்பற்றி - ஏஜி ஷார்ஜா தமிழ் சபை',
@@ -379,13 +388,11 @@ const translations = {
     'Thursday Midweek Service': 'வியாழக்கிழமை வாராந்திர ஆராதனை',
     'Saturday Fasting Prayer': 'சனிக்கிழமை உபவாச ஜெபம்',
     'Umm Al Quwain Service': 'உம்-அல்-குவைன் கிளை ஆராதனை',
-    '06:00 AM - 08:30 AM': 'காலை 06:00 - 08:30 மணி',
+    '06:45 AM - 08:30 AM': 'காலை 06:45 - 08:30 மணி',
     '09:00 AM - 10:45 AM': 'காலை 09:00 - 10:45 மணி',
     '11:15 AM - 12:45 PM': 'மதியம் 11:15 - 12:45 மணி',
-    '08:00 PM - 09:55 PM': 'இரவு 08:00 - 09:55 மணி',
-    '08:30 PM - 09:55 PM': 'இரவு 08:30 - 09:55 மணி',
-    '10:00 AM - 12:45 PM': 'காலை 10:00 - மதியம் 12:45 மணி',
     '08:30 PM - 10:00 PM': 'இரவு 08:30 - 10:00 மணி',
+    '10:00 AM - 12:45 PM': 'காலை 10:00 - மதியம் 12:45 மணி',
     'St. Martin\'s Anglican Church, Sharjah': 'செயிண்ட் மார்ட்டின் ஆங்கிலிகன் சர்ச், ஷார்ஜா',
     'Umm Al Quwain Industrial District': 'உம்-அல்-குவைன் தொழில்துறை பகுதி',
     'Main Worship': 'ஆராதனை',
@@ -411,7 +418,6 @@ const translations = {
     'Bro. Ruskin': 'சகோ. ரஸ்கின்',
     'Br. Jeyaraj': 'சகோ. ஜெயராஜ்',
     'Pastor Regilin': 'போதகர் ரெஜிலின்',
-    'Sis. Mary Immanuel': 'சகோதரி. மேரி இம்மானுவேல்',
     'Bro. Gunaseelan': 'சகோ. குணசீலன்',
     'Sharjah Main Assembly': 'ஷார்ஜா முதன்மை சபை',
     'Sundays': 'ஞாயிற்றுக்கிழமைகள்',
@@ -474,7 +480,6 @@ const translations = {
     
     'Women’s Ministry': 'பெண்கள் ஐக்கியம்',
     'Empowering sisters through intense prayer circles, home-to-home visitations, charitable outreach, and the weekly Tuesday Sisters Fellowship.': 'சகோதரிகளை ஆவிக்குரிய ஜீவியத்தில் பலப்படுத்த ஜெபக் குழுக்கள், இல்ல சந்திப்புகள், நற்பணிகள் மற்றும் வாராந்திர செவ்வாய்க்கிழமை சகோதரிகள் கூட்டங்களை நடத்தும் ஊழியம்.',
-    'Sis. Mary Immanuel': 'சகோதரி. மேரி இம்மானுவேல்',
     'Tuesdays at 10:00 AM': 'செவ்வாய்க்கிழமை காலை 10:00 மணி',
 
     // Additional Page Translations
@@ -592,8 +597,13 @@ const translations = {
     bg_events: '/images/home-banner1.JPG',
     bg_resources: '/images/home-banner1.JPG',
     bg_contact: '/images/home-banner1.JPG',
-    sundayFirstServiceTiming: 'காலை 6:00 முதல் 8:30 வரை (முதல் ஆராதனை)',
-    sundaySecondServiceTiming: 'காலை 9:00 முதல் 10:45 வரை (இரண்டாம் ஆராதனை)'
+    sundayFirstServiceTiming: 'காலை 6:45 முதல் 8:30 வரை (முதல் ஆராதனை)',
+    sundaySecondServiceTiming: 'காலை 9:00 முதல் 10:45 வரை (இரண்டாம் ஆராதனை)',
+    saturdayFastingPrayerTiming: 'காலை 10:00 - மதியம் 12:45 (உபவாச ஜெபம்)',
+    thursdayMidweekServiceTiming: 'இரவு 08:30 - 10:00 (வாராந்திர ஆராதனை)',
+    footerPhone: '+971 50 764 6822',
+    footerEmail: 'admin@agsharjah.org',
+    footerMapLink: "https://www.google.com/maps/search/?api=1&query=St.+Martin's+Anglican+Church,+Yarmook,+Sharjah"
   }
 };
 

@@ -42,7 +42,6 @@ const Services = () => {
     'Bro. Ruskin',
     'Br. Jeyaraj',
     'Pastor Regilin',
-    'Sis. Mary Immanuel',
     'Bro. Gunaseelan'
   ];
 

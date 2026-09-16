@@ -1,4 +1,5 @@
 const mysql = require('mysql2/promise');
+const path = require('path');
 
 const env = process.env;
 const getEnv = (...names) => {
@@ -8,6 +9,11 @@ const getEnv = (...names) => {
   }
   return undefined;
 };
+
+// SQLite configuration
+const sqliteDbPath = path.join(__dirname, '..', 'db.sqlite');
+let sqliteDb;
+let isSqlite = false;
 
 const dbConfig = {
   host:     getEnv('DB_HOST', 'MYSQL_HOST', 'MYSQLHOST') || 'localhost',
@@ -20,44 +26,128 @@ const dbConfig = {
   queueLimit: 0,
   charset: 'utf8mb4',
   timezone: '+00:00',
-  connectTimeout: 10000
+  connectTimeout: 4000 // 4 seconds short timeout for faster local fallback
 };
 
-console.log(`[DB] Connecting to MySQL: host=${dbConfig.host} port=${dbConfig.port} user=${dbConfig.user} db=${dbConfig.database}`);
+let pool;
+let mysqlConnected = false;
 
-const pool = mysql.createPool(dbConfig);
+// We will export helper functions that check whether we are using MySQL or SQLite
+let dbReadyResolve;
+const dbReadyPromise = new Promise((resolve) => {
+  dbReadyResolve = resolve;
+});
 
-pool.getConnection()
-  .then(conn => {
-    console.log('[DB] Connected to MySQL successfully.');
-    conn.release();
-  })
-  .catch(err => {
-    console.error(`[DB] MySQL connection FAILED: ${err.message}`);
-    console.error(`[DB] Config used: host=${dbConfig.host} port=${dbConfig.port} user=${dbConfig.user} db=${dbConfig.database}`);
-    console.error('[DB] If on Hostinger, make sure DB_HOST=localhost and the DB user has been granted access in hPanel > Databases > MySQL Databases.');
-  });
+function cleanSqlForSqlite(sql) {
+  let s = sql;
+  // Strip MySQL table options:
+  s = s.replace(/ENGINE\s*=\s*\w+/gi, '');
+  s = s.replace(/DEFAULT\s+CHARSET\s*=\s*\w+/gi, '');
+  s = s.replace(/COLLATE\s*=\s*[\w_]+/gi, '');
+  s = s.replace(/CHARACTER\s+SET\s*=\s*\w+/gi, '');
+  // Clean up trailing commas/parentheses
+  s = s.replace(/\s*,\s*\)/g, ')');
+  // Convert AUTO_INCREMENT
+  s = s.replace(/(\bINT\b|\bINTEGER\b)\s+NOT\s+NULL\s+AUTO_INCREMENT\s+PRIMARY\s+KEY/gi, 'INTEGER PRIMARY KEY AUTOINCREMENT');
+  s = s.replace(/(\bINT\b|\bINTEGER\b)\s+AUTO_INCREMENT\s+PRIMARY\s+KEY/gi, 'INTEGER PRIMARY KEY AUTOINCREMENT');
+  return s;
+}
 
-// Returns array of rows
 const allAsync = async (sql, params = []) => {
-  const [rows] = await pool.execute(sql, params);
-  return rows;
+  await dbReadyPromise;
+  if (isSqlite) {
+    return new Promise((resolve, reject) => {
+      sqliteDb.all(cleanSqlForSqlite(sql), params, (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    });
+  } else {
+    const [rows] = await pool.execute(sql, params);
+    return rows;
+  }
 };
 
-// Returns single row or undefined
 const getAsync = async (sql, params = []) => {
-  const [rows] = await pool.execute(sql, params);
-  return rows[0] || undefined;
+  await dbReadyPromise;
+  if (isSqlite) {
+    return new Promise((resolve, reject) => {
+      sqliteDb.get(cleanSqlForSqlite(sql), params, (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    });
+  } else {
+    const [rows] = await pool.execute(sql, params);
+    return rows[0] || undefined;
+  }
 };
 
-// Returns { lastID, changes }
 const runAsync = async (sql, params = []) => {
-  const [result] = await pool.execute(sql, params);
-  return {
-    lastID: result.insertId || 0,
-    changes: result.affectedRows || 0
-  };
+  await dbReadyPromise;
+  if (isSqlite) {
+    return new Promise((resolve, reject) => {
+      sqliteDb.run(cleanSqlForSqlite(sql), params, function (err) {
+        if (err) reject(err);
+        else resolve({ lastID: this.lastID, changes: this.changes });
+      });
+    });
+  } else {
+    const [result] = await pool.execute(sql, params);
+    return {
+      lastID: result.insertId || 0,
+      changes: result.affectedRows || 0
+    };
+  }
 };
+
+// Initialize SQLite fallback
+function initSqlite() {
+  const sqlite3 = require('sqlite3').verbose();
+  isSqlite = true;
+  console.log(`[DB] SQLite Mode Active. Database file: ${sqliteDbPath}`);
+  sqliteDb = new sqlite3.Database(sqliteDbPath, (err) => {
+    if (err) {
+      console.error(`[DB] SQLite connection FAILED: ${err.message}`);
+    } else {
+      console.log('[DB] Connected to SQLite successfully.');
+    }
+    if (dbReadyResolve) {
+      dbReadyResolve();
+      dbReadyResolve = null;
+    }
+  });
+}
+
+// Try connecting to MySQL
+const forceSqlite = getEnv('DB_DIALECT') === 'sqlite' || getEnv('DB_USER') === 'root' || !getEnv('DB_PASSWORD');
+
+if (forceSqlite) {
+  initSqlite();
+} else {
+  console.log(`[DB] Connecting to MySQL: host=${dbConfig.host} port=${dbConfig.port} user=${dbConfig.user} db=${dbConfig.database}`);
+  try {
+    pool = mysql.createPool(dbConfig);
+    
+    pool.getConnection()
+      .then(conn => {
+        console.log('[DB] Connected to MySQL successfully.');
+        mysqlConnected = true;
+        conn.release();
+        if (dbReadyResolve) {
+          dbReadyResolve();
+          dbReadyResolve = null;
+        }
+      })
+      .catch(err => {
+        console.error(`[DB] MySQL connection FAILED: ${err.message}`);
+        initSqlite();
+      });
+  } catch (err) {
+    console.error(`[DB] Failed to create MySQL pool: ${err.message}`);
+    initSqlite();
+  }
+}
 
 const publicConfig = {
   host: dbConfig.host,
@@ -66,5 +156,25 @@ const publicConfig = {
   database: dbConfig.database
 };
 
-const db = { allAsync, getAsync, runAsync, pool, config: publicConfig };
+const db = {
+  allAsync,
+  getAsync,
+  runAsync,
+  get pool() {
+    if (isSqlite) {
+      return {
+        execute: async (sql, params = []) => {
+          const rows = await allAsync(sql, params);
+          return [rows];
+        },
+        getConnection: async () => {
+          return { release: () => {} };
+        }
+      };
+    }
+    return pool;
+  },
+  config: publicConfig
+};
+
 module.exports = db;

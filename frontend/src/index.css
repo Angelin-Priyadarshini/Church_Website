@@ -635,7 +635,7 @@ html[data-theme="light"] .relative.overflow-hidden .text-slate-300 {
 }
 
 /* ── Mobile menu ── */
-html[data-theme="light"] .xl\:hidden .glass-panel {
+html[data-theme="light"] .lg\:hidden .glass-panel {
   background: rgba(255, 255, 255, 0.99) !important;
 }
 
@@ -972,9 +972,133 @@ select.believer-input {
 }
 
 /* ==========================================
-   LOCALHOST-ONLY FONTS OVERRIDE FOR ABOUT US PAGE
+   ADMIN PORTAL — DARK MODE CONTRAST OVERRIDES
    ========================================== */
-.about-localhost-fonts {
-  --font-serif: 'Druk Wide Bold', 'Impact', 'Arial Black', sans-serif !important;
-  --font-body: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif !important;
+html[data-theme="dark"] .admin-portal {
+  color: hsl(215, 25%, 88%) !important;
 }
+
+/* Headings color */
+html[data-theme="dark"] .admin-portal h1,
+html[data-theme="dark"] .admin-portal h2,
+html[data-theme="dark"] .admin-portal h3,
+html[data-theme="dark"] .admin-portal h4,
+html[data-theme="dark"] .admin-portal h5 {
+  color: hsl(0, 0%, 100%) !important;
+}
+
+/* Text color helper overrides */
+html[data-theme="dark"] .admin-portal .text-slate-900,
+html[data-theme="dark"] .admin-portal .text-slate-800,
+html[data-theme="dark"] .admin-portal .text-slate-700 {
+  color: hsl(215, 25%, 90%) !important;
+}
+
+html[data-theme="dark"] .admin-portal .text-slate-600,
+html[data-theme="dark"] .admin-portal .text-slate-505,
+html[data-theme="dark"] .admin-portal .text-slate-500,
+html[data-theme="dark"] .admin-portal .text-slate-450,
+html[data-theme="dark"] .admin-portal .text-slate-400 {
+  color: hsl(218, 15%, 72%) !important;
+}
+
+/* Form labels */
+html[data-theme="dark"] .admin-portal label {
+  color: hsl(218, 15%, 80%) !important;
+}
+
+/* Backgrounds & borders overrides */
+html[data-theme="dark"] .admin-portal .bg-white {
+  background-color: hsl(223, 45%, 11%) !important;
+  border-color: hsl(222, 30%, 20%) !important;
+  color: hsl(215, 25%, 90%) !important;
+}
+
+html[data-theme="dark"] .admin-portal .bg-slate-50 {
+  background-color: hsl(222, 47%, 9%) !important;
+}
+
+html[data-theme="dark"] .admin-portal .bg-slate-50\/30 {
+  background-color: rgba(15, 23, 42, 0.3) !important;
+}
+
+/* Alternating rows divide color */
+html[data-theme="dark"] .admin-portal .divide-slate-200 > * + * {
+  border-color: hsl(222, 30%, 20%) !important;
+}
+
+html[data-theme="dark"] .admin-portal .border-slate-200,
+html[data-theme="dark"] .admin-portal .border-slate-150,
+html[data-theme="dark"] .admin-portal .border-slate-100 {
+  border-color: hsl(222, 30%, 18%) !important;
+}
+
+/* Inputs & select dropdown controls */
+html[data-theme="dark"] .admin-portal .input-control,
+html[data-theme="dark"] .admin-portal select,
+html[data-theme="dark"] .admin-portal textarea,
+html[data-theme="dark"] .admin-portal input[type="text"],
+html[data-theme="dark"] .admin-portal input[type="date"],
+html[data-theme="dark"] .admin-portal input[type="number"],
+html[data-theme="dark"] .admin-portal input[type="email"],
+html[data-theme="dark"] .admin-portal input[type="password"] {
+  background-color: hsl(222, 47%, 9%) !important;
+  color: hsl(0, 0%, 100%) !important;
+  border: 1px solid hsl(222, 30%, 25%) !important;
+}
+
+html[data-theme="dark"] .admin-portal .input-control::placeholder,
+html[data-theme="dark"] .admin-portal textarea::placeholder,
+html[data-theme="dark"] .admin-portal input::placeholder {
+  color: hsl(218, 15%, 55%) !important;
+}
+
+html[data-theme="dark"] .admin-portal select option {
+  background-color: hsl(223, 45%, 11%) !important;
+  color: hsl(0, 0%, 100%) !important;
+}
+
+/* Tables, headers & hovers */
+html[data-theme="dark"] .admin-portal table th {
+  background-color: hsl(222, 47%, 9%) !important;
+  color: hsl(42, 90%, 65%) !important;
+  border-bottom: 1px solid hsl(222, 30%, 20%) !important;
+}
+
+html[data-theme="dark"] .admin-portal tbody tr {
+  background-color: transparent !important;
+  border-bottom: 1px solid hsl(222, 30%, 18%) !important;
+}
+
+/* Override the white background hover from light-mode layout */
+html[data-theme="dark"] .admin-portal tbody tr:hover,
+html[data-theme="dark"] .admin-portal .hover\:bg-slate-50:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Table links readability */
+html[data-theme="dark"] .admin-portal tbody td a {
+  color: hsl(0, 0%, 100%) !important;
+}
+
+html[data-theme="dark"] .admin-portal tbody td a:hover {
+  color: var(--primary-gold) !important;
+}
+
+/* Buttons / badges styling in dark mode */
+html[data-theme="dark"] .admin-portal .bg-red-50 {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+  color: hsl(0, 85%, 75%) !important;
+}
+
+html[data-theme="dark"] .admin-portal .bg-amber-100 {
+  background-color: rgba(245, 158, 11, 0.1) !important;
+  color: hsl(42, 90%, 65%) !important;
+}
+
+html[data-theme="dark"] .admin-portal .bg-emerald-100 {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+  color: hsl(152, 60%, 75%) !important;
+}
+
+

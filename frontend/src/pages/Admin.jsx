@@ -170,17 +170,7 @@ const Admin = () => {
     capacity: 100
   });
 
-  // Study Resources Management State
-  const [resources, setResources] = useState([]);
-  const [isSubmittingResource, setIsSubmittingResource] = useState(false);
-  const [editingResourceId, setEditingResourceId] = useState(null);
-  const [newResource, setNewResource] = useState({
-    title: '',
-    description: '',
-    file_url: '',
-    file_type: 'PDF',
-    category: 'Bible Study'
-  });
+
 
   // Dynamic file/image base64 uploading helper
   const [isUploading, setIsUploading] = useState(false);
@@ -236,6 +226,7 @@ const Admin = () => {
   const [creatorSuccess, setCreatorSuccess] = useState('');
   const [creatorError, setCreatorError] = useState('');
   const [isCreatingQuiz, setIsCreatingQuiz] = useState(false);
+  const [isImportingQuiz, setIsImportingQuiz] = useState(false);
 
   // Roster Analysis State (Data Admin)
   const [analysisData, setAnalysisData] = useState(null);
@@ -495,6 +486,71 @@ const Admin = () => {
     }
   };
 
+  const handleImportFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    if (ext !== '.docx' && ext !== '.pdf') {
+      alert("Please upload only .docx or .pdf documents.");
+      return;
+    }
+
+    setIsImportingQuiz(true);
+    setCreatorError('');
+    setCreatorSuccess('');
+
+    try {
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const base64Data = event.target.result;
+          const response = await fetch(`${API_BASE}/api/quizzes/parse-document`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              fileName: file.name,
+              base64Data
+            })
+          });
+
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || 'Failed to parse document.');
+
+          if (data.questions && data.questions.length > 0) {
+            const formatted = data.questions.map(q => ({
+              question_text: q.question_text || '',
+              option_a: q.option_a || '',
+              option_b: q.option_b || '',
+              option_c: q.option_c || '',
+              option_d: q.option_d || '',
+              option_e: q.option_e || '',
+              correct_option: q.correct_option || 'A',
+              reference_verse: q.reference_verse || ''
+            }));
+            setNewQuizQuestions(formatted);
+            setCreatorSuccess(`Successfully parsed ${data.questionsCount} questions from "${file.name}"! Please review them below before publishing.`);
+          } else {
+            throw new Error("No valid questions found in the document. Please check the document format.");
+          }
+        } catch (err) {
+          setCreatorError(err.message);
+        } finally {
+          setIsImportingQuiz(false);
+          e.target.value = '';
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      setCreatorError(err.message);
+      setIsImportingQuiz(false);
+      e.target.value = '';
+    }
+  };
+
   // 4. Create Quiz API
   const handleAddQuestion = () => {
     setNewQuizQuestions(prev => [
@@ -704,12 +760,7 @@ const Admin = () => {
         setMinistries(mnData);
       }
 
-      // 9. Fetch study resources
-      const rsRes = await fetch(`${API_BASE}/api/resources`);
-      if (rsRes.ok) {
-        const rsData = await rsRes.json();
-        setResources(rsData);
-      }
+
 
       // 10. Fetch registered users (admin only)
       if (user && user.role === 'admin') {
@@ -1265,92 +1316,7 @@ const Admin = () => {
     setFormSuccess('');
   };
 
-  // 5. Study Resources Handlers
-  const handleSaveResource = async (e) => {
-    e.preventDefault();
-    setFormError('');
-    setFormSuccess('');
-    setIsSubmittingResource(true);
 
-    try {
-      const url = editingResourceId 
-        ? `${API_BASE}/api/resources/${editingResourceId}` 
-        : `${API_BASE}/api/resources`;
-      const method = editingResourceId ? 'PUT' : 'POST';
-
-      const res = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(newResource)
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to save resource.');
-      }
-
-      setFormSuccess(editingResourceId ? 'Study resource updated successfully!' : 'Study resource cataloged successfully!');
-      setNewResource({
-        title: '',
-        description: '',
-        file_url: '',
-        file_type: 'PDF',
-        category: 'Bible Study'
-      });
-      setEditingResourceId(null);
-      fetchDashboardData();
-    } catch (err) {
-      setFormError(err.message);
-    } finally {
-      setIsSubmittingResource(false);
-    }
-  };
-
-  const handleDeleteResource = async (id) => {
-    if (!window.confirm('Are you sure you want to remove this downloadable resource?')) return;
-    try {
-      const res = await fetch(`${API_BASE}/api/resources/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to delete resource.');
-      }
-      fetchDashboardData();
-    } catch (err) {
-      alert(err.message);
-    }
-  };
-
-  const handleStartEditResource = (rs) => {
-    setEditingResourceId(rs.id);
-    setNewResource({
-      title: rs.title,
-      description: rs.description,
-      file_url: rs.file_url,
-      file_type: rs.file_type,
-      category: rs.category
-    });
-    setFormError('');
-    setFormSuccess('');
-  };
-
-  const handleCancelEditResource = () => {
-    setEditingResourceId(null);
-    setNewResource({
-      title: '',
-      description: '',
-      file_url: '',
-      file_type: 'PDF',
-      category: 'Bible Study'
-    });
-    setFormError('');
-    setFormSuccess('');
-  };
 
   useEffect(() => {
     if (token && user) {
@@ -3268,7 +3234,7 @@ const Admin = () => {
               </button>
             )}
 
-            {/* NEW: Upload Bible Tests (admin / data_admin only) */}
+            {/* NEW: Bible Quiz Portal (admin / data_admin only) */}
             {(user && (user.role === 'admin' || user.role === 'data_admin')) && (
               <button
                 onClick={() => setActiveTab('upload_test')}
@@ -3279,7 +3245,7 @@ const Admin = () => {
                 }`}
               >
                 <BookOpen className="w-4 h-4 shrink-0" />
-                <span className="flex-1">Upload Bible Tests</span>
+                <span className="flex-1">Bible Quiz Portal</span>
               </button>
             )}
 
@@ -3346,19 +3312,6 @@ const Admin = () => {
                   <Users className="w-4 h-4 shrink-0" />
                   <span className="flex-1">Ministries</span>
                   <span className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold ${activeTab === 'ministries' ? 'bg-slate-950/20 text-slate-955' : 'bg-slate-100 text-slate-600'}`}>{ministries.length}</span>
-                </button>
-
-                <button
-                  onClick={() => setActiveTab('resources')}
-                  className={`flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl font-bold text-xs transition-all border ${
-                    activeTab === 'resources'
-                      ? 'bg-amber-500 text-slate-950 border-amber-500 shadow-sm'
-                      : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-950 border-transparent'
-                  }`}
-                >
-                  <BookOpen className="w-4 h-4 shrink-0" />
-                  <span className="flex-1">Resources</span>
-                  <span className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold ${activeTab === 'resources' ? 'bg-slate-950/20 text-slate-955' : 'bg-slate-100 text-slate-600'}`}>{resources.length}</span>
                 </button>
 
                 <button
@@ -3435,7 +3388,7 @@ const Admin = () => {
                 {user?.role !== 'data_admin' && <option value="sermons">🎥 Sermons Manager ({sermons.length})</option>}
                 {user?.role === 'admin' && <option value="events">📅 Events Manager ({events.length})</option>}
                 {(user?.role === 'admin' || user?.role === 'data_admin') && <option value="believers">👥 Believers Database & Import</option>}
-                {(user?.role === 'admin' || user?.role === 'data_admin') && <option value="upload_test">📝 Upload Bible Tests</option>}
+                {(user?.role === 'admin' || user?.role === 'data_admin') && <option value="upload_test">📝 Bible Quiz Portal</option>}
                 {user?.role !== 'data_admin' && (
                   <>
                     <option value="homepage">🏠 Homepage Content Editor</option>
@@ -3443,7 +3396,6 @@ const Admin = () => {
                     <option value="customizer">🛠️ Page Headers Customizer</option>
                     <option value="schedules">⏰ Timings & Assemblies ({schedules.length})</option>
                     <option value="ministries">👥 Ministries ({ministries.length})</option>
-                    <option value="resources">📚 Resources ({resources.length})</option>
                     <option value="devotionals">🔖 Devotionals ({devotionals.length})</option>
                   </>
                 )}
@@ -3822,6 +3774,58 @@ const Admin = () => {
                       className="input-control w-full p-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-amber-500"
                       required
                     />
+                  </div>
+
+                  {/* Document Import Upload Zone */}
+                  <div className={`p-4 border border-dashed rounded-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-2 transition-all ${
+                    isLight 
+                      ? 'border-amber-300 bg-amber-500/5' 
+                      : 'border-slate-800 bg-slate-900/40'
+                  }`}>
+                    <div>
+                      <h4 className={`text-xs font-extrabold uppercase tracking-wider ${
+                        isLight ? 'text-amber-700' : 'text-amber-400'
+                      }`}>
+                        Import Questions from Word / PDF
+                      </h4>
+                      <p className={`text-[10px] mt-0.5 ${
+                        isLight ? 'text-slate-500' : 'text-slate-400'
+                      }`}>
+                        Upload a `.docx` or `.pdf` file with your questions, options (up to 5), answers, and reference verses to fill the form automatically.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="file"
+                        accept=".docx,.pdf"
+                        onChange={handleImportFileChange}
+                        className="hidden"
+                        id="quiz-file-import"
+                        disabled={isImportingQuiz}
+                      />
+                      <label
+                        htmlFor="quiz-file-import"
+                        className={`px-4 py-2 border rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm cursor-pointer ${
+                          isImportingQuiz
+                            ? 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed'
+                            : isLight
+                            ? 'bg-white border-amber-200 text-amber-700 hover:bg-amber-50'
+                            : 'bg-slate-900 border-slate-800 text-amber-400 hover:bg-slate-850 hover:text-amber-300'
+                        }`}
+                      >
+                        {isImportingQuiz ? (
+                          <>
+                            <svg className="animate-spin h-3.5 w-3.5 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Parsing...
+                          </>
+                        ) : (
+                          <>📄 Import Document</>
+                        )}
+                      </label>
+                    </div>
                   </div>
 
                   {/* Questions builder */}
@@ -6093,180 +6097,6 @@ const Admin = () => {
           </div>
         )}
 
-{/* 8. STUDY RESOURCES PANEL */}
-        {activeTab === 'resources' && (
-          <div className="flex flex-col gap-8 animate-slideup text-left">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Form block */}
-              <div className="lg:col-span-1 glass-panel p-6 bg-white border-slate-200 shadow-sm flex flex-col gap-4">
-                <div className="border-b border-slate-100 pb-3 flex items-center gap-2">
-                  <Plus className="w-5 h-5 text-amber-500" />
-                  <h3 className="font-serif font-bold text-lg text-slate-900">
-                    {editingResourceId ? 'Edit Study Material' : 'Catalog New Material'}
-                  </h3>
-                </div>
-
-                <form onSubmit={handleSaveResource} className="flex flex-col gap-4">
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 block mb-1">Resource Title *</label>
-                    <input 
-                      type="text"
-                      value={newResource.title}
-                      onChange={(e) => setNewResource({ ...newResource, title: e.target.value })}
-                      placeholder="e.g. Family Altar Guide - June 2026"
-                      className="input-control w-full text-slate-950 bg-white"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 block mb-1">File Path / URL *</label>
-                    <input 
-                      type="text"
-                      value={newResource.file_url}
-                      onChange={(e) => setNewResource({ ...newResource, file_url: e.target.value })}
-                      placeholder="e.g. /resources/guide-june2026.pdf"
-                      className="input-control w-full text-slate-950 bg-white font-mono text-xs mb-2"
-                      required
-                    />
-                    <input 
-                      type="file"
-                      accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
-                      onChange={async (e) => {
-                        const file = e.target.files[0];
-                        if (file) {
-                          try {
-                            const url = await uploadFile(file, 'resources');
-                            setNewResource({ 
-                              ...newResource, 
-                              file_url: url,
-                              file_type: file.name.split('.').pop().toUpperCase()
-                            });
-                          } catch (err) {
-                            alert('Upload failed: ' + err.message);
-                          }
-                        }
-                      }}
-                      className="input-control w-full text-slate-950 bg-white text-xs"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-xs font-bold text-slate-700 block mb-1">File Type</label>
-                      <input 
-                        type="text"
-                        value={newResource.file_type}
-                        onChange={(e) => setNewResource({ ...newResource, file_type: e.target.value })}
-                        placeholder="e.g. PDF"
-                        className="input-control w-full text-slate-950 bg-white font-bold"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs font-bold text-slate-700 block mb-1">Category</label>
-                      <select
-                        value={newResource.category}
-                        onChange={(e) => setNewResource({ ...newResource, category: e.target.value })}
-                        className="input-control w-full text-slate-950 bg-white"
-                      >
-                        <option value="Bible Study">Bible Study</option>
-                        <option value="Children Corner">Children Corner</option>
-                        <option value="Family Devotional">Family Devotional</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 block mb-1">Short Description</label>
-                    <textarea 
-                      value={newResource.description}
-                      onChange={(e) => setNewResource({ ...newResource, description: e.target.value })}
-                      placeholder="Provide outline points, details, target group..."
-                      rows="3"
-                      className="input-control w-full text-slate-950 bg-white"
-                    />
-                  </div>
-
-                  {formError && <span className="text-xs font-bold text-red-600 block">{formError}</span>}
-                  {formSuccess && <span className="text-xs font-bold text-emerald-600 block">{formSuccess}</span>}
-
-                  <div className="flex gap-2 border-t border-slate-100 pt-3 mt-1">
-                    {editingResourceId && (
-                      <button 
-                        type="button"
-                        onClick={handleCancelEditResource}
-                        className="btn-secondary py-2 px-4 text-xs flex-1"
-                      >
-                        Cancel
-                      </button>
-                    )}
-                    <button 
-                      type="submit"
-                      disabled={isSubmittingResource}
-                      className="btn-primary justify-center py-2 px-4 text-xs flex-1"
-                    >
-                      {isSubmittingResource ? 'Saving...' : (editingResourceId ? 'Update Resource' : 'Catalog Resource')}
-                    </button>
-                  </div>
-                </form>
-              </div>
-
-              {/* Resources Table list */}
-              <div className="lg:col-span-2 glass-panel overflow-hidden bg-white border-slate-200 shadow-sm flex flex-col">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse text-sm min-w-[700px]">
-                    <thead>
-                      <tr className="bg-slate-900 text-white font-bold text-xs uppercase tracking-wider">
-                        <th className="p-4">Resource Outline</th>
-                        <th className="p-4">Category / Type</th>
-                        <th className="p-4 text-center">Stats</th>
-                        <th className="p-4 text-center">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200 font-semibold text-slate-700">
-                      {resources.map((rs) => (
-                        <tr key={rs.id} className="hover:bg-slate-50 transition-colors">
-                          <td className="p-4">
-                            <span className="block text-slate-900 font-bold">{rs.title}</span>
-                            <span className="block text-xs text-slate-400 font-medium leading-relaxed mt-0.5">{rs.description}</span>
-                            <span className="block font-mono text-[9px] text-amber-600 mt-1 select-all">{rs.file_url}</span>
-                          </td>
-                          <td className="p-4">
-                            <span className="px-1.5 py-0.5 bg-emerald-50 text-emerald-700 text-[9px] font-extrabold uppercase rounded block w-fit mb-1">
-                              {rs.category}
-                            </span>
-                            <span className="text-[10px] text-slate-400 font-bold block">{rs.file_type}</span>
-                          </td>
-                          <td className="p-4 text-center font-bold text-xs text-slate-500">
-                            📥 {rs.download_count || 0}
-                          </td>
-                          <td className="p-4">
-                            <div className="flex gap-2 justify-center">
-                              <button 
-                                onClick={() => handleStartEditResource(rs)}
-                                className="p-1.5 rounded bg-amber-50 text-amber-600 hover:bg-amber-100"
-                                title="Edit Resource"
-                              >
-                                <Edit className="w-4 h-4" />
-                              </button>
-                              <button 
-                                onClick={() => handleDeleteResource(rs.id)}
-                                className="p-1.5 rounded bg-red-50 text-red-600 hover:bg-red-100"
-                                title="Delete Resource"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* 4. DEVOTIONALS MANAGER PANEL */}
         {activeTab === 'devotionals' && (

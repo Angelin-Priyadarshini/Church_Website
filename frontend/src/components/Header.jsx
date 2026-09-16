@@ -66,12 +66,12 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation with perfectly equal spacing between everything */}
-          <div className="hidden xl:flex items-center justify-between flex-grow ml-8 xl:ml-12 2xl:ml-16">
+          <div className="hidden lg:flex items-center justify-between flex-grow ml-4 lg:ml-6 xl:ml-12 2xl:ml-16">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
-                className={`${language === 'ta' ? 'text-[12.5px] 2xl:text-[14px] tracking-tighter' : 'text-[15px] 2xl:text-[16px]'} font-semibold transition-colors ${navTextColor} ${navHoverColor} whitespace-nowrap`}
+                className={`${language === 'ta' ? 'text-[11px] lg:text-[12.5px] 2xl:text-[14px] tracking-tighter' : 'text-[13px] lg:text-[15px] 2xl:text-[16px]'} font-semibold transition-colors ${navTextColor} ${navHoverColor} whitespace-nowrap`}
               >
                 {link.label}
               </Link>
@@ -140,7 +140,7 @@ const Header = () => {
           </div>
 
           {/* Mobile Controls */}
-          <div className="xl:hidden flex items-center gap-1 shrink-0">
+          <div className="lg:hidden flex items-center gap-1 shrink-0">
             {/* Theme toggle mobile */}
             <button
               onClick={toggleTheme}
@@ -181,7 +181,7 @@ const Header = () => {
       {/* Mobile Menu */}
       {isOpen && (
         <div
-          className="xl:hidden absolute left-3 right-3 top-full mt-2 glass-panel p-4 animate-slideup max-h-[calc(100vh-92px)] overflow-y-auto"
+          className="lg:hidden absolute left-3 right-3 top-full mt-2 glass-panel p-4 animate-slideup max-h-[calc(100vh-92px)] overflow-y-auto"
           style={{ borderRadius: '14px', background: isDark ? 'rgba(8,12,24,0.98)' : 'rgba(255,255,255,0.99)' }}
         >
           <div className="grid grid-cols-1 gap-2">

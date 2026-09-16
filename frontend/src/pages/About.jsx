@@ -5,7 +5,6 @@ import { resolveImageUrl } from '../config';
 
 const About = () => {
   const { t, language } = useLanguage();
-  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
   // Dynamic Statements of Faith from database
   const rawFaith = t('faithStatements');
@@ -109,7 +108,7 @@ const About = () => {
   };
 
   return (
-    <div className={`animate-slideup ${isLocal ? 'about-localhost-fonts' : ''}`}>
+    <div className="animate-slideup">
       {/* 1. Header Banner */}
       <section 
         className="bg-slate-950/65 text-white py-16 relative overflow-hidden border-b border-amber-500/20"

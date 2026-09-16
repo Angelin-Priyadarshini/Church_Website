@@ -14,6 +14,7 @@ async function seedDatabase() {
       role VARCHAR(50) NOT NULL DEFAULT 'user',
       is_verified INTEGER DEFAULT 0,
       verification_code TEXT,
+      login_id VARCHAR(50) UNIQUE DEFAULT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
 
@@ -56,6 +57,11 @@ async function seedDatabase() {
       // Column already exists, ignore
     }
 
+    try {
+      await db.runAsync(`UPDATE ministries SET leader = '' WHERE name IN ('Mens Ministry', 'Women\'s Ministry')`);
+      console.log('Cleared leaders of Mens Ministry and Womens Ministry.');
+    } catch (e) {}
+
     await db.runAsync(`CREATE TABLE IF NOT EXISTS prayers (
       id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
       name TEXT NOT NULL,
@@ -78,6 +84,10 @@ async function seedDatabase() {
     try {
       await db.runAsync(`ALTER TABLE users ADD COLUMN verification_code TEXT`);
       console.log('Migrated users table: added verification_code column.');
+    } catch (e) {}
+    try {
+      await db.runAsync(`ALTER TABLE users ADD COLUMN login_id VARCHAR(50) UNIQUE DEFAULT NULL`);
+      console.log('Migrated users table: added login_id column.');
     } catch (e) {}
     try {
       await db.runAsync(`ALTER TABLE prayers ADD COLUMN user_id INTEGER DEFAULT NULL`);
@@ -166,10 +176,21 @@ async function seedDatabase() {
     await db.runAsync(`CREATE TABLE IF NOT EXISTS quizzes (
       id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
       title TEXT NOT NULL,
+      reference_verse VARCHAR(255) DEFAULT NULL,
+      results_released INT DEFAULT 0,
       duration_seconds INT NOT NULL,
       created_by INT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
+
+    try {
+      await db.runAsync(`ALTER TABLE quizzes ADD COLUMN reference_verse VARCHAR(255) DEFAULT NULL`);
+      console.log('Migrated quizzes table: added reference_verse column.');
+    } catch (e) {}
+    try {
+      await db.runAsync(`ALTER TABLE quizzes ADD COLUMN results_released INT DEFAULT 0`);
+      console.log('Migrated quizzes table: added results_released column.');
+    } catch (e) {}
 
     await db.runAsync(`CREATE TABLE IF NOT EXISTS questions (
       id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -179,9 +200,20 @@ async function seedDatabase() {
       option_b TEXT NOT NULL,
       option_c TEXT NOT NULL,
       option_d TEXT NOT NULL,
+      option_e TEXT DEFAULT NULL,
       correct_option VARCHAR(10) NOT NULL,
+      reference_verse VARCHAR(255) DEFAULT NULL,
       FOREIGN KEY(quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
+
+    try {
+      await db.runAsync(`ALTER TABLE questions ADD COLUMN option_e TEXT DEFAULT NULL`);
+      console.log('Migrated questions table: added option_e column.');
+    } catch (e) {}
+    try {
+      await db.runAsync(`ALTER TABLE questions ADD COLUMN reference_verse VARCHAR(255) DEFAULT NULL`);
+      console.log('Migrated questions table: added reference_verse column.');
+    } catch (e) {}
 
     await db.runAsync(`CREATE TABLE IF NOT EXISTS quiz_scores (
       id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -232,7 +264,7 @@ async function seedDatabase() {
       const modHash = bcrypt.hashSync('password123', 10);
       
       await db.runAsync(`INSERT INTO users (name, email, password_hash, role, is_verified) VALUES (?, ?, ?, ?, ?)`, 
-        ['Senior Pastor Tamilselvi', 'tamilselvimariappan@gmail.com', adminHash, 'admin', 1]
+        ['Tamilselvi', 'tamilselvimariappan@gmail.com', adminHash, 'admin', 1]
       );
       await db.runAsync(`INSERT INTO users (name, email, password_hash, role, is_verified) VALUES (?, ?, ?, ?, ?)`, 
         ['Prayer Coordinator Barathi', 'moderator@agstc.org', modHash, 'moderator', 1]
@@ -244,12 +276,12 @@ async function seedDatabase() {
       if (!hasTamilAdmin) {
         const adminHash = bcrypt.hashSync('password123', 10);
         await db.runAsync(`INSERT INTO users (name, email, password_hash, role, is_verified) VALUES (?, ?, ?, ?, ?)`, 
-          ['Senior Pastor Tamilselvi', 'tamilselvimariappan@gmail.com', adminHash, 'admin', 1]
+          ['Tamilselvi', 'tamilselvimariappan@gmail.com', adminHash, 'admin', 1]
         );
         console.log('Admin tamilselvimariappan@gmail.com seeded successfully.');
       } else {
-        await db.runAsync(`UPDATE users SET role = 'admin', is_verified = 1 WHERE email = ?`, ['tamilselvimariappan@gmail.com']);
-        console.log('Admin role ensured for tamilselvimariappan@gmail.com.');
+        await db.runAsync(`UPDATE users SET name = 'Tamilselvi', role = 'admin', is_verified = 1 WHERE email = ?`, ['tamilselvimariappan@gmail.com']);
+        console.log('Admin role and name ensured for tamilselvimariappan@gmail.com.');
       }
       
       // Enforce demotion of the old administrative seed email
@@ -280,7 +312,7 @@ async function seedDatabase() {
     // 3. Seed Schedule (Reset and seed to ensure updates apply instantly on redeployment)
     await db.runAsync(`DELETE FROM schedule`);
     await db.runAsync(`INSERT INTO schedule (name, time, location, category, recurrence) VALUES (?, ?, ?, ?, ?)`,
-      ['Sunday First Service', '06:00 AM - 08:30 AM', 'St. Martin\'s Anglican Church, Sharjah', 'Main Worship', 'Weekly']
+      ['Sunday First Service', '06:45 AM - 08:30 AM', 'St. Martin\'s Anglican Church, Sharjah', 'Main Worship', 'Weekly']
     );
     await db.runAsync(`INSERT INTO schedule (name, time, location, category, recurrence) VALUES (?, ?, ?, ?, ?)`,
       ['Sunday Second Service', '09:00 AM - 10:45 AM', 'St. Martin\'s Anglican Church, Sharjah', 'Main Worship', 'Weekly']
@@ -295,7 +327,7 @@ async function seedDatabase() {
       ['Brothers & Sisters Meeting', '11:15 AM - 12:45 PM', 'St. Martin\'s Anglican Church, Sharjah', 'Fellowship', 'Monthly (2nd Sunday)']
     );
     await db.runAsync(`INSERT INTO schedule (name, time, location, category, recurrence) VALUES (?, ?, ?, ?, ?)`,
-      ['Thursday Midweek Service', '08:00 PM - 09:55 PM', 'St. Martin\'s Anglican Church, Sharjah', 'Prayer Meeting', 'Weekly']
+      ['Thursday Midweek Service', '08:30 PM - 10:00 PM', 'St. Martin\'s Anglican Church, Sharjah', 'Prayer Meeting', 'Weekly']
     );
     await db.runAsync(`INSERT INTO schedule (name, time, location, category, recurrence) VALUES (?, ?, ?, ?, ?)`,
       ['Saturday Fasting Prayer', '10:00 AM - 12:45 PM', 'St. Martin\'s Anglican Church, Sharjah', 'Prayer Meeting', 'Weekly']
@@ -308,7 +340,7 @@ async function seedDatabase() {
       const defaultMinistries = [
         {
           name: 'IT & Media Ministry',
-          description: 'Technical stewards orchestrating live streaming broadcasts, acoustics, video recording, and post-production logic to publish sermons on the YouTube channel.',
+          description: 'Managing our sound systems, live broadcasts, slide projections, website, and digital outreach to ensure the Gospel reaches beyond our physical walls.',
           leader: 'Bro. David Raj',
           schedule: 'Every service',
           category: 'Technical Support',
@@ -316,7 +348,7 @@ async function seedDatabase() {
         },
         {
           name: 'Children Ministry',
-          description: 'Nurturing the youngest children of the AGSTC church through structured Tamil Sunday School, scripture memorisation, and interactive bible lesson workshops.',
+          description: 'Guiding our children in the knowledge and love of Christ through engaging Bible lessons, action songs, and prayer. Sunday School meets every Friday evening.',
           leader: 'Sis. Rachel Grace',
           schedule: 'Sundays at 9:30 AM',
           category: 'Youth & Education',
@@ -332,7 +364,7 @@ async function seedDatabase() {
         },
         {
           name: 'Counselling Ministry',
-          description: 'Providing confidential, biblically sound advice and psychological encouragement for individuals, couples, and youths walking through various life storms.',
+          description: 'Confidential, Bible-centered pastoral guidance for individuals, couples, and families navigating life challenges, grief, or major decisions.',
           leader: 'Pastor Immanuel',
           schedule: 'By Appointment',
           category: 'Pastoral Care',
@@ -348,15 +380,15 @@ async function seedDatabase() {
         },
         {
           name: 'Mens Ministry',
-          description: 'Uniting brothers to grow as spiritual leaders in their homes, businesses, and the wider Sharjah community, featuring regular breakfasts and study workshops.',
-          leader: 'Bro. Paul Durai',
+          description: 'Empowering men to be godly leaders in their homes, workplaces, and the church through monthly prayer breakfasts and discipleship circles.',
+          leader: '',
           schedule: 'Last Saturday at 8:00 AM',
           category: 'Fellowship',
           image_url: '/images/banner14.jpg'
         },
         {
           name: 'Transport Ministry',
-          description: 'Providing dedicated bus shuttle routes completely free of cost across Sharjah and nearby centers, ensuring every member has safe, reliable transit to services.',
+          description: 'Coordinating safe, reliable transport for members attending services across Sharjah, Dubai, Ajman, and surrounding emirates.',
           leader: 'Bro. Stephen Raj',
           schedule: 'Every service transit',
           category: 'Logistics',
@@ -364,8 +396,8 @@ async function seedDatabase() {
         },
         {
           name: 'Women\'s Ministry',
-          description: 'Empowering sisters through intense prayer circles, home-to-home visitations, charitable outreach, and the weekly Tuesday Sisters Fellowship.',
-          leader: 'Sis. Mary Immanuel',
+          description: 'Encouraging women in prayer, fellowship, and compassionate outreach — building a community of mothers, sisters, and daughters rooted in the Word.',
+          leader: '',
           schedule: 'Tuesdays at 10:00 AM',
           category: 'Fellowship',
           image_url: '/images/banner20.jpg'
@@ -384,7 +416,7 @@ async function seedDatabase() {
     const servCount = await db.getAsync(`SELECT COUNT(*) as count FROM services`);
     if (servCount.count === 0) {
       await db.runAsync(`INSERT INTO services (title, description, youtube_video_id, category, duration, upload_date, preacher, view_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        ['15/2/26 | SUNDAY SERVICE | Worship: Bro.Durai | PERFECT PEACE : Asst.Past.Paulsamy', 'Sunday Service live recording from Assemblies of God Sharjah Tamil Church. Special message on Perfect Peace by Asst. Past. Paulsamy, with worship led by Bro. Durai.', 'H4gf7y5mvlM', 'Sunday Service', '2:15:30', '2026-02-15', 'Asst. Past. Paulsamy', 450]
+        ['August 16, 2026 | Sunday Service | Worship: Bro.Libin | Three Stages of Christian Freedom: Rev.Andrew', 'Sunday Service live recording from Assemblies of God Sharjah Tamil Church. Special message on Three Stages of Christian Freedom by Rev. Andrew, with worship led by Bro. Libin.', 'H4gf7y5mvlM', 'Sunday Service', '2:15:30', '2026-08-16', 'Rev. Andrew', 450]
       );
       await db.runAsync(`INSERT INTO services (title, description, youtube_video_id, category, duration, upload_date, preacher, view_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         ['12/02/26 | THURSDAY SERVICE | Worship: Bro. Babu | “Strength For a New Season”: Bro. Raskin', 'Thursday Service recording from Assemblies of God Sharjah Tamil Church. Bro. Raskin shares a powerful message on "Strength for a New Season". Worship led by Bro. Babu.', 'fBUkKrNagaE', 'Midweek Prayer', '1:48:15', '2026-02-12', 'Bro. Ruskin', 320]
@@ -411,7 +443,7 @@ async function seedDatabase() {
         ['25/12/25 | CHRISTMAS SPECIAL SERVICE | Worship: Choir | Message: Pastor Immanuel', 'Christmas Service live recording from Assembly of God Sharjah Tamil Church. Special message on Christ our Hope by Pastor Immanuel.', 'R9RCFux4S7A', 'Christmas Service', '2:30:15', '2025-12-25', 'Pastor Immanuel', 690]
       );
       await db.runAsync(`INSERT INTO services (title, description, youtube_video_id, category, duration, upload_date, preacher, view_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        ['21/12/25 | SUNDAY SERVICE | Worship: Bro. Babu | Message: Sis. Mary Immanuel', 'Sunday Tamil Worship. Special message on the Grace of God by Sis. Mary Immanuel. Worship led by Bro. Babu.', '_3Xy8ASnk3Y', 'Sunday Service', '2:02:40', '2025-12-21', 'Sis. Mary Immanuel', 315]
+        ['21/12/25 | SUNDAY SERVICE | Worship: Bro. Babu | Message: Pastor Immanuel', 'Sunday Tamil Worship. Special message on the Grace of God by Pastor Immanuel. Worship led by Bro. Babu.', '_3Xy8ASnk3Y', 'Sunday Service', '2:02:40', '2025-12-21', 'Pastor Immanuel', 315]
       );
       await db.runAsync(`INSERT INTO services (title, description, youtube_video_id, category, duration, upload_date, preacher, view_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         ['14/12/25 | SUNDAY SERVICE | Worship: Bro. William | Message: Rev. Andrew', 'Sunday Service message by Rev. Andrew. Worship led by Bro. William.', 'nNqM7otHQ1o', 'Sunday Service', '1:58:30', '2025-12-14', 'Rev. Andrew', 335]
@@ -461,8 +493,8 @@ async function seedDatabase() {
     if (blogCount.count === 0) {
       await db.runAsync(`INSERT INTO blog_devotionals (title, content, author, category, read_time_minutes) VALUES (?, ?, ?, ?, ?)`,
         [
-          'The Promise of Shaddai Security', 
-          '\"He who dwells in the secret place of the Most High shall abide under the shadow of the Almighty.\" (Psalm 91:1). In this transient world, especially as many of us live far from our native towns, the shadow of El Shaddai represents absolute protection. The shadow covers us from heat, protects us from spiritual attacks, and wraps us in comfort. Dwell in His presence today through heartfelt prayer, knowing your steps are secure.',
+          'The Security of El Shaddai', 
+          '“He who dwells in the secret place of the Most High shall abide under the shadow of the Almighty.” (Psalm 91:1). In this transient world — especially for those of us far from our native towns — the shadow of El Shaddai is our covering and our protection: shelter from the heat, defense against spiritual attack, comfort for the weary. Dwell in His presence today through heartfelt prayer, and rest in the knowledge that your steps are secure.',
           'Pastor Immanuel', 
           'Daily Promise', 
           4
@@ -471,7 +503,7 @@ async function seedDatabase() {
       await db.runAsync(`INSERT INTO blog_devotionals (title, content, author, category, read_time_minutes) VALUES (?, ?, ?, ?, ?)`,
         [
           'The Power of Intercession', 
-          'Standing in the gap for another is one of the highest priestly privileges a Christian has. Through the Jeremiah ministry, we have seen massive spiritual breakthroughs. When we lift others, our own burdens dissolve in the grace of Christ. Make it a goal to intercede for at least one sibling in faith today.',
+          'Standing in the gap for another is one of the highest privileges a Christian carries. Through the Jeremiah Ministry, we have witnessed real, lasting breakthroughs — and when we lift others in prayer, our own burdens grow lighter in the grace of Christ. Make it your goal today to intercede for at least one brother or sister in faith.',
           'Bro. Gunaseelan', 
           'Spiritual Growth', 
           3
@@ -501,60 +533,35 @@ async function seedDatabase() {
       console.log('Download resources seeded.');
     }
 
-    // Seed Events if empty
-    const eventCount = await db.getAsync(`SELECT COUNT(*) as count FROM events`);
-    if (eventCount.count === 0) {
-      await db.runAsync(`INSERT INTO events (title, description, date, time, location, image_url, capacity) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [
-          'Pentecost Power Meeting (பெந்தெகொஸ்தே வல்லமை கூடுகை)',
-          'An intense worship experience celebrating the outpouring of the Holy Spirit. Join us for a time of healing, deliverance, and spiritual re-firing. \n\nதூய ஆவியானவரின் அளவற்ற அபிஷேகத்தையும் வல்லமையையும் பெற்றுக்கொள்ளும் எழுப்புதல் மற்றும் விடுதலை கூடுகை. அனைவரும் கலந்து கொண்டு ஆசீர்வதிக்கப்படுங்கள்.',
-          '2026-05-31',
-          '06:30 PM - 09:30 PM',
-          'Sharjah Worship Center Hall A',
-          '/images/home-banner1.JPG',
-          120
-        ]
-      );
-      await db.runAsync(`INSERT INTO events (title, description, date, time, location, image_url, capacity) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [
-          'Family Blessing Seminar (குடும்ப ஆசீர்வாத கருத்தரங்கு)',
-          'A special seminar for couples and youth. Pastor Immanuel will share biblically grounded principles for fostering peaceful homes and strong marriages. \n\nதம்பதியர் மற்றும் வாலிபர்களுக்கான விசேஷ கருத்தரங்கு. சமாதானம் நிறைந்த குடும்பங்களையும் பலமான திருமண வாழ்க்கையையும் உருவாக்க போதகர் இம்மானுவேல் வேதப்பூர்வமான கருத்துக்களைப் பகிர்ந்து கொள்வார்.',
-          '2026-06-07',
-          '09:00 AM - 12:30 PM',
-          'Sharjah Worship Center Hall A',
-          '/images/pastor-immanuel.png',
-          80
-        ]
-      );
-      await db.runAsync(`INSERT INTO events (title, description, date, time, location, image_url, capacity) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [
-          'Jeremiah Fasting Prayer Crusade',
-          'A combined regional intercession assembly gathering intercessors across Sharjah and neighboring emirates to stand in the gap for our communities.',
-          '2026-06-12',
-          '08:00 PM - 10:30 PM',
-          'Main Sanctuary Hall B, Sharjah',
-          '/images/prayer.jpg',
-          150
-        ]
-      );
-      console.log('Default events seeded.');
-    }
+    // Seed Events: remove everything but the retreat, and seed/preserve only RETREAT 2026 with reduced description
+    try {
+      await db.runAsync(`DELETE FROM event_registrations WHERE event_id NOT IN (SELECT id FROM events WHERE title LIKE '%RETREAT 2026%')`);
+      await db.runAsync(`DELETE FROM events WHERE title NOT LIKE '%RETREAT 2026%'`);
 
-    // Explicitly guarantee RETREAT 2026 exists
-    const retreatExists = await db.getAsync(`SELECT id FROM events WHERE title LIKE '%RETREAT 2026%'`);
-    if (!retreatExists) {
-      await db.runAsync(`INSERT INTO events (title, description, date, time, location, image_url, capacity) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [
-          'RETREAT 2026 (ரிட்ரீட் 2026)',
-          'Join us for an inspiring and spiritually enriching \'RETREAT 2026\' at the elegant St. Mary\'s Hall (St. Martin\'s Anglican Church Campus, Yarmook). We are deeply privileged to have our beloved Senior Pastor Immanuel share an empowering and timely message centered on the foundational Christian family values. Guided by scriptural wisdom, this seminar is designed to cultivate, fortify, and bless the family altar with love, mutual respect, faith, and El Shaddai\'s enduring grace. A delicious take-away lunch will be provided. Come with an expectant heart to be transformed and uplifted! \n\nஎங்கள் அன்பான தலைமை போதகர் இம்மானுவேல் அவர்களால் நடத்தப்படும் \'ரிட்ரீட் 2026\' சிறப்பு ஆராதனையில் பங்குபெற உங்களை அன்போடு அழைக்கிறோம். ஒரு கிறிஸ்தவ குடும்பத்தின் அடிப்படை விழுமியங்கள், தெய்வீக அன்பு, விசுவாசம் மற்றும் கர்த்தருடைய ஆச்சரியமான கிருபையைப் பற்றிய ஒரு எழுப்புதல் செய்தி இக்கூட்டத்தில் வல்லமையோடு பகிர்ந்து கொள்ளப்படும். எடுத்துச் செல்லும் சுவையான மதிய உணவு வழங்கப்படும். உங்கள் குடும்பத்தோடு வந்து தேவ ஆசீர்வாதத்தைப் பெற்றுக்கொள்ளுங்கள்!',
-          '2026-05-27',
-          '9:00 AM - 1:00 PM',
-          'St. Mary\'s Hall, St. Martin\'s Anglican Church Campus, Yarmook',
-          '/images/retreat-2026-flyer.jpg',
-          450
-        ]
-      );
-      console.log('RETREAT 2026 event successfully seeded.');
+      const retreatExists = await db.getAsync(`SELECT id FROM events WHERE title LIKE '%RETREAT 2026%'`);
+      if (!retreatExists) {
+        await db.runAsync(`INSERT INTO events (title, description, date, time, location, image_url, capacity) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          [
+            'RETREAT 2026 (ரிட்ரீட் 2026)',
+            'Join us for our annual RETREAT 2026 at St. Mary\'s Hall, Yarmook. Our Senior Pastor Immanuel will share an inspiring message on Christian family values. Lunch will be provided. \n\nஎங்கள் தலைமை போதகர் இம்மானுவேல் அவர்களால் நடத்தப்படும் \'ரிட்ரீட் 2026\' சிறப்பு ஆராதனையில் பங்குபெற உங்களை அன்போடு அழைக்கிறோம். மதிய உணவு வழங்கப்படும்.',
+            '2026-05-27',
+            '9:00 AM - 1:00 PM',
+            'St. Mary\'s Hall, St. Martin\'s Anglican Church Campus, Yarmook',
+            '/images/retreat-2026-flyer.jpg',
+            450
+          ]
+        );
+        console.log('RETREAT 2026 event successfully seeded.');
+      } else {
+        // Update the description of existing retreat to the reduced version
+        await db.runAsync(
+          `UPDATE events SET description = ? WHERE title LIKE '%RETREAT 2026%'`,
+          ['Join us for our annual RETREAT 2026 at St. Mary\'s Hall, Yarmook. Our Senior Pastor Immanuel will share an inspiring message on Christian family values. Lunch will be provided. \n\nஎங்கள் தலைமை போதகர் இம்மானுவேல் அவர்களால் நடத்தப்படும் \'ரிட்ரீட் 2026\' சிறப்பு ஆராதனையில் பங்குபெற உங்களை அன்போடு அழைக்கிறோம். மதிய உணவு வழங்கப்படும்.']
+        );
+        console.log('RETREAT 2026 event description updated to reduced version.');
+      }
+    } catch (err) {
+      console.error('Error seeding/syncing events:', err);
     }
 
     // 9. Seed Dynamic About Us Content if empty
@@ -776,22 +783,36 @@ async function seedDatabase() {
     await db.runAsync(`DELETE FROM ministries WHERE name LIKE '%Ajman%' OR name LIKE '%Umm Al Quwain%' OR name LIKE '%UMM-AL-QUWAIN%'`);
     
     // 2. Rename Audio & Video Ministry to IT & Media Ministry bilingually
-    await db.runAsync(`UPDATE ministries SET name = 'IT & Media Ministry', description = 'Technical stewards orchestrating live streaming broadcasts, acoustics, video recording, and post-production logic to publish sermons on the YouTube channel.' WHERE name = 'Audio & Video Ministry'`);
+    await db.runAsync(`UPDATE ministries SET name = 'IT & Media Ministry', description = ? WHERE name = 'Audio & Video Ministry' OR name = 'IT & Media Ministry'`, ["Technical stewards managing live streaming, sound, video recording, and editing — so every service reaches those who couldn't be there in person."]);
     
-    // 3. Remove regional references from other ministry descriptions
-    await db.runAsync(`UPDATE ministries SET description = 'Providing dedicated bus shuttle routes completely free of cost across Sharjah and nearby centers, ensuring every member has safe, reliable transit to services.' WHERE name = 'Transport Ministry'`);
-    
+    // 3. Update ministry descriptions
+    await db.runAsync(`UPDATE ministries SET description = ? WHERE name LIKE '%Children%' OR name LIKE '%Sunday School%'`, ["Nurturing the youngest children of AGSTC through structured Scripture classes, Scripture memorization, and interactive Bible lesson workshops."]);
+    await db.runAsync(`UPDATE ministries SET description = ? WHERE name LIKE '%Counselling%' OR name LIKE '%Counseling%'`, ["Providing confidential, biblically grounded counsel and compassionate support for individuals, couples, and youth walking through life's storms."]);
+    await db.runAsync(`UPDATE ministries SET description = ? WHERE name LIKE '%Mens%' OR name LIKE '%Men%'`, ["Uniting brothers to grow as spiritual leaders in their homes, businesses, and the wider community, with regular monthly meetings."]);
+    await db.runAsync(`UPDATE ministries SET description = ? WHERE name LIKE '%Transport%'`, ["Providing dedicated bus shuttle routes, free of charge, across Sharjah, Ajman, Dubai and UAQ, ensuring every member has a safe, reliable way to reach our services."]);
+    await db.runAsync(`UPDATE ministries SET description = ? WHERE name LIKE '%Women%' OR name LIKE '%Sisters%'`, ["Empowering sisters through devoted prayer circles, charitable outreach, and our monthly Sisters Fellowship."]);
+
     // 4. Update Fasting Prayer and other events description regional mentions
-    await db.runAsync(`UPDATE events SET description = 'A combined regional intercession assembly gathering intercessors across Sharjah and neighboring emirates to stand in the gap for our communities.' WHERE title LIKE '%Jeremiah Fasting Prayer Crusade%'`);
+    await db.runAsync(`UPDATE events SET description = ? WHERE title LIKE '%Jeremiah Fasting Prayer Crusade%'`, ["A combined regional intercession assembly gathering intercessors across Sharjah and neighboring emirates to stand in the gap for our communities."]);
     
-    // 5. Update about content regional references and starting year
-    await db.runAsync(`UPDATE about_content SET en_val = 'Assemblies of God Sharjah Tamil Church (AGSTC) was founded with a divine burden to minister to the spiritual and social welfare of the Tamil expatriate workforce residing in Sharjah and neighboring emirates.', ta_val = 'ஏஜி ஷார்ஜா தமிழ் சபையானது (AGSTC) ஷார்ஜா மற்றும் அருகில் உள்ள எமிரேட்களில் வசிக்கும் தமிழ் உழைப்பாளர் மக்களின் ஆவிக்குரிய மற்றும் சமூக நலனுக்காக ஊழியங்களைச் செய்ய வேண்டும் என்ற தாளாத பாரத்தோடு துவங்கப்பட்டது.' WHERE \`key\` = 'aboutPara1'`);
-    await db.runAsync(`UPDATE about_content SET en_val = 'Established by grace as a spiritual refuge for Tamil families in the UAE since 1982.', ta_val = '1982 முதல் ஐக்கிய அரபு அமீரகத்தில் வாழும் தமிழ் குடும்பங்களின் ஆவிக்குரிய புகலிடமாக தேவ கிருபையால் நிறுவப்பட்டது.' WHERE \`key\` = 'aboutHeaderSub'`);
-    
+    // 5. Update devotionals
+    await db.runAsync(`UPDATE blog_devotionals SET title = 'The Security of El Shaddai', content = ? WHERE id = 1 OR title LIKE '%Shaddai%' OR title LIKE '%Security%'`, ["“He who dwells in the secret place of the Most High shall abide under the shadow of the Almighty.” (Psalm 91:1). In this transient world — especially for those of us far from our native towns — the shadow of El Shaddai is our covering and our protection: shelter from the heat, defense against spiritual attack, comfort for the weary. Dwell in His presence today through heartfelt prayer, and rest in the knowledge that your steps are secure."]);
+    await db.runAsync(`UPDATE blog_devotionals SET content = ? WHERE id = 2 OR title LIKE '%Intercession%'`, ["Standing in the gap for another is one of the highest privileges a Christian carries. Through the Jeremiah Ministry, we have witnessed real, lasting breakthroughs — and when we lift others in prayer, our own burdens grow lighter in the grace of Christ. Make it your goal today to intercede for at least one brother or sister in faith."]);
+
+    // 6. Update Services featured title and date to ensure top position
+    await db.runAsync(`UPDATE services SET title = 'August 16, 2026 | Sunday Service | Worship: Bro.Libin | Three Stages of Christian Freedom: Rev.Andrew', upload_date = '2026-08-16', preacher = 'Rev. Andrew' WHERE upload_date = (SELECT MAX(upload_date) FROM services) OR id = 1`);
+
+    // 7. Update about content regional references and starting year
+    await db.runAsync(`UPDATE about_content SET en_val = ? WHERE \`key\` = 'aboutPara1'`, ["Assembly of God Sharjah Tamil Church (AGSTC) was founded out of a God-given calling to care for the spiritual and social wellbeing of Tamil expatriates living and working in Sharjah and the neighbouring emirates."]);
+    await db.runAsync(`UPDATE about_content SET en_val = ? WHERE \`key\` = 'aboutPara2'`, ["What began as a small home cell meeting has grown, under the dedicated leadership of Pastor Immanuel, into a thriving church where hundreds of brothers and sisters gather every week. Our transport ministry carries that same spirit further still, bringing believers from remote labor camps into the fellowship of the church family."]);
+    await db.runAsync(`UPDATE about_content SET en_val = ? WHERE \`key\` = 'aboutHeaderSub'`, ["A spiritual home for Tamil families in the UAE, established by grace since 1982."]);
+    await db.runAsync(`UPDATE about_content SET en_val = ? WHERE \`key\` = 'heroSub2'`, ["Whatever you're carrying, you don't carry it alone. Our Jeremiah Ministry and sister circles hold you in prayer every day of the week — share your request in confidence, or with the whole church family, and let us stand with you."]);
+    await db.runAsync(`UPDATE about_content SET en_val = ? WHERE \`key\` = 'pastorMessageText'`, ["We welcome you, in the precious name of our Lord and Savior, Jesus Christ. By His amazing grace, He has made AG Sharjah Tamil Church a place of peace, comfort, and belonging — a spiritual home for His children living far from family and friends. God has blessed this church as an instrument to carry Christ's love to our community, and especially to our Tamil brothers and sisters here in the UAE. AGSTC exists to help each of us climb higher in our walk of faith: growing in the knowledge of Christ, walking closely with Him, and worshiping Him with an upright heart."]);
+
     const updatedMilestonesJson = JSON.stringify([
-      {"year": "1982", "titleEn": "Humble Beginnings", "titleTa": "எளிய ஆரம்பம்", "descEn": "Started as a weekly bilingually home fellowship in Sharjah, with a focus on supporting regional expatriate workers.", "descTa": "ஷார்ஜாவில் ஒரு எளிய இல்ல ஜேபக் கூட்டமாகத் தொடங்கப்பட்டு, தூரதேசத்தில் வாழும் உழைப்பாளர்களை ஆவிக்குரிய ரீதியில் ஆதரிப்பதை நோக்கமாகக் கொண்டு ஆரம்பிக்கப்பட்டது."},
+      {"year": "1982", "titleEn": "Humble Beginnings", "titleTa": "எளிய ஆரம்பம்", "descEn": "Started as a weekly bilingual home fellowship in Sharjah, with a focus on supporting regional expatriate workers.", "descTa": "ஷார்ஜாவில் ஒரு எளிய இல்ல ஜெபக் கூட்டமாகத் தொடங்கப்பட்டு, தூரதேசத்தில் வாழும் உழைப்பாளர்களை ஆவிக்குரிய ரீதியில் ஆதரிப்பதை நோக்கமாகக் கொண்டு ஆரம்பிக்கப்பட்டது."},
       {"year": "1986", "titleEn": "Regional Branch Network", "titleTa": "கிளை சபைகள் விரிவாக்கம்", "descEn": "Formally established regional cell fellowships to expand weekly home ministries across neighboring communities.", "descTa": "அண்டை பகுதிகளில் முறையான வாராந்திர வீட்டு ஐக்கியங்கள் மற்றும் ஜெபக் குழுக்கள் ஏற்படுத்தப்பட்டு ஊழியங்கள் விரிவுபடுத்தப்பட்டன."},
-      {"year": "1995", "titleEn": "Transport fleet launched", "titleTa": "போக்குவரத்து சேவை துவக்கம்", "descEn": "Launched our transport service by renting vans to fetch Tamil laborers completely free of charge from far-flung industrial camps.", "descTa": "தொழிலாளர்கள் எவ்வித சிரமமுமின்றி ஆராதனையில் கலந்து கொள்ள தூர முகாம்களில் இருந்து முற்றிலும் இலவசமாக அழைத்து வர வாடகை வேன்கள் மூலம் போக்குவரத்து சேவை தொடங்கப்பட்டது."}
+      {"year": "1995", "titleEn": "Transport fleet launched", "titleTa": "போக்குவரத்து சேவை துவக்கம்", "descEn": "Launched our transport service by renting vans to bring Tamil brothers, free of charge, from far-flung industrial camps.", "descTa": "தொழிலாளர்கள் எவ்வித சிரமமுமின்றி ஆராதனையில் கலந்து கொள்ள தூர முகாம்களில் இருந்து முற்றிலும் இலவசமாக அழைத்து வர வாடகை வேன்கள் மூலம் போக்குவரத்து சேவை தொடங்கப்பட்டது."}
     ]);
     await db.runAsync(`UPDATE about_content SET en_val = ?, ta_val = ? WHERE \`key\` = 'milestones'`, [updatedMilestonesJson, updatedMilestonesJson]);
     

@@ -273,7 +273,7 @@ const Events = () => {
           <p className="text-slate-400 text-xs sm:text-sm max-w-lg mx-auto mt-3 leading-relaxed">
             {language === 'ta' 
               ? 'எங்களோடு இணைந்து கர்த்தரை ஆராதித்து, அவருடைய மாறாத அன்பையும் கிருபையையும் உங்கள் வாழ்வில் அநுபவியுங்கள்.' 
-              : 'Join us in fellowship and worship, and experience the grace of God Shaddai in our regional gatherings.'}
+              : 'Join us in fellowship and worship, and experience the grace of El Shaddai in our gatherings across the region.'}
           </p>
         </div>
 

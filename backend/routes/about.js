@@ -54,11 +54,18 @@ router.put('/', authenticateToken, async (req, res) => {
       const en_val = en[key] || '';
       const ta_val = ta[key] || '';
 
-      await db.runAsync(
-        `INSERT INTO about_content (\`key\`, en_val, ta_val) VALUES (?, ?, ?)
-         ON DUPLICATE KEY UPDATE en_val = VALUES(en_val), ta_val = VALUES(ta_val)`,
-        [key, en_val, ta_val]
-      );
+      const exists = await db.getAsync('SELECT `key` FROM about_content WHERE `key` = ?', [key]);
+      if (exists) {
+        await db.runAsync(
+          'UPDATE about_content SET en_val = ?, ta_val = ? WHERE `key` = ?',
+          [en_val, ta_val, key]
+        );
+      } else {
+        await db.runAsync(
+          'INSERT INTO about_content (`key`, en_val, ta_val) VALUES (?, ?, ?)',
+          [key, en_val, ta_val]
+        );
+      }
     }
 
     res.json({ message: 'About us content updated successfully.' });
